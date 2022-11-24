@@ -24,7 +24,7 @@ void Tape::midiIn(MData &cmd) {
 //    }
 }
 
-void Tape::draw(NVGcontext *vg) {
+void Tape::draw(GFXcanvas1 * screen) {
 //    nvgCircle(vg, 50, 16, 10);
 //    nvgCircle(vg, 78, 16, 10);
 //

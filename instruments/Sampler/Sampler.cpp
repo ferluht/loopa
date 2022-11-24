@@ -115,7 +115,8 @@ void Sampler::processVoice(SamplerState *voiceState, float *outputBuffer, float 
     }
 }
 
-void Sampler::draw(NVGcontext *vg) {
-    nvgFontSize(vg, 10);
-    nvgText(vg, 2, 12, "SAMPLER", NULL);
+void Sampler::draw(GFXcanvas1 * screen) {
+    screen->setCursor(30, 6);
+    screen->setTextSize(1);
+    screen->print("SAMPLER");
 }

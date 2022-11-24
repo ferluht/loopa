@@ -14,8 +14,9 @@ class DummyInstrument : public AMG {
 public:
     DummyInstrument() = default;
 
-    void draw(NVGcontext * vg) override {
-        nvgFontSize(vg, 10);
-        nvgText(vg, 2, 12, "BYPASS INSTR", NULL);
+    void draw(GFXcanvas1 * screen) override {
+        screen->setCursor(30, 6);
+        screen->setTextSize(1);
+        screen->print("BYPASS INSTR");
     }
 };

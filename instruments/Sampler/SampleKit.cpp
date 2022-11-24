@@ -28,7 +28,8 @@ void SampleKit::addSample(const char *sample_name_, const char note) {
     activeChains.push_back(chain);
 }
 
-void SampleKit::draw(NVGcontext *vg) {
-    nvgFontSize(vg, 10);
-    nvgText(vg, 2, 12, "KIT", NULL);
+void SampleKit::draw(GFXcanvas1 * screen) {
+    screen->setCursor(20, 16);
+    screen->setTextSize(1);
+    screen->print("KIT");
 }

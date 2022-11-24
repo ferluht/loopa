@@ -11,9 +11,10 @@ class DummyMidi : public AMG {
 public:
     DummyMidi() = default;
 
-    void draw(NVGcontext * vg) override {
-        nvgFontSize(vg, 10);
-        nvgText(vg, 2, 12, "BYPASS MIDI", NULL);
+    void draw(GFXcanvas1 * screen) override {
+        screen->setCursor(30, 6);
+        screen->setTextSize(1);
+        screen->print("BYPASS MIDI");
     }
 };
 

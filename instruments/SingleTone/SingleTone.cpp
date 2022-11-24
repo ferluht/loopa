@@ -58,7 +58,8 @@ void SingleTone::processVoice(SingleToneVoiceState * voiceState, float *outputBu
     }
 }
 
-void SingleTone::draw(NVGcontext *vg) {
-    nvgFontSize(vg, 10);
-    nvgText(vg, 2, 12, "SINGLTN", NULL);
+void SingleTone::draw(GFXcanvas1 * screen) {
+    screen->setCursor(30, 6);
+    screen->setTextSize(1);
+    screen->print("SINGLETONE");
 }

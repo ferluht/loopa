@@ -12,7 +12,8 @@ void Scale::midiIn(MData &cmd) {
     }
 }
 
-void Scale::draw(NVGcontext *vg) {
-    nvgFontSize(vg, 10);
-    nvgText(vg, 2, 12, "SCALE: MXL", NULL);
+void Scale::draw(GFXcanvas1 * screen) {
+    screen->setCursor(20, 16);
+    screen->setTextSize(1);
+    screen->print("SCALE");
 }

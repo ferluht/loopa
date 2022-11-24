@@ -5,7 +5,7 @@
 #pragma once
 
 #include <cstdint>
-#include <nanovg/src/nanovg.h>
+#include <Adafruit-GFX-offscreen/Adafruit_GFX.h>
 
 class G {
 public:
@@ -14,5 +14,5 @@ public:
 
     }
 
-    virtual void draw(NVGcontext * vg) {}
+    virtual void draw(GFXcanvas1 * screen) {}
 };

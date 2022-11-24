@@ -3,6 +3,7 @@
 //
 
 #include "Daw.h"
+#include <Adafruit-GFX-offscreen/Fonts/Picopixel.h>
 #include <cmath>
 
 void DAW::midiIn(MData& cmd) {
@@ -40,8 +41,29 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
     }
 }
 
-void DAW::draw(NVGcontext *vg) {
-    focus_rack->draw(vg);
+void DAW::draw(GFXcanvas1 * screen) {
+    screen->drawFastVLine(24, 0, 32, 1);
+
+    screen->setFont(&Picopixel);
+    screen->setTextSize(1);
+
+//    screen->drawRect(70, 0, 10, 10, 1);
+    screen->setCursor(10, 4);
+    screen->print("M1");
+//    screen->drawRect(82, 0, 10, 10, 1);
+    screen->setCursor(10, 10);
+    screen->print("M2");
+//    screen->drawRect(94, 0, 10, 10, 1);
+    screen->setCursor(10, 17);
+    screen->print(" I");
+//    screen->drawRect(106, 0, 10, 10, 1);
+    screen->setCursor(10, 24);
+    screen->print("A1");
+//    screen->drawRect(118, 0, 10, 10, 1);
+    screen->setCursor(10, 31);
+    screen->print("A2");
+
+    focus_rack->draw(screen);
 }
 
 void DAW::SHandler(MData &cmd) {

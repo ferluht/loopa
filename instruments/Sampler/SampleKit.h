@@ -25,5 +25,5 @@ public:
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, double streamTime) override;
 
-    void draw(NVGcontext * vg) override;
+    void draw(GFXcanvas1 * screen) override;
 };

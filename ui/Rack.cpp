@@ -56,9 +56,9 @@ void Rack::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
     }
 }
 
-void Rack::draw(NVGcontext *vg) {
+void Rack::draw(GFXcanvas1 * screen) {
     if (focus_item != items.end())
-        (*focus_item)->draw(vg);
+        (*focus_item)->draw(screen);
 }
 
 void Rack::add(AMG *item) {

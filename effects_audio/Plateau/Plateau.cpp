@@ -17,7 +17,8 @@ void Plateau::process(float *outputBuffer, float * inputBuffer,
     }
 }
 
-void Plateau::draw(NVGcontext *vg) {
-    nvgFontSize(vg, 10);
-    nvgText(vg, 2, 12, "PLATEAU", NULL);
+void Plateau::draw(GFXcanvas1 * screen) {
+    screen->setCursor(20, 16);
+    screen->setTextSize(1);
+    screen->print("PLATEAU");
 }

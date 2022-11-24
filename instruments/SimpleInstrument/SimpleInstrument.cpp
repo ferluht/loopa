@@ -31,7 +31,8 @@ void SimpleInstrument::processVoice(SimpleInstrumentVoiceState * voiceState, flo
     }
 }
 
-void SimpleInstrument::draw(NVGcontext *vg) {
-    nvgFontSize(vg, 10);
-    nvgText(vg, 2, 12, "SIMP INST", NULL);
+void SimpleInstrument::draw(GFXcanvas1 * screen) {
+    screen->setCursor(30, 6);
+    screen->setTextSize(1);
+    screen->print("SIMP INST");
 }

@@ -56,7 +56,7 @@ public:
 
     void midiIn(MData& cmd) override;
 
-    void draw(NVGcontext * vg) override;
+    void draw(GFXcanvas1 * screen) override;
 
 private:
 

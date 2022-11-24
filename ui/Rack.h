@@ -27,7 +27,7 @@ public:
 
     void midiIn(MData& cmd) override;
 
-    void draw(NVGcontext * vg) override;
+    void draw(GFXcanvas1 * screen) override;
 
     void process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) override;
 
