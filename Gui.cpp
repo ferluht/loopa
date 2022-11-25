@@ -4,86 +4,84 @@
 
 #include "Gui.h"
 
+extern DAW * daw;
+
+class KbdScreen : public Screen {
+
+public:
+
+    KbdScreen(DAW * mdaw_) : Screen() {
+        mdaw = mdaw_;
+    }
+
+    bool keyboardEvent(int key, int scancode, int action, int modifiers) override {
+
+//        std::cout << key << " " << action << std::endl;
+
+        if (65 <= key && key <= 90) {
+            cmd.status = action ? NOTEON_HEADER : NOTEOFF_HEADER;
+            cmd.data1 = key;
+            cmd.data2 = action ? 100 : 0;
+            daw->midiIn(cmd);
+        } else if (key > 261) {
+            cmd.status = CC_HEADER;
+            cmd.data1 = S2;
+            cmd.data2 = 127;
+            daw->midiIn(cmd);
+            cmd.status = CC_HEADER;
+            cmd.data2 = action ? 100 : 0;
+            switch (key) {
+                case 262:
+                    cmd.data1 = K3;
+                    break;
+                case 263:
+                    cmd.data1 = K1;
+                    break;
+                case 264:
+                    cmd.data1 = K2;
+                    break;
+                case 265:
+                    cmd.data1 = K4;
+                    break;
+                default:
+                    break;
+            }
+            daw->midiIn(cmd);
+            cmd.status = CC_HEADER;
+            cmd.data1 = S2;
+            cmd.data2 = 0;
+            daw->midiIn(cmd);
+        } else {
+            return true;
+        }
+
+        daw->midiIn(cmd);
+    }
+
+private:
+    DAW * mdaw;
+    MData cmd;
+};
+
 #ifndef __APPLE__
     int fd;
     uint8_t uartbuffer[256];
     uint8_t uartit = 0;
 #else
-    Screen *nguiscreen = nullptr;
+    KbdScreen *nguiscreen = nullptr;
     GLFWwindow* window = nullptr;
 #endif
 
-class ImageCanvas : public nanogui::GLCanvas {
+class PixelDisplay : public nanogui::GLCanvas {
 public:
 
-    ImageCanvas(Widget *parent, GFXcanvas1 * screen) : nanogui::GLCanvas(parent) {
-        using namespace nanogui;
-        mScreen = screen;
-
-        mShader.init(
-                /* An identifying name */
-                "a_simple_shader",
-
-                /* Vertex shader */
-                "#version 330\n"
-                "uniform mat4 modelViewProj;\n"
-                "in vec3 position;\n"
-                "in vec3 color;\n"
-                "out vec4 frag_color;\n"
-                "void main() {\n"
-                "    frag_color = 3.0 * modelViewProj * vec4(color, 1.0);\n"
-                "    gl_Position = modelViewProj * vec4(position, 1.0);\n"
-                "}",
-
-                /* Fragment shader */
-                "#version 330\n"
-                "out vec4 color;\n"
-                "in vec4 frag_color;\n"
-                "void main() {\n"
-                "    color = frag_color;\n"
-                "}"
-        );
-
-        mShader.bind();
-    }
-
-    void drawGL() override {
-
-        mShader.bind();
-//        glEnable(GL_DEPTH_TEST);
-        /* Draw 12 triangles starting at index 0 */
-        glDrawPixels(10, 10, GL_RGBA, GL_UNSIGNED_BYTE, mScreen->getBuffer());
-//        glDisable(GL_DEPTH_TEST);
-//        glClear(GL_COLOR_BUFFER_BIT);
-//        glMatrixMode( GL_PROJECTION );
-//        glLoadIdentity();
-//        gluOrtho2D( 0.0, 500.0, 500.0,0.0 );
-//
-//        glBegin(GL_POINTS);
-//            glColor3f(1,1,1);
-//            glVertex2i(100,100);
-//        glEnd();
-//        glDrawPixels(10, 10, GL_RGBA, GL_UNSIGNED_BYTE, mScreen->getBuffer());
-
-//        glBindTexture(GL_TEXTURE_2D, mImageID);
-//        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 128, 32, GL_COLOR_INDEX, GL_BITMAP, (GLvoid*)mScreen->getBuffer());
-    }
-
-private:
-    nanogui::GLShader mShader;
-    GFXcanvas1 * mScreen;
-};
-
-class MyGLCanvas : public nanogui::GLCanvas {
-public:
-
-    MyGLCanvas(Widget *parent, GFXcanvas1 * screen) : nanogui::GLCanvas(parent) {
+    PixelDisplay(Widget *parent, GFXcanvas1 * screen, float pixsize, float pixratio) : nanogui::GLCanvas(parent) {
         mScreen = screen;
 
         indices = new MatrixXu(3, SCREEN_HEIGHT * SCREEN_WIDTH * 2);
         positions = new MatrixXf(3, SCREEN_HEIGHT * SCREEN_WIDTH * 4);
         colors = new MatrixXf(3, SCREEN_HEIGHT * SCREEN_WIDTH * 4);
-        float pixsize = 0.015;
+
         for (int i = 0; i < SCREEN_HEIGHT; i ++) {
             for (int j = 0; j < SCREEN_WIDTH; j ++) {
                 int n = i * SCREEN_WIDTH + j;
@@ -91,35 +89,35 @@ public:
                 indices->col( n * 2 + 1) << n * 4 + 3, n * 4 + 0, n * 4 + 2;
 
                 float pmx = pixsize * j;
-                float pmy = pixsize * i;
-                positions->col(n * 4 + 0) << - pmx + pixsize / 2 + SCREEN_WIDTH * pixsize / 2,  - pmy + pixsize / 2 + SCREEN_HEIGHT * pixsize / 2, 0;
-                positions->col(n * 4 + 1) << - pmx - pixsize / 2 + SCREEN_WIDTH * pixsize / 2,  - pmy + pixsize / 2 + SCREEN_HEIGHT * pixsize / 2, 0;
-                positions->col(n * 4 + 2) << - pmx - pixsize / 2 + SCREEN_WIDTH * pixsize / 2,  - pmy - pixsize / 2 + SCREEN_HEIGHT * pixsize / 2, 0;
-                positions->col(n * 4 + 3) << - pmx + pixsize / 2 + SCREEN_WIDTH * pixsize / 2,  - pmy - pixsize / 2 + SCREEN_HEIGHT * pixsize / 2, 0;
+                float pmy = pixsize * i * pixratio;
+                positions->col(n * 4 + 0) << pmx - pixsize / 2 - SCREEN_WIDTH * pixsize / 2,  - pmy + pixsize * pixratio / 2 + SCREEN_HEIGHT * pixsize * pixratio / 2, 0;
+                positions->col(n * 4 + 1) << pmx + pixsize / 2 - SCREEN_WIDTH * pixsize / 2,  - pmy + pixsize * pixratio / 2 + SCREEN_HEIGHT * pixsize * pixratio / 2, 0;
+                positions->col(n * 4 + 2) << pmx + pixsize / 2 - SCREEN_WIDTH * pixsize / 2,  - pmy - pixsize * pixratio / 2 + SCREEN_HEIGHT * pixsize * pixratio / 2, 0;
+                positions->col(n * 4 + 3) << pmx - pixsize / 2 - SCREEN_WIDTH * pixsize / 2,  - pmy - pixsize * pixratio / 2 + SCREEN_HEIGHT * pixsize * pixratio / 2, 0;
             }
         }
 
         mShader.init(
-                /* An identifying name */
-                "a_simple_shader",
+            /* An identifying name */
+            "a_simple_shader",
 
-                /* Vertex shader */
-                "#version 330\n"
-                "in vec3 position;\n"
-                "in vec3 color;\n"
-                "out vec4 frag_color;\n"
-                "void main() {\n"
-                "    frag_color = vec4(color, 1.0);\n"
-                "    gl_Position = vec4(position, 1.0);\n"
-                "}",
+            /* Vertex shader */
+            "#version 330\n"
+            "in vec3 position;\n"
+            "in vec3 color;\n"
+            "out vec4 frag_color;\n"
+            "void main() {\n"
+            "    frag_color = vec4(color, 1.0);\n"
+            "    gl_Position = vec4(position, 1.0);\n"
+            "}",
 
-                /* Fragment shader */
-                "#version 330\n"
-                "out vec4 color;\n"
-                "in vec4 frag_color;\n"
-                "void main() {\n"
-                "    color = frag_color;\n"
-                "}"
+            /* Fragment shader */
+            "#version 330\n"
+            "out vec4 color;\n"
+            "in vec4 frag_color;\n"
+            "void main() {\n"
+            "    color = frag_color;\n"
+            "}"
         );
 
         mShader.bind();
@@ -127,7 +125,7 @@ public:
         mShader.uploadAttrib("position", *positions);
     }
 
-    ~MyGLCanvas() {
+    ~PixelDisplay() {
         mShader.free();
     }
 
@@ -135,19 +133,16 @@ public:
 
         mShader.bind();
         for (int i = 0; i < SCREEN_HEIGHT; i++) {
-            for (int j = 0; j < SCREEN_WIDTH / 8; j++) {
-                for (int k = 0; k < 8; k++) {
-                    int n = i * (int)(SCREEN_WIDTH / 8) + j;
-                    int m = i * SCREEN_WIDTH + j * 8 + k;
+            for (int j = 0; j < SCREEN_WIDTH; j++) {
+                int n = i * SCREEN_WIDTH + j;
 
-                    int c = 0;
-                    if ((mScreen->getBuffer()[n] >> k) % 2) c = 250;
+                int c = 0;
+                if (mScreen->getPixel(j, i) > 0) c = 250;
 
-                    colors->col(m * 4 + 0) << c, c, c;
-                    colors->col(m * 4 + 1) << c, c, c;
-                    colors->col(m * 4 + 2) << c, c, c;
-                    colors->col(m * 4 + 3) << c, c, c;
-                }
+                colors->col(n * 4 + 0) << c, c, c;
+                colors->col(n * 4 + 1) << c, c, c;
+                colors->col(n * 4 + 2) << c, c, c;
+                colors->col(n * 4 + 3) << c, c, c;
             }
         }
 
@@ -195,7 +190,7 @@ void init_gui() {
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
     // Create a GLFWwindow object
-    window = glfwCreateWindow(800, 800, "rpidaw", nullptr, nullptr);
+    window = glfwCreateWindow(800, 400, "rpidaw emulator", nullptr, nullptr);
     if (window == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -206,7 +201,7 @@ void init_gui() {
     glClearColor(0.2f, 0.25f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    nguiscreen = new Screen();
+    nguiscreen = new KbdScreen(daw);
     nguiscreen->initialize(window, true);
 
     int width, height;
@@ -215,57 +210,31 @@ void init_gui() {
     glfwSwapInterval(0);
     glfwSwapBuffers(window);
 
-//    glDrawPixels(10, 10, GL_COLOR_INDEX, GL_BITMAP, screen->getBuffer());
+    PixelDisplay * dspl = nguiscreen->add<PixelDisplay>(screen, 0.016, 4);
+    dspl->setFixedSize(Eigen::Vector2i(400, 100));
+    dspl->setPosition(Eigen::Vector2i(50, 50));
 
-    enum test_enum {
-        Item1 = 0,
-        Item2,
-        Item3
-    };
+    Button * ctrl = nguiscreen->add<Button>();
+    ctrl->setFlags(Button::NormalButton);
+    ctrl->setFixedSize(Eigen::Vector2i(50, 50));
+    ctrl->setPosition(Eigen::Vector2i(50, 250));
+    ctrl->setCaption("ctrl");
+    ctrl->setCallback([ctrl]() {
+        MData cmd;
+        cmd.status = NOTEON_HEADER;
+        cmd.data1 = 70;
+        cmd.data2 = 100;
+        daw->midiIn(cmd);
+        SLEEP(5);
+        cmd.status = NOTEOFF_HEADER;
+        cmd.data1 = 70;
+        cmd.data2 = 0;
+        daw->midiIn(cmd);
+    });
 
-    bool bvar = true;
-    int ivar = 12345678;
-    double dvar = 3.1415926;
-    float fvar = (float)dvar;
-    std::string strval = "A string";
-    test_enum enumval = Item2;
-    nanogui::Color colval(0.5f, 0.5f, 0.7f, 1.f);
-
-    // Create nanogui gui
-    bool enabled = true;
-    FormHelper *gui = new FormHelper(nguiscreen);
-
-    ref<Window> nanoguiWindow = gui->addWindow(Eigen::Vector2i(10, 10), "Form helper example");
-
-    gui->addGroup("Basic types");
-    gui->addVariable("bool", bvar)->setTooltip("Test tooltip.");
-    gui->addVariable("string", strval);
-
-//    gui->addWidget("test", new ImageCanvas(nanoguiWindow, screen));
-    gui->addWidget("test", new MyGLCanvas(nanoguiWindow, screen));
-
-    gui->addGroup("Validating fields");
-    gui->addVariable("int", ivar)->setSpinnable(true);
-    gui->addVariable("float", fvar)->setTooltip("Test.");
-    gui->addVariable("double", dvar)->setSpinnable(true);
-
-    gui->addGroup("Complex types");
-    gui->addVariable("Enumeration", enumval, enabled)->setItems({ "Item 1", "Item 2", "Item 3" });
-    gui->addVariable("Color", colval)
-            ->setFinalCallback([](const Color &c) {
-                std::cout << "ColorPicker Final Callback: ["
-                          << c.r() << ", "
-                          << c.g() << ", "
-                          << c.b() << ", "
-                          << c.w() << "]" << std::endl;
-            });
-
-    gui->addGroup("Other widgets");
-    gui->addButton("A button", []() { std::cout << "Button pressed." << std::endl; })->setTooltip("Testing a much longer tooltip, that will wrap around to new lines multiple times.");;
 
     nguiscreen->setVisible(true);
     nguiscreen->performLayout();
-    nanoguiWindow->center();
 
     glfwSetCursorPosCallback(window,
                              [](GLFWwindow *, double x, double y) {
@@ -320,17 +289,43 @@ bool process_gui() {
     glClearColor(0.2f, 0.25f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Draw nanogui
     nguiscreen->drawContents();
     nguiscreen->drawWidgets();
 
     glfwSwapBuffers(window);
 #else
     for (int i = 0; i < 128*32/8; i ++) {
-                serialPutchar(fd, screen.getBuffer()[i]);
-            }
+        serialPutchar(fd, screen.getBuffer()[i]);
+    }
 #endif
     return true;
+}
+
+void scan_buttons() {
+#ifndef __APPLE__
+    while (serialDataAvail(fd) > 0) {
+        uartbuffer[uartit] = serialGetchar(fd);
+        if (uartbuffer[uartit] == '\n') {
+            MData cmd;
+            switch (uartbuffer[0]) {
+                case CC_HEADER:
+                case NOTEON_HEADER:
+                case NOTEOFF_HEADER:
+                    cmd.status = uartbuffer[0];
+                    cmd.data1 = uartbuffer[1];
+                    cmd.data2 = uartbuffer[2];
+                    daw->midiIn(cmd);
+                    break;
+                default:
+                    break;
+            }
+            uartit = 0;
+        } else {
+            uartit++;
+        }
+        if (uartit > 255) uartit = 0;
+    }
+#endif
 }
 
 void close_gui() {

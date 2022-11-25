@@ -13,7 +13,7 @@ void Scale::midiIn(MData &cmd) {
 }
 
 void Scale::draw(GFXcanvas1 * screen) {
-    screen->setCursor(20, 16);
+    screen->setCursor(30, 6);
     screen->setTextSize(1);
     screen->print("SCALE");
 }

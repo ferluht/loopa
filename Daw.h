@@ -10,7 +10,8 @@
 #include <AudioEffects.h>
 #include <MidiEffects.h>
 #include <Ui.h>
-
+#include <unistd.h>
+#include <chrono>
 
 #define S1 100
 #define S2 101
@@ -27,6 +28,8 @@
 #define P2 111
 #define P3 112
 #define P4 113
+
+#define SLEEP( milliseconds ) usleep( (unsigned long) (milliseconds * 1000.0) )
 
 class DAW : public AMG{
 

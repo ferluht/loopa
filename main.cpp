@@ -3,13 +3,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <signal.h>
-#include <unistd.h>
-#include <chrono>
 
 #include "Gui.h"
 #include "Daw.h"
-
-#define SLEEP( milliseconds ) usleep( (unsigned long) (milliseconds * 1000.0) )
 
 DAW * daw;
 extern GFXcanvas1 * screen;
@@ -41,45 +37,9 @@ int audiocallback( void *outputBuffer, void *inputBuffer, unsigned int nBufferFr
     if ( status )
         std::cout << "Stream underflow detected!" << std::endl;
 
-//    std::cout << nBufferFrames << std::endl;
-
-//    auto t1 = std::chrono::high_resolution_clock::now();
-
     float *outBufferFloat = (float *) outputBuffer;
     float *inBufferFloat = (float *) inputBuffer;
     daw->process(outBufferFloat, inBufferFloat, nBufferFrames, streamTime);
-//    if (outBufferFloat[0] > 0.01) std::cout << outBufferFloat[0] << std::endl;
-//    auto t2 = std::chrono::high_resolution_clock::now();
-//    std::chrono::duration<double, std::milli> ms_double = t2 - t1;
-//
-//    double newcpuusage = ms_double.count() / 10 / (256.f / SAMPLERATE);
-//    if (newcpuusage > cpuusage) cpuusage = newcpuusage;
-//    prevStreamTime = streamTime;
-
-#ifndef __APPLE__
-    while (serialDataAvail(fd) > 0) {
-        uartbuffer[uartit] = serialGetchar(fd);
-        if (uartbuffer[uartit] == '\n') {
-            MData cmd;
-            switch (uartbuffer[0]) {
-                case CC_HEADER:
-                case NOTEON_HEADER:
-                case NOTEOFF_HEADER:
-                    cmd.status = uartbuffer[0];
-                    cmd.data1 = uartbuffer[1];
-                    cmd.data2 = uartbuffer[2];
-                    daw->midiIn(cmd);
-                    break;
-                default:
-                    break;
-            }
-            uartit = 0;
-        } else {
-            uartit++;
-        }
-        if (uartit > 255) uartit = 0;
-    }
-#endif
 
     return 0;
 }
@@ -181,6 +141,8 @@ int main( int argc, char *argv[] )
             daw->draw(screen);
             if (!process_gui()) break;
         }
+
+        scan_buttons();
 
         it = (it + 1) % div;
         SLEEP(midi_refresh_time);

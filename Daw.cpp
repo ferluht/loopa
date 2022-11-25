@@ -42,6 +42,10 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
 }
 
 void DAW::draw(GFXcanvas1 * screen) {
+
+//    screen->drawCircle(64, 16, 10, 1);
+//    return;
+
     screen->drawFastVLine(24, 0, 32, 1);
 
     screen->setFont(&Picopixel);
@@ -158,7 +162,7 @@ Rack *DAW::spawnSingleTrack(int i, int j, int k) {
 
 Rack *DAW::spawnMidiRack() {
     Rack * midirack = new Rack(Rack::SELECTIVE);
-    midirack->add(new DummyMidi());
+//    midirack->add(new DummyMidi());
     midirack->add(new Scale());
     return midirack;
 }

@@ -22,6 +22,8 @@
     using namespace nanogui;
 #endif
 
+#include "Daw.h"
+
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
 
@@ -29,6 +31,7 @@
 
 void init_gui();
 bool process_gui();
+void scan_buttons();
 void close_gui();
 
 #endif //RPIDAW_GUI_H
