@@ -6,23 +6,13 @@
 #include <unistd.h>
 #include <chrono>
 
-#ifndef __APPLE__
-    #include <wiringSerial.h>
-#endif
-
+#include "Gui.h"
 #include "Daw.h"
-#include "Adafruit-GFX-offscreen/Adafruit_GFX.h"
 
 #define SLEEP( milliseconds ) usleep( (unsigned long) (milliseconds * 1000.0) )
 
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 32
-
-int fd;
-uint8_t uartbuffer[256];
-uint8_t uartit = 0;
 DAW * daw;
-GFXcanvas1 screen(SCREEN_WIDTH, SCREEN_HEIGHT);
+extern GFXcanvas1 * screen;
 
 void midiErrorCallback( RtMidiError::Type /*type*/, const std::string &errorText, void *) {
     std::cerr << "\nMidi Error: " << errorText << "\n\n";
@@ -114,19 +104,6 @@ bool checkMidi(RtMidiIn * midiin) {
     return true;
 }
 
-void draw() {
-
-    screen.fillScreen(0x00);
-
-    daw->draw(&screen);
-
-#ifndef __APPLE__
-    for (int i = 0; i < 128*32/8; i ++) {
-        serialPutchar(fd, screen.getBuffer()[i]);
-    }
-#endif
-}
-
 int main( int argc, char *argv[] )
 {
     unsigned int bufferFrames, fs = SAMPLERATE, device = 0, offset = 0;
@@ -171,12 +148,11 @@ int main( int argc, char *argv[] )
     options.flags = RTAUDIO_HOG_DEVICE;
     options.flags |= RTAUDIO_SCHEDULE_REALTIME;
 
-#ifndef __APPLE__
-    if((fd=serialOpen("/dev/ttyS0", 115200))<0){
-        fprintf(stderr,"Unable to open serial device: %s\n",strerror(errno));
-        return 1;
-    }
-#endif
+    init_gui();
+
+    int it = 0;
+    const int div = 50;
+    const int midi_refresh_time = 1;
 
     // An error in the openStream() function can be detected either by
     // checking for a non-zero return value OR by a subsequent call to
@@ -189,7 +165,6 @@ int main( int argc, char *argv[] )
 
     std::cout << "Stream latency = " << dac.getStreamLatency() << "\n" << std::endl;
 
-    // Stream is open ... now start it.
     if ( dac.startStream() ) {
         std::cout << dac.getErrorText() << std::endl;
         goto cleanup;
@@ -197,17 +172,21 @@ int main( int argc, char *argv[] )
 
     MData cmd;
 
-    std::srand(std::time(nullptr));
-
     while ( dac.isStreamRunning() == true ) {
         checkMidi(&midiin);
-        cmd.status = NOTEON_HEADER;
-        cmd.data1 = 60;
-        cmd.data2 = 100;
         daw->midiIn(cmd);
-        draw();
-        SLEEP(1500);
+
+        if (it == 0) {
+            screen->fillScreen(0x00);
+            daw->draw(screen);
+            if (!process_gui()) break;
+        }
+
+        it = (it + 1) % div;
+        SLEEP(midi_refresh_time);
     }
+
+    close_gui();
 
     cleanup:
     if ( dac.isStreamOpen() ) dac.closeStream();

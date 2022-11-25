@@ -9,6 +9,8 @@ set(BUILD_TESTING OFF)
 add_subdirectory(3rdparty/rtmidi)
 add_subdirectory(3rdparty/rtaudio)
 
+add_subdirectory(3rdparty/nanogui)
+
 FIND_LIBRARY(wiringPi NAMES wiringPi)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -21,6 +23,10 @@ include_directories(instruments)
 include_directories(ui)
 include_directories(utils)
 include_directories(3rdparty)
+include_directories(3rdparty/nanogui/include)
+include_directories(3rdparty/nanogui/ext/eigen)
+include_directories(3rdparty/nanogui/ext/glfw/include)
+include_directories(3rdparty/nanogui/ext/nanovg/src)
 
 set(LIBSAMPLERATE_TESTS OFF)
 set(LIBSAMPLERATE_EXAMPLES OFF)
@@ -56,13 +62,13 @@ add_executable(rpidaw
         utils/WavFile.cpp
         instruments/Sampler/Sampler.cpp
         instruments/Sampler/SampleKit.cpp
-        3rdparty/Adafruit-GFX-offscreen/Adafruit_GFX.cpp)
+        3rdparty/Adafruit-GFX-offscreen/Adafruit_GFX.cpp Gui.cpp Gui.h)
 
 set(CMAKE_CXX_FLAGS "-O3 -Wno-cpp") # -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wall -Wextra")
 #target_compile_options(rpidaw PRIVATE -Ofast)
 
 if (MACOSX)
-    target_link_libraries(rpidaw rtaudio rtmidi samplerate)
+    target_link_libraries(rpidaw rtaudio rtmidi samplerate nanogui)
 else()
     target_link_libraries(rpidaw rtaudio rtmidi samplerate wiringPi brcmEGL brcmGLESv2)
 endif()

@@ -165,7 +165,7 @@ Rack *DAW::spawnMidiRack() {
 
 Rack *DAW::spawnInstrumentRack() {
     Rack * instrument = new Rack(Rack::SELECTIVE);
-    instrument->add(new DummyInstrument());
+//    instrument->add(new DummyInstrument());
     instrument->add(new SingleTone());
     instrument->add(new Sampler("/home/pi/rpidaw_samples/Kick/Kick 909 1.wav"));
     instrument->add(new SimpleInstrument());
@@ -182,7 +182,7 @@ Rack *DAW::spawnInstrumentRack() {
 
 Rack *DAW::spawnEffectRack() {
     Rack * effects = new Rack(Rack::SELECTIVE);
-    effects->add(new DummyAudio());
+//    effects->add(new DummyAudio());
     effects->add(new Plateau());
     return effects;
 }

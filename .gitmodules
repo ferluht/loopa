@@ -13,3 +13,9 @@
 [submodule "3rdparty/rtmidi"]
 	path = 3rdparty/rtmidi
 	url = https://github.com/thestk/rtmidi
+[submodule "3rdparty/glfw"]
+	path = 3rdparty/glfw
+	url = https://github.com/glfw/glfw
+[submodule "3rdparty/nanogui"]
+	path = 3rdparty/nanogui
+	url = https://github.com/wjakob/nanogui

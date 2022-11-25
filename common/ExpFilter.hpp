@@ -1,7 +1,7 @@
 #pragma once
 #include "SampleDelay.hpp"
 
-#define depth 3
+#define _filter_depth 3
 
 class ExpFilter {
 
@@ -13,7 +13,7 @@ public:
     float coeffDel = 1 - coeffIn;
     float res = 0;
 
-    OneSampleDelay* delayArray[depth];
+    OneSampleDelay* delayArray[_filter_depth];
 
     float delayCounter = 0;
     float cv = 0;
@@ -24,7 +24,7 @@ public:
     float hp = 0;
 
   ExpFilter() {
-    for (int i = 0; i < depth; i++) {
+    for (int i = 0; i < _filter_depth; i++) {
       delayArray[i] = new OneSampleDelay();
     }
   }
@@ -36,24 +36,24 @@ public:
     coeffDel = 1 - coeffIn;
     out = 0;
 
-    delayArray[0]->in = in * coeffIn + delayArray[0]->out * coeffDel - delayArray[depth - 1]->out * res * coeffIn;
+    delayArray[0]->in = in * coeffIn + delayArray[0]->out * coeffDel - delayArray[_filter_depth - 1]->out * res * coeffIn;
     out = delayArray[0]->out;
-    for (int i = 1; i < depth; i++) {
+    for (int i = 1; i < _filter_depth; i++) {
       delayArray[i]->in = out * coeffIn + delayArray[i]->out * coeffDel;
       out = delayArray[i]->out;
     }
-    for (int i = 0; i < depth; i++) {
+    for (int i = 0; i < _filter_depth; i++) {
       delayArray[i]->process();
     }
 
     in = out;
-    delayArray[0]->in = in * coeffIn + delayArray[0]->out * coeffDel - delayArray[depth - 1]->out * res * coeffIn;
+    delayArray[0]->in = in * coeffIn + delayArray[0]->out * coeffDel - delayArray[_filter_depth - 1]->out * res * coeffIn;
     out = delayArray[0]->out;
-    for (int i = 1; i < depth; i++) {
+    for (int i = 1; i < _filter_depth; i++) {
       delayArray[i]->in = out * coeffIn + delayArray[i]->out * coeffDel;
       out = delayArray[i]->out;
     }
-    for (int i = 0; i < depth; i++) {
+    for (int i = 0; i < _filter_depth; i++) {
       delayArray[i]->process();
     }
   }
