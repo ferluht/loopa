@@ -98,3 +98,7 @@ void Rack::set_focus_by_index(int i) {
 AMG *Rack::get_focus() {
     return *focus_item;
 }
+
+int Rack::get_focus_index() {
+    return focus_item - items.begin();
+}

@@ -42,32 +42,57 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
 }
 
 void DAW::draw(GFXcanvas1 * screen) {
-
-//    screen->drawCircle(64, 16, 10, 1);
-//    return;
-
-    screen->drawFastVLine(24, 0, 32, 1);
+    screen->drawFastVLine(96, 0, 32, 1);
 
     screen->setFont(&Picopixel);
     screen->setTextSize(1);
 
-//    screen->drawRect(70, 0, 10, 10, 1);
-    screen->setCursor(10, 4);
-    screen->print("M1");
-//    screen->drawRect(82, 0, 10, 10, 1);
-    screen->setCursor(10, 10);
-    screen->print("M2");
-//    screen->drawRect(94, 0, 10, 10, 1);
-    screen->setCursor(10, 17);
-    screen->print(" I");
-//    screen->drawRect(106, 0, 10, 10, 1);
-    screen->setCursor(10, 24);
-    screen->print("A1");
-//    screen->drawRect(118, 0, 10, 10, 1);
-    screen->setCursor(10, 31);
-    screen->print("A2");
+    auto selected_track = (Rack*)(tracks->get_focus());
+    screen->setCursor(3, 6);
+    screen->setTextSize(1);
+    screen->print(selected_track->name);
 
-    focus_rack->draw(screen);
+    auto selected_stage = (Rack*)(selected_track->get_focus());
+    screen->setCursor(33, 6);
+    screen->setTextSize(1);
+    screen->print(selected_stage->name);
+
+    auto selected_fx = (Rack*)(selected_stage->get_focus());
+    screen->setCursor(65, 6);
+    screen->setTextSize(1);
+    screen->print(selected_fx->name);
+
+    if (focus_rack == tracks) {
+        screen->drawFastHLine(3, 8, 27, 1);
+    } else if (focus_rack == selected_track) {
+        screen->drawFastHLine(31, 8, 31, 1);
+    } else {
+        screen->drawFastHLine(63, 8, 30, 1);
+    }
+
+    screen->setCursor(100, 6);
+    screen->setTextSize(1);
+    screen->print(tapes->name);
+
+////    screen->drawRect(70, 0, 10, 10, 1);
+//    screen->setCursor(11, 4);
+//    screen->print("M1");
+////    screen->drawRect(82, 0, 10, 10, 1);
+//    screen->setCursor(11, 10);
+//    screen->print("M2");
+////    screen->drawRect(94, 0, 10, 10, 1);
+//    screen->setCursor(11, 17);
+//    screen->print(" I");
+////    screen->drawRect(106, 0, 10, 10, 1);
+//    screen->setCursor(11, 24);
+//    screen->print("A1");
+////    screen->drawRect(118, 0, 10, 10, 1);
+//    screen->setCursor(11, 31);
+//    screen->print("A2");
+
+//    focus_rack->
+
+//    focus_rack->draw(screen);
 }
 
 void DAW::SHandler(MData &cmd) {
@@ -91,15 +116,15 @@ void DAW::KHandler(MData &cmd) {
         switch (cmd.data1) {
             case K1:
                 focus_rack = focus_rack->dive_out();
-                std::cout << "dive out" << std::endl;
+                std::cout << "<-" << focus_rack->name << std::endl;
                 break;
             case K2:
                 focus_rack->dive_next();
-                std::cout << "dive next" << std::endl;
+                std::cout << "|" << focus_rack->get_focus()->name  << std::endl;
                 break;
             case K3:
                 focus_rack = focus_rack->dive_in();
-                std::cout << "dive in" << std::endl;
+                std::cout << "->" << focus_rack->name << std::endl;
                 break;
             default:
                 break;
@@ -112,24 +137,19 @@ void DAW::KHandler(MData &cmd) {
 
 
 Rack *DAW::spawnTracksRack(int n) {
-    Rack * tracks_ = new Rack(Rack::SELECTIVE);
-//    for (int i = 0; i < n; i ++) {
-//        auto tr = spawnSingleTrack();
-//        tr->attach(tracks_);
-//        tracks_->add(tr);
-//    }
+    Rack * tracks_ = new Rack("ARRANGEMENT",Rack::SELECTIVE);
 
-    auto tr = spawnSingleTrack(1, 2, 0);
+    auto tr = spawnSingleTrack("TRACK 0", 1, 2, 0);
     tr->attach(tracks_);
     tracks_->add(tr);
     tr->dive_next();
 
-    tr = spawnSingleTrack(1, 1, 1);
+    tr = spawnSingleTrack("TRACK 1",1, 1, 1);
     tr->attach(tracks_);
     tracks_->add(tr);
     tr->dive_next();
 
-    tr = spawnSingleTrack(1, 3, 1);
+    tr = spawnSingleTrack("TRACK 2",1, 3, 1);
     tr->attach(tracks_);
     tracks_->add(tr);
     tr->dive_next();
@@ -137,10 +157,10 @@ Rack *DAW::spawnTracksRack(int n) {
     return tracks_;
 }
 
-Rack *DAW::spawnSingleTrack() {spawnSingleTrack(0,0,0);}
+Rack *DAW::spawnSingleTrack() {spawnSingleTrack("TRACK",0,0,0);}
 
-Rack *DAW::spawnSingleTrack(int i, int j, int k) {
-    Rack * track = new Rack(Rack::SEQUENTIAL);
+Rack *DAW::spawnSingleTrack(const char * name, int i, int j, int k) {
+    Rack * track = new Rack(name, Rack::SEQUENTIAL);
 
     auto r = spawnMidiRack();
     r->attach(track);
@@ -161,15 +181,15 @@ Rack *DAW::spawnSingleTrack(int i, int j, int k) {
 }
 
 Rack *DAW::spawnMidiRack() {
-    Rack * midirack = new Rack(Rack::SELECTIVE);
-//    midirack->add(new DummyMidi());
+    Rack * midirack = new Rack("MIDI FX",Rack::SELECTIVE);
+    midirack->add(new DummyMidi());
     midirack->add(new Scale());
     return midirack;
 }
 
 Rack *DAW::spawnInstrumentRack() {
-    Rack * instrument = new Rack(Rack::SELECTIVE);
-//    instrument->add(new DummyInstrument());
+    Rack * instrument = new Rack("ENGINE", Rack::SELECTIVE);
+    instrument->add(new DummyInstrument());
     instrument->add(new SingleTone());
     instrument->add(new Sampler("/home/pi/rpidaw_samples/Kick/Kick 909 1.wav"));
     instrument->add(new SimpleInstrument());
@@ -185,14 +205,14 @@ Rack *DAW::spawnInstrumentRack() {
 }
 
 Rack *DAW::spawnEffectRack() {
-    Rack * effects = new Rack(Rack::SELECTIVE);
-//    effects->add(new DummyAudio());
+    Rack * effects = new Rack("AUDIO FX", Rack::SELECTIVE);
+    effects->add(new DummyAudio());
     effects->add(new Plateau());
     return effects;
 }
 
 Rack *DAW::spawnTapeRack(int n) {
-    Rack * tapes = new Rack(Rack::PARALLEL);
+    Rack * tapes = new Rack("TAPE",Rack::PARALLEL);
     for (int i = 0; i < n; i ++) {
         tapes->add(new Tape());
     }

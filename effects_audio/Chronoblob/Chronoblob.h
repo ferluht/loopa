@@ -5,11 +5,11 @@
 #pragma once
 
 #include "PingPong.hpp"
-#include <A.h>
+#include <AMG.h>
 
-class Chronoblob : public A{
+class Chronoblob : public AMG{
 public:
-    Chronoblob() : A() {
+    Chronoblob() : AMG("CHRNBLB") {
         pingpong = new PingPong();
         pingpong->sync = false;
         pingpong->mode = false;

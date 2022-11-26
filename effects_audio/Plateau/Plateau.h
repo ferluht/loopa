@@ -9,7 +9,7 @@
 
 class Plateau : public AMG{
 public:
-    Plateau() : AMG() {
+    Plateau() : AMG("PLATEAU") {
         dattorro = new Dattorro();
         dattorro->size = 0.95;
         dattorro->decay = 0.9;

@@ -12,7 +12,9 @@
 class DummyInstrument : public AMG {
 
 public:
-    DummyInstrument() = default;
+    DummyInstrument() : AMG("EMPTY") {
+
+    }
 
     void draw(GFXcanvas1 * screen) override {
         screen->setCursor(30, 6);

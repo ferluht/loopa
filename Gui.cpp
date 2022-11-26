@@ -22,12 +22,12 @@ public:
             cmd.status = action ? NOTEON_HEADER : NOTEOFF_HEADER;
             cmd.data1 = key;
             cmd.data2 = action ? 100 : 0;
-            daw->midiIn(cmd);
+            mdaw->midiIn(cmd);
         } else if (key > 261) {
             cmd.status = CC_HEADER;
             cmd.data1 = S2;
             cmd.data2 = 127;
-            daw->midiIn(cmd);
+            mdaw->midiIn(cmd);
             cmd.status = CC_HEADER;
             cmd.data2 = action ? 100 : 0;
             switch (key) {
@@ -46,11 +46,11 @@ public:
                 default:
                     break;
             }
-            daw->midiIn(cmd);
+            mdaw->midiIn(cmd);
             cmd.status = CC_HEADER;
             cmd.data1 = S2;
             cmd.data2 = 0;
-            daw->midiIn(cmd);
+            mdaw->midiIn(cmd);
         } else {
             return true;
         }

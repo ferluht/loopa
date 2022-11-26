@@ -37,7 +37,7 @@ public:
 
     DAW() : DAW(3, 4) {};
 
-    DAW (int n_tracks, int n_tapes) {
+    DAW (int n_tracks, int n_tapes) : AMG("DAW") {
         for (int i = 0; i < 128; i ++) {
             cc_states[i] = 0;
             cc_handlers[i] = nullptr;
@@ -66,7 +66,7 @@ private:
     static Rack * spawnTracksRack(int n);
     static Rack * spawnTapeRack(int n);
     static Rack * spawnSingleTrack();
-    static Rack * spawnSingleTrack(int i, int j, int k);
+    static Rack * spawnSingleTrack(const char * name, int i, int j, int k);
     static Rack * spawnMidiRack();
     static Rack * spawnInstrumentRack();
     static Rack * spawnEffectRack();

@@ -13,7 +13,9 @@
 class DummyAudio : public AMG {
 
 public:
-    DummyAudio() = default;
+    DummyAudio() : AMG("NO FX") {
+
+    }
 
     void draw(GFXcanvas1 * screen) override {
         screen->setCursor(30, 6);

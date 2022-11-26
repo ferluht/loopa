@@ -34,7 +34,7 @@ class SingleTone : public PolyInstrument<SingleToneVoiceState> {
 
 public:
 
-    SingleTone() : PolyInstrument<SingleToneVoiceState>() {
+    SingleTone() : PolyInstrument<SingleToneVoiceState>("SNGLTN") {
         set_voices(1);
     }
 

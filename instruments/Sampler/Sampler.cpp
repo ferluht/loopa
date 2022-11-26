@@ -4,7 +4,7 @@
 
 #include "Sampler.h"
 
-Sampler::Sampler(const char * sample_name_) {
+Sampler::Sampler(const char * sample_name_) : PolyInstrument<SamplerState>("SAMPLR") {
     sample_name = sample_name_;
 
     const_pitch = false;

@@ -9,7 +9,7 @@
 class Scale : public AMG {
 
 public:
-    Scale() {
+    Scale() : AMG("SCALE") {
 
     }
 

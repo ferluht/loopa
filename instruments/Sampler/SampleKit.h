@@ -14,7 +14,7 @@ class SampleKit : public AMG {
 
 public:
 
-    SampleKit() : AMG() {
+    SampleKit() : AMG("KIT") {
         for (int i = 0; i < 128; i ++) notes[i] = nullptr;
     }
 

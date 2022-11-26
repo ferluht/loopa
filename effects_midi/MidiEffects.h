@@ -9,7 +9,10 @@
 class DummyMidi : public AMG {
 
 public:
-    DummyMidi() = default;
+
+    DummyMidi() : AMG("NO FX") {
+
+    }
 
     void draw(GFXcanvas1 * screen) override {
         screen->setCursor(30, 6);

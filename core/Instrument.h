@@ -29,7 +29,12 @@ public:
     template <class VoiceState> friend class PolyInstrument;
 };
 
-class Instrument : public AMG {};
+class Instrument : public AMG {
+public:
+    Instrument(const char * name) : AMG(name) {
+
+    }
+};
 
 template <class TVoiceState>
 class PolyInstrument : public Instrument {
@@ -60,7 +65,7 @@ public:
     float pitch = 0;
     float pitch_distance = 12.0;
 
-    PolyInstrument() {
+    PolyInstrument(const char * name) : Instrument(name){
         pitch = 0;
         for (int i = 0; i < num_voices; i++) voices.push_back(new TVoiceState());
     }

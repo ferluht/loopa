@@ -16,7 +16,7 @@ public:
         SELECTIVE,
     };
 
-    Rack(RACKTYPE racktype_) {
+    Rack(const char * name, RACKTYPE racktype_) : AMG(name) {
         racktype = racktype_;
         focus_item = items.begin();
         if (racktype == PARALLEL) emptybuffer = new float[BUF_SIZE * 2];
@@ -37,9 +37,11 @@ public:
 
     Rack * dive_in();
     Rack * dive_out();
+    void dive_prev();
     void dive_next();
     void set_focus_by_index(int i);
     AMG * get_focus();
+    int get_focus_index();
 
 private:
 

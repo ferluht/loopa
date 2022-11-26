@@ -25,7 +25,7 @@ public:
 class SimpleInstrument : public PolyInstrument<SimpleInstrumentVoiceState> {
 public:
 
-    SimpleInstrument() : PolyInstrument<SimpleInstrumentVoiceState>() {
+    SimpleInstrument() : PolyInstrument<SimpleInstrumentVoiceState>("SIMP") {
 
     }
 
