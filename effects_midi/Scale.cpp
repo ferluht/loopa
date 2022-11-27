@@ -13,7 +13,7 @@ void Scale::midiIn(MData &cmd) {
 }
 
 void Scale::draw(GFXcanvas1 * screen) {
-    screen->setCursor(30, 6);
+    screen->setCursor(4, 16);
     screen->setTextSize(1);
-    screen->print("SCALE");
+    screen->print("C MIXOLYDIAN");
 }

@@ -14,13 +14,6 @@ class Tape : public AMG {
 
     float s_phase = 0;
 
-    enum LOOPER_STATE {
-        STOP,
-        PLAY,
-        REC,
-        OVERDUB
-    };
-
     int looper_state = STOP;
 
     bool waitingforsync = false;
@@ -38,6 +31,13 @@ class Tape : public AMG {
     uint8_t cc_code = 0;
 
 public:
+
+    enum TAPE_STATE {
+        STOP,
+        PLAY,
+        REC,
+        OVERDUB
+    };
 
     static const float looper_ratio;
 
@@ -127,4 +127,8 @@ public:
     void midiIn(MData &cmd) override;
 
     void draw(GFXcanvas1 * screen) override;
+
+    float getPosition();
+
+    int getState();
 };

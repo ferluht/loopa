@@ -13,22 +13,6 @@
 #include <unistd.h>
 #include <chrono>
 
-#define S1 100
-#define S2 101
-
-#define K1 60
-#define K2 61
-#define K3 62
-#define K4 63
-#define K5 64
-#define K6 65
-#define K7 66
-
-#define P1 110
-#define P2 111
-#define P3 112
-#define P4 113
-
 #define SLEEP( milliseconds ) usleep( (unsigned long) (milliseconds * 1000.0) )
 
 class DAW : public AMG{

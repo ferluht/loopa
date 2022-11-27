@@ -29,7 +29,7 @@ void SampleKit::addSample(const char *sample_name_, const char note) {
 }
 
 void SampleKit::draw(GFXcanvas1 * screen) {
-    screen->setCursor(30, 6);
+    screen->setCursor(4, 16);
     screen->setTextSize(1);
-    screen->print("KIT");
+    screen->print("D&B KIT");
 }

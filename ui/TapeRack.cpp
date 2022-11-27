@@ -5,18 +5,18 @@
 #include "TapeRack.h"
 
 void TapeRack::midiIn(MData &cmd) {
-    if (cmd.status == CC_HEADER && cmd.data1 >= 110 && cmd.data1 < 114 && cmd.data2 > 0) {
-        focus_tape = cmd.data1 - 110;
+    if (cmd.status == CC_HEADER && cmd.data1 >= P1 && cmd.data1 <= P4 && cmd.data2 > 0) {
+        focus_tape = cmd.data1 - P1;
         if (!cmdpressed) tapes[focus_tape]->trig();
         else tapes[focus_tape]->clear();
     }
 
     if (cmd.status == CC_HEADER) {
         switch (cmd.data1) {
-            case 100:
+            case S1:
                 cmdpressed = cmd.data2 > 0;
                 break;
-            case 101:
+            case S2:
                 shiftpressed = cmd.data2 > 0;
                 break;
             default:
@@ -79,4 +79,27 @@ void TapeRack::draw(GFXcanvas1 * screen) {
 //
 //    phase += 0.1;
 //    if (phase > M_PI * 2) phase = 0;
+
+
+    for (int i = 0; i < 4; i ++) {
+        screen->drawRect(111, 11 + 5 * i, 15, 4, 1);
+        float width = tapes[i]->getPosition() * 15;
+        if (width > 1)
+            screen->drawRect(111, 11 + 5 * i + 1, width, 2, 1);
+
+        switch (tapes[i]->getState()) {
+            case (Tape::TAPE_STATE::REC):
+            case (Tape::TAPE_STATE::OVERDUB):
+                screen->drawCircle(103, 11 + 5 * i + 1, 1, 1);
+                break;
+            case (Tape::TAPE_STATE::STOP):
+                screen->drawRect(98, 11 + 5 * i, 3, 3,1);
+                break;
+            case (Tape::TAPE_STATE::PLAY):
+                screen->drawTriangle(106, 11 + 5 * i, 106, 11 + 5 * i + 2, 109, 11 + 5 * i + 1,1);
+                break;
+            default:
+                break;
+        }
+    }
 }

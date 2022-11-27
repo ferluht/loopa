@@ -11,7 +11,7 @@ class TapeRack : public AMG {
 
 public:
 
-    TapeRack() : AMG("TAPE") {
+    TapeRack() : AMG("TAPES") {
         for (int i = 0; i < 4; i ++) tapes.push_back(new Tape());
         focus_tape = 0;
         phase = 0;

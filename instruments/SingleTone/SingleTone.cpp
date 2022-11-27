@@ -44,22 +44,22 @@ void SingleTone::processVoice(SingleToneVoiceState * voiceState, float *outputBu
 
         if (voiceState->adsr.end()) voiceState->disable();
 
-        voiceState->phase1 += getPhaseIncrement(voiceState->note + voiceState->glide);
+        voiceState->phase1 += getPhaseIncrement(voiceState->note - 12 + voiceState->glide);
         if (voiceState->phase1 > M_PI*2) voiceState->phase1 -= M_PI*2;
 
-        voiceState->phase2 += getPhaseIncrement(voiceState->note + 12 + voiceState->glide);
+        voiceState->phase2 += getPhaseIncrement(voiceState->note + voiceState->glide);
         if (voiceState->phase2 > M_PI*2) voiceState->phase2 -= M_PI*2;
 
         if (voiceState->glide * voiceState->glide_dir > 0)
             voiceState->glide += voiceState->glide_inc;
 
-        outputBuffer[i+0] = inputBuffer[i+0] + sample;
-        outputBuffer[i+1] = inputBuffer[i+1] + sample;
+        outputBuffer[i+0] = inputBuffer[i+0] + sample * 0.1;
+        outputBuffer[i+1] = inputBuffer[i+1] + sample * 0.1;
     }
 }
 
 void SingleTone::draw(GFXcanvas1 * screen) {
-    screen->setCursor(30, 6);
+    screen->setCursor(4, 16);
     screen->setTextSize(1);
     screen->print("SINGLETONE");
 }

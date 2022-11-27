@@ -23,7 +23,7 @@ public:
             cmd.data1 = key;
             cmd.data2 = action ? 100 : 0;
             mdaw->midiIn(cmd);
-        } else if (key > 261) {
+        } else if (key >= 262 && key <= 265) {
             cmd.status = CC_HEADER;
             cmd.data1 = S2;
             cmd.data2 = 127;
@@ -51,11 +51,19 @@ public:
             cmd.data1 = S2;
             cmd.data2 = 0;
             mdaw->midiIn(cmd);
+        } else if (key >= '1' && key <= '4') {
+            cmd.status = CC_HEADER;
+            cmd.data1 = P1 + key - '1';
+            cmd.data2 = action ? 127 : 0;
+            mdaw->midiIn(cmd);
+        } else if (key == 341) {
+            cmd.status = CC_HEADER;
+            cmd.data1 = S1;
+            cmd.data2 = action ? 127 : 0;
+            mdaw->midiIn(cmd);
         } else {
             return true;
         }
-
-        daw->midiIn(cmd);
     }
 
 private:
@@ -190,7 +198,7 @@ void init_gui() {
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
     // Create a GLFWwindow object
-    window = glfwCreateWindow(800, 400, "rpidaw emulator", nullptr, nullptr);
+    window = glfwCreateWindow(450, 150, "rpidaw emulator", nullptr, nullptr);
     if (window == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -212,25 +220,25 @@ void init_gui() {
 
     PixelDisplay * dspl = nguiscreen->add<PixelDisplay>(screen, 0.016, 4);
     dspl->setFixedSize(Eigen::Vector2i(400, 100));
-    dspl->setPosition(Eigen::Vector2i(50, 50));
+    dspl->setPosition(Eigen::Vector2i(25, 25));
 
-    Button * ctrl = nguiscreen->add<Button>();
-    ctrl->setFlags(Button::NormalButton);
-    ctrl->setFixedSize(Eigen::Vector2i(50, 50));
-    ctrl->setPosition(Eigen::Vector2i(50, 250));
-    ctrl->setCaption("ctrl");
-    ctrl->setCallback([ctrl]() {
-        MData cmd;
-        cmd.status = NOTEON_HEADER;
-        cmd.data1 = 70;
-        cmd.data2 = 100;
-        daw->midiIn(cmd);
-        SLEEP(5);
-        cmd.status = NOTEOFF_HEADER;
-        cmd.data1 = 70;
-        cmd.data2 = 0;
-        daw->midiIn(cmd);
-    });
+//    Button * ctrl = nguiscreen->add<Button>();
+//    ctrl->setFlags(Button::NormalButton);
+//    ctrl->setFixedSize(Eigen::Vector2i(50, 50));
+//    ctrl->setPosition(Eigen::Vector2i(50, 250));
+//    ctrl->setCaption("ctrl");
+//    ctrl->setCallback([ctrl]() {
+//        MData cmd;
+//        cmd.status = NOTEON_HEADER;
+//        cmd.data1 = 70;
+//        cmd.data2 = 100;
+//        daw->midiIn(cmd);
+//        SLEEP(5);
+//        cmd.status = NOTEOFF_HEADER;
+//        cmd.data1 = 70;
+//        cmd.data2 = 0;
+//        daw->midiIn(cmd);
+//    });
 
 
     nguiscreen->setVisible(true);

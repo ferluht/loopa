@@ -116,7 +116,7 @@ void Sampler::processVoice(SamplerState *voiceState, float *outputBuffer, float 
 }
 
 void Sampler::draw(GFXcanvas1 * screen) {
-    screen->setCursor(30, 6);
+    screen->setCursor(4, 16);
     screen->setTextSize(1);
-    screen->print("SAMPLER");
+    screen->print("909 KICK");
 }

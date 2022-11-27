@@ -56,3 +56,11 @@ void Tape::draw(GFXcanvas1 * screen) {
 //    phase += 0.1;
 //    if (phase > M_PI * 2) phase = 0;
 }
+
+float Tape::getPosition() {
+    return (float)position / (float)audio.size();
+}
+
+int Tape::getState() {
+    return looper_state;
+}

@@ -43,37 +43,40 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
 
 void DAW::draw(GFXcanvas1 * screen) {
     screen->drawFastVLine(96, 0, 32, 1);
+    screen->drawFastHLine(0, 8, 128, 1);
 
     screen->setFont(&Picopixel);
     screen->setTextSize(1);
 
     auto selected_track = (Rack*)(tracks->get_focus());
-    screen->setCursor(3, 6);
+    screen->setCursor(4, 6);
     screen->setTextSize(1);
     screen->print(selected_track->name);
 
     auto selected_stage = (Rack*)(selected_track->get_focus());
-    screen->setCursor(33, 6);
+    screen->setCursor(34, 6);
     screen->setTextSize(1);
     screen->print(selected_stage->name);
 
     auto selected_fx = (Rack*)(selected_stage->get_focus());
-    screen->setCursor(65, 6);
+    screen->setCursor(66, 6);
     screen->setTextSize(1);
     screen->print(selected_fx->name);
 
     if (focus_rack == tracks) {
-        screen->drawFastHLine(3, 8, 27, 1);
+        screen->drawFastHLine(0, 9, 32, 1);
     } else if (focus_rack == selected_track) {
-        screen->drawFastHLine(31, 8, 31, 1);
+        screen->drawFastHLine(32, 9, 32, 1);
     } else {
-        screen->drawFastHLine(63, 8, 30, 1);
+        screen->drawFastHLine(64, 9, 32, 1);
     }
 
-    screen->setCursor(100, 6);
+    screen->setCursor(101, 6);
     screen->setTextSize(1);
     screen->print(tapes->name);
 
+    focus_rack->draw(screen);
+    tapes->draw(screen);
 ////    screen->drawRect(70, 0, 10, 10, 1);
 //    screen->setCursor(11, 4);
 //    screen->print("M1");
@@ -120,11 +123,15 @@ void DAW::KHandler(MData &cmd) {
                 break;
             case K2:
                 focus_rack->dive_next();
-                std::cout << "|" << focus_rack->get_focus()->name  << std::endl;
+                std::cout << "|" << focus_rack->get_focus()->name << std::endl;
                 break;
             case K3:
                 focus_rack = focus_rack->dive_in();
                 std::cout << "->" << focus_rack->name << std::endl;
+                break;
+            case K4:
+                focus_rack->dive_prev();
+                std::cout << "|" << focus_rack->get_focus()->name << std::endl;
                 break;
             default:
                 break;
@@ -139,7 +146,7 @@ void DAW::KHandler(MData &cmd) {
 Rack *DAW::spawnTracksRack(int n) {
     Rack * tracks_ = new Rack("ARRANGEMENT",Rack::SELECTIVE);
 
-    auto tr = spawnSingleTrack("TRACK 0", 1, 2, 0);
+    auto tr = spawnSingleTrack("TRACK 0", 0, 4, 0);
     tr->attach(tracks_);
     tracks_->add(tr);
     tr->dive_next();
@@ -191,15 +198,15 @@ Rack *DAW::spawnInstrumentRack() {
     Rack * instrument = new Rack("ENGINE", Rack::SELECTIVE);
     instrument->add(new DummyInstrument());
     instrument->add(new SingleTone());
-    instrument->add(new Sampler("/home/pi/rpidaw_samples/Kick/Kick 909 1.wav"));
+    instrument->add(new Sampler("../res/samples/Kick/Kick 909 1.wav"));
     instrument->add(new SimpleInstrument());
 
     auto kit = new SampleKit();
-    kit->addSample("/home/pi/rpidaw_samples/Kick/Kick 909 1.wav", 60);
-    kit->addSample("/home/pi/rpidaw_samples/Kick/Kick 70sDnB 1.wav", 61);
-    kit->addSample("/home/pi/rpidaw_samples/Snare/Snare 808 1.wav", 62);
-    kit->addSample("/home/pi/rpidaw_samples/Snare/Snare 70sDnB 1.wav", 63);
-    kit->addSample("/home/pi/rpidaw_samples/HHClosed/ClosedHH 808.wav", 64);
+    kit->addSample("../res/samples/Kick/Kick 909 1.wav", 70);
+    kit->addSample("../res/samples/Kick/Kick 70sDnB 1.wav", 71);
+    kit->addSample("../res/samples/Snare/Snare 808 1.wav", 72);
+    kit->addSample("../res/samples/Snare/Snare 70sDnB 1.wav", 73);
+    kit->addSample("../res/samples/HHClosed/ClosedHH 808.wav", 74);
     instrument->add(kit);
     return instrument;
 }
@@ -212,7 +219,7 @@ Rack *DAW::spawnEffectRack() {
 }
 
 Rack *DAW::spawnTapeRack(int n) {
-    Rack * tapes = new Rack("TAPE",Rack::PARALLEL);
+    Rack * tapes = new Rack("TAPES",Rack::PARALLEL);
     for (int i = 0; i < n; i ++) {
         tapes->add(new Tape());
     }

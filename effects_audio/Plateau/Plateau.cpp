@@ -18,7 +18,7 @@ void Plateau::process(float *outputBuffer, float * inputBuffer,
 }
 
 void Plateau::draw(GFXcanvas1 * screen) {
-    screen->setCursor(30, 6);
+    screen->setCursor(4, 18);
     screen->setTextSize(1);
-    screen->print("PLATEAU");
+    screen->print("SZ:0.95 | DC:0.9 | D/W:0.5");
 }
