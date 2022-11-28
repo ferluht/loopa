@@ -7,16 +7,17 @@
 #include "A.h"
 #include "M.h"
 #include "G.h"
+#include <cstring>
 
 class AMG : public A, public M, public G {
 public:
     char name[50];
 
     AMG() {
-        strcpy(name, "name");
+        std::strcpy(name, "name");
     }
 
     AMG(const char * name_) : A(), M(), G() {
-        strcpy(name, name_);
+        std::strcpy(name, name_);
     }
 };

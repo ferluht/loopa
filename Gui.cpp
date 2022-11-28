@@ -6,6 +6,14 @@
 
 extern DAW * daw;
 
+#ifndef __APPLE__
+int fd;
+uint8_t uartbuffer[256];
+uint8_t uartit = 0;
+#else
+KbdScreen *nguiscreen = nullptr;
+GLFWwindow* window = nullptr;
+
 class KbdScreen : public Screen {
 
 public:
@@ -71,14 +79,6 @@ private:
     MData cmd;
 };
 
-#ifndef __APPLE__
-    int fd;
-    uint8_t uartbuffer[256];
-    uint8_t uartit = 0;
-#else
-    KbdScreen *nguiscreen = nullptr;
-    GLFWwindow* window = nullptr;
-#endif
 
 class PixelDisplay : public nanogui::GLCanvas {
 public:
@@ -168,7 +168,7 @@ private:
     MatrixXf * colors;
     GFXcanvas1 * mScreen;
 };
-
+#endif
 
 GFXcanvas1 * screen = new GFXcanvas1(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -176,7 +176,7 @@ void init_gui() {
 #ifndef __APPLE__
     if((fd=serialOpen("/dev/ttyS0", 115200))<0){
         fprintf(stderr,"Unable to open serial device: %s\n",strerror(errno));
-        return 1;
+        return;
     }
 #else
     glfwInit();
@@ -303,7 +303,7 @@ bool process_gui() {
     glfwSwapBuffers(window);
 #else
     for (int i = 0; i < 128*32/8; i ++) {
-        serialPutchar(fd, screen.getBuffer()[i]);
+        serialPutchar(fd, screen->getBuffer()[i]);
     }
 #endif
     return true;

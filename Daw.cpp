@@ -146,7 +146,7 @@ void DAW::KHandler(MData &cmd) {
 Rack *DAW::spawnTracksRack(int n) {
     Rack * tracks_ = new Rack("ARRANGEMENT",Rack::SELECTIVE);
 
-    auto tr = spawnSingleTrack("TRACK 0", 0, 4, 0);
+    auto tr = spawnSingleTrack("TRACK 0", 1, 4, 0);
     tr->attach(tracks_);
     tracks_->add(tr);
     tr->dive_next();
@@ -202,11 +202,11 @@ Rack *DAW::spawnInstrumentRack() {
     instrument->add(new SimpleInstrument());
 
     auto kit = new SampleKit();
-    kit->addSample("../res/samples/Kick/Kick 909 1.wav", 70);
-    kit->addSample("../res/samples/Kick/Kick 70sDnB 1.wav", 71);
-    kit->addSample("../res/samples/Snare/Snare 808 1.wav", 72);
-    kit->addSample("../res/samples/Snare/Snare 70sDnB 1.wav", 73);
-    kit->addSample("../res/samples/HHClosed/ClosedHH 808.wav", 74);
+    kit->addSample("../res/samples/Kick/Kick 909 1.wav", 60);
+    kit->addSample("../res/samples/Kick/Kick 70sDnB 1.wav", 61);
+    kit->addSample("../res/samples/Snare/Snare 808 1.wav", 62);
+    kit->addSample("../res/samples/Snare/Snare 70sDnB 1.wav", 63);
+    kit->addSample("../res/samples/HHClosed/ClosedHH 808.wav", 64);
     instrument->add(kit);
     return instrument;
 }

@@ -2,8 +2,9 @@
 // Created by ferluht on 25/11/2022.
 //
 
-#ifndef RPIDAW_GUI_H
-#define RPIDAW_GUI_H
+#pragma once
+
+#include <stdint.h>
 
 #ifdef __APPLE__
     #define GLFW_INCLUDE_GLCOREARB
@@ -12,9 +13,7 @@
 #endif
 
 #ifndef __APPLE__
-    int fd;
-    uint8_t uartbuffer[256];
-    uint8_t uartit = 0;
+    #include <wiringSerial.h>
 #else
     #define GLFW_INCLUDE_GLU
     #include <GLFW/glfw3.h>
@@ -34,4 +33,3 @@ bool process_gui();
 void scan_buttons();
 void close_gui();
 
-#endif //RPIDAW_GUI_H

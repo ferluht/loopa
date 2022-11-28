@@ -5,13 +5,16 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MACOSX TRUE)
 endif()
 
-set(BUILD_TESTING OFF)
-add_subdirectory(3rdparty/rtmidi)
-add_subdirectory(3rdparty/rtaudio)
-
-add_subdirectory(3rdparty/nanogui)
-
-FIND_LIBRARY(wiringPi NAMES wiringPi)
+if (MACOSX)
+    set(BUILD_TESTING OFF)
+    add_subdirectory(3rdparty/rtmidi)
+    add_subdirectory(3rdparty/rtaudio)
+    add_subdirectory(3rdparty/nanogui)
+else()
+    FIND_LIBRARY(rtaudio NAMES RtAudio)
+    FIND_LIBRARY(rtmidi NAMES RtMidi)
+    FIND_LIBRARY(wiringPi NAMES wiringPi)
+endif()
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -32,6 +35,11 @@ set(LIBSAMPLERATE_TESTS OFF)
 set(LIBSAMPLERATE_EXAMPLES OFF)
 set(LIBSAMPLERATE_INSTALL OFF)
 add_subdirectory(3rdparty/libsamplerate)
+
+if(NOT MACOS)
+include_directories(/opt/vc/include)
+link_directories(/opt/vc/lib)
+endif()
 
 #include_directories(/opt/vc/include)
 #link_directories(/opt/vc/lib)
@@ -55,14 +63,15 @@ add_executable(rpidaw
         effects_audio/Tape/Tape.cpp
         common/Utils.cpp
         instruments/SingleTone/SingleTone.cpp
-        3rdparty/nanovg/src/nanovg.c
+#        3rdparty/nanovg/src/nanovg.c
         effects_midi/Scale.cpp
         ui/Rack.cpp
         ui/TapeRack.cpp
         utils/WavFile.cpp
         instruments/Sampler/Sampler.cpp
         instruments/Sampler/SampleKit.cpp
-        3rdparty/Adafruit-GFX-offscreen/Adafruit_GFX.cpp Gui.cpp Gui.h)
+        3rdparty/Adafruit-GFX-offscreen/Adafruit_GFX.cpp
+        Gui.cpp)
 
 set(CMAKE_CXX_FLAGS "-O3 -Wno-cpp") # -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wall -Wextra")
 #target_compile_options(rpidaw PRIVATE -Ofast)
@@ -70,5 +79,5 @@ set(CMAKE_CXX_FLAGS "-O3 -Wno-cpp") # -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=h
 if (MACOSX)
     target_link_libraries(rpidaw rtaudio rtmidi samplerate nanogui)
 else()
-    target_link_libraries(rpidaw rtaudio rtmidi samplerate wiringPi brcmEGL brcmGLESv2)
+    target_link_libraries(rpidaw rtaudio rtmidi samplerate wiringPi)
 endif()
