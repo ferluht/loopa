@@ -24,7 +24,7 @@ void midicallback( double deltatime, std::vector< unsigned char > *message, void
     unsigned int nBytes = message->size();
     if (nBytes == 3) {
         MData cmd;
-        cmd.status = message->at(0);
+        cmd.status = message->at(0) & 0xF0;
         cmd.data1 = message->at(1);
         cmd.data2 = message->at(2);
         daw->midiIn(cmd);
@@ -67,7 +67,7 @@ bool checkMidi(RtMidiIn * midiin) {
 int main( int argc, char *argv[] )
 {
     unsigned int bufferFrames, fs = SAMPLERATE, device = 0, offset = 0;
-    daw = new DAW();
+    daw = new DAW(screen);
 
     RtMidiIn midiin;
     midiin.setErrorCallback(&midiErrorCallback);
@@ -130,20 +130,15 @@ int main( int argc, char *argv[] )
         goto cleanup;
     }
 
-    MData cmd;
-
     while ( dac.isStreamRunning() == true ) {
-        checkMidi(&midiin);
-        daw->midiIn(cmd);
 
         if (it == 0) {
+            checkMidi(&midiin);
             screen->fillScreen(0x00);
             daw->draw(screen);
             if (!process_gui()) break;
         }
-
         scan_buttons();
-
         it = (it + 1) % div;
         SLEEP(midi_refresh_time);
     }

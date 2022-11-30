@@ -12,7 +12,14 @@
 
 class Tape : public AMG {
 
+    const int TAPE_MAX_MINUTES = 6;
+
     float s_phase = 0;
+
+    unsigned int doubling_progress = 0;
+    unsigned int doubling_size = 0;
+    const unsigned int max_doubling_stepsize = 8192;
+    const unsigned int max_loop_size = TAPE_MAX_MINUTES*60*SAMPLERATE;
 
     int looper_state = STOP;
 
@@ -28,8 +35,6 @@ class Tape : public AMG {
 
     bool monitoring = true;
 
-    uint8_t cc_code = 0;
-
 public:
 
     enum TAPE_STATE {
@@ -41,43 +46,62 @@ public:
 
     static const float looper_ratio;
 
-    Tape() : Tape(110) {};
+    Tape() : Tape(110) {
+        audio.reserve(max_loop_size);
+    };
 
     Tape(uint8_t cc_code) : AMG() {
-        this->cc_code = cc_code;
         clear();
     }
 
-    void trig() {
+    MIDISTATUS trig() {
         switch (looper_state) {
             case STOP:
-                looper_state = REC;
-                std::cout << "Looper: REC" << std::endl;
+                if (audio.size() > 0)
+                    looper_state = PLAY;
+                else
+                    looper_state = REC;
                 break;
             case REC:
                 looper_state = OVERDUB;
-                std::cout << "Looper: OVERDUB" << std::endl;
                 break;
             case OVERDUB:
                 looper_state = PLAY;
-                std::cout << "Looper: PLAY" << std::endl;
                 break;
             case PLAY:
                 looper_state = OVERDUB;
-                std::cout << "Looper: OVERDUB" << std::endl;
                 break;
             default:
                 break;
         }
+        return MIDISTATUS::DONE;
     }
 
-    void clear() {
+    MIDISTATUS clear() {
         looper_state = STOP;
         audio.clear();
         position = 0;
         avg = 0;
         avg_env = 0;
-        std::cout << "Looper: CLEAR" << std::endl;
+        return MIDISTATUS::DONE;
+    }
+
+    MIDISTATUS double_loop() {
+        if (doubling_progress == 0)
+            doubling_size = audio.size();
+        if (doubling_size * 2 > max_loop_size) {
+            return MIDISTATUS::DONE;
+        }
+        auto beg = audio.begin() + doubling_progress;
+        unsigned int step_size = std::min(doubling_size - doubling_progress, max_doubling_stepsize);
+        auto end = beg + step_size;
+        std::copy(beg, end, std::back_inserter(audio));
+        doubling_progress += step_size;
+        if (doubling_progress == doubling_size) {
+            doubling_progress = 0;
+            return MIDISTATUS::DONE;
+        }
+        return MIDISTATUS::WAITING;
     }
 
     inline float envelope(float sample, float w, float w_env) {
@@ -123,8 +147,7 @@ public:
         }
     }
 
-
-    void midiIn(MData &cmd) override;
+    MIDISTATUS midiIn(MData &cmd) override;
 
     void draw(GFXcanvas1 * screen) override;
 

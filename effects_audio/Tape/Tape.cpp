@@ -4,24 +4,33 @@
 
 #include "Tape.h"
 
-void Tape::midiIn(MData &cmd) {
-//    if (cmd.status == CC_HEADER && cmd.data1 == cc_code && cmd.data2 > 0) {
-//        trig();
-//        else tapes[focus_tape]->clear();
-//    }
-//
-//    if (cmd.status == CC_HEADER) {
-//        switch (cmd.data1) {
-//            case 100:
-//                cmdpressed = cmd.data2 > 0;
-//                break;
-//            case 101:
-//                shiftpressed = cmd.data2 > 0;
-//                break;
-//            default:
-//                break;
-//        }
-//    }
+MIDISTATUS Tape::midiIn(MData &cmd) {
+    MIDISTATUS ret = MIDISTATUS::DONE;
+    if (cmd.status == CC_HEADER &&
+        cmd.data1 > MIDICC::TAPE &&
+        cmd.data1 < MIDICC::TAPE_END &&
+        cmd.data2 > 0) {
+
+        switch (cmd.data1) {
+            case MIDICC::TAPE_TRIG:
+                ret = trig();
+                break;
+            case MIDICC::TAPE_CLEAR:
+                ret = clear();
+                break;
+            case MIDICC::TAPE_DOUBLE:
+                ret = double_loop();
+                break;
+            case MIDICC::TAPE_STOP:
+                looper_state = STOP;
+                position = 0;
+                ret = MIDISTATUS::DONE;
+                break;
+            default:
+                break;
+        }
+    }
+    return ret;
 }
 
 void Tape::draw(GFXcanvas1 * screen) {

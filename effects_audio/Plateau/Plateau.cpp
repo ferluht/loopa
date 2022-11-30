@@ -12,13 +12,22 @@ void Plateau::process(float *outputBuffer, float * inputBuffer,
 
         dattorro->process();
 
-        outputBuffer[i+0] = dattorro->leftOut * 0.5 + inputBuffer[i+0] * 0.5;
-        outputBuffer[i+1] = dattorro->rightOut * 0.5 + inputBuffer[i+1] * 0.5;
+        outputBuffer[i+0] = dattorro->leftOut * (1 - dry) + inputBuffer[i+0] * dry;
+        outputBuffer[i+1] = dattorro->rightOut * (1 - dry) + inputBuffer[i+1] * dry;
     }
 }
 
+MIDISTATUS Plateau::midiIn(MData &cmd) {
+    if (cmd.status == CC_HEADER && cmd.data1 == CC_E1) {
+        dry = (float)cmd.data2 / 127.0;
+    }
+    return MIDISTATUS::DONE;
+}
+
 void Plateau::draw(GFXcanvas1 * screen) {
-    screen->setCursor(4, 18);
+    screen->setCursor(4, 16);
     screen->setTextSize(1);
-    screen->print("SZ:0.95 | DC:0.9 | D/W:0.5");
+    char output[50];
+    sprintf(output, "SZ:0.95 | DC:0.9 | D/W:%.2f", dry);
+    screen->print(output);
 }

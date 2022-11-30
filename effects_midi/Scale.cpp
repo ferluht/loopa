@@ -4,16 +4,23 @@
 
 #include "Scale.h"
 
-void Scale::midiIn(MData &cmd) {
-    int scale[] = {0, 2, 4, 5, 7, 9, 10};
-//    int scale[] = {0, 2, 3, 6, 7, 8, 11};
+MIDISTATUS Scale::midiIn(MData &cmd) {
     if (cmd.status == NOTEON_HEADER || cmd.status == NOTEOFF_HEADER) {
-        cmd.data1 = scale[(cmd.data1 - 36) % 7] + (int)((cmd.data1 - 36) / 7) * 12;
+        std::vector<int> * scale = &selected_scale->second;
+        cmd.data1 = (*scale)[(cmd.data1 - 36) % scale->size()] + (int)((cmd.data1 - 36) / scale->size()) * 12;
+    } else if (cmd.status == CC_HEADER) {
+        if (cmd.data1 == CC_E1) {
+            if (selected_scale + 1 != scales.end())
+                selected_scale ++;
+            else
+                selected_scale = scales.begin();
+        }
     }
+    return MIDISTATUS::DONE;
 }
 
 void Scale::draw(GFXcanvas1 * screen) {
     screen->setCursor(4, 16);
     screen->setTextSize(1);
-    screen->print("C MIXOLYDIAN");
+    screen->print(selected_scale->first);
 }

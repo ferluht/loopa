@@ -4,25 +4,19 @@
 
 #include "TapeRack.h"
 
-void TapeRack::midiIn(MData &cmd) {
-    if (cmd.status == CC_HEADER && cmd.data1 >= P1 && cmd.data1 <= P4 && cmd.data2 > 0) {
-        focus_tape = cmd.data1 - P1;
-        if (!cmdpressed) tapes[focus_tape]->trig();
-        else tapes[focus_tape]->clear();
+MIDISTATUS TapeRack::midiIn(MData &cmd) {
+    MIDISTATUS ret = MIDISTATUS::DONE;
+
+    if ((cmd.status & 0xF0) == CC_HEADER &&
+        cmd.data1 > MIDICC::TAPE &&
+        cmd.data1 < MIDICC::TAPE_END &&
+        cmd.data2 > 0) {
+        focus_tape = cmd.status - CC_HEADER;
+        cmd.status = CC_HEADER;
+        ret = tapes[focus_tape]->midiIn(cmd);
     }
 
-    if (cmd.status == CC_HEADER) {
-        switch (cmd.data1) {
-            case S1:
-                cmdpressed = cmd.data2 > 0;
-                break;
-            case S2:
-                shiftpressed = cmd.data2 > 0;
-                break;
-            default:
-                break;
-        }
-    }
+    return ret;
 }
 
 void TapeRack::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) {

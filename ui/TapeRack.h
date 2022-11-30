@@ -17,7 +17,7 @@ public:
         phase = 0;
     }
 
-    void midiIn(MData& cmd) override;
+    MIDISTATUS midiIn(MData& cmd) override;
 
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, double streamTime) override;

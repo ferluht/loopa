@@ -20,7 +20,7 @@ public:
 
     void addSample(const char * sample_name_, const char note);
 
-    void midiIn(MData & cmd) override;
+    MIDISTATUS midiIn(MData & cmd) override;
 
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, double streamTime) override;

@@ -73,7 +73,7 @@ public:
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, double streamTime) override;
 
-    void midiIn(MData& cmd) override;
+    MIDISTATUS midiIn(MData& cmd) override;
     void keyPressed(MData& md);
 
     inline float getFrequency(float note)
@@ -98,24 +98,24 @@ public:
 };
 
 template <class TVoiceState>
-void PolyInstrument<TVoiceState>::midiIn(MData& cmd) {
+MIDISTATUS PolyInstrument<TVoiceState>::midiIn(MData& cmd) {
     switch (cmd.status & 0xF0){
         case NOTEON_HEADER:
         case NOTEOFF_HEADER:
             keyPressed(cmd);
             break;
         case CC_HEADER:
-            switch (cmd.data1){
-                case CC_E1:
-                    instrument_volume = cmd.data2 / 127.0;
-                    break;
-//                case CC_SOSTENUTO:
-//                    sostenuto = false;
-//                    if (cmd.data2 != 0xFF) sostenuto = true;
+//            switch (cmd.data1){
+//                case CC_E1:
+//                    instrument_volume = cmd.data2 / 127.0;
 //                    break;
-                default:
-                    break;
-            }
+////                case CC_SOSTENUTO:
+////                    sostenuto = false;
+////                    if (cmd.data2 != 0xFF) sostenuto = true;
+////                    break;
+//                default:
+//                    break;
+//            }
             break;
         case PITCHWHEEL_HEADER:
             pitch = (cmd.data1 + cmd.data2*128.0f) / (float)0xFFFF * pitch_distance;
@@ -123,6 +123,7 @@ void PolyInstrument<TVoiceState>::midiIn(MData& cmd) {
         default:
             break;
     }
+    return MIDISTATUS::DONE;
 }
 
 template <class TVoiceState>

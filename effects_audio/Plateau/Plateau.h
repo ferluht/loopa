@@ -20,8 +20,10 @@ public:
 
     void draw(GFXcanvas1 * screen) override;
 
-private:
+    MIDISTATUS midiIn(MData &cmd) override;
 
+private:
+    float dry = 0.5;
     Dattorro * dattorro;
 };
 

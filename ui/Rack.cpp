@@ -4,26 +4,35 @@
 
 #include "Rack.h"
 
-void Rack::midiIn(MData &cmd) {
+MIDISTATUS Rack::midiIn(MData &cmd) {
     switch (racktype) {
         case PARALLEL:
             for (auto it = items.begin(); it < items.end(); it++) {
                 MData ccmd = cmd;
-                (*it)->midiIn(ccmd);
+                if (rackMidiStatus != MIDISTATUS::WAITING || it->second != MIDISTATUS::DONE)
+                    it->second = it->first->midiIn(ccmd);
             }
             break;
         case SEQUENTIAL:
             for (auto it = items.begin(); it < items.end(); it++) {
-                (*it)->midiIn(cmd);
+                if (rackMidiStatus != MIDISTATUS::WAITING || it->second != MIDISTATUS::DONE)
+                    it->second = it->first->midiIn(cmd);
             }
             break;
         case SELECTIVE:
             if (focus_item != items.end())
-                (*focus_item)->midiIn(cmd);
+                focus_item->second = focus_item->first->midiIn(cmd);
             break;
         default:
             break;
     }
+    for (auto it = items.begin(); it < items.end(); it++) {
+        if (it->second != MIDISTATUS::DONE) {
+            rackMidiStatus = MIDISTATUS::WAITING;
+            return MIDISTATUS::WAITING;
+        }
+    }
+    return MIDISTATUS::DONE;
 }
 
 void Rack::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) {
@@ -33,9 +42,9 @@ void Rack::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
 
             for (auto it = items.begin(); it < items.end(); it++) {
                 if (it == focus_item)
-                    (*it)->process(&outbuffer[(it - items.begin()) * BUF_SIZE * 2], inputBuffer, nBufferFrames, 0);
+                    it->first->process(&outbuffer[(it - items.begin()) * BUF_SIZE * 2], inputBuffer, nBufferFrames, 0);
                 else
-                    (*it)->process(&outbuffer[(it - items.begin()) * BUF_SIZE * 2], emptybuffer, nBufferFrames, 0);
+                    it->first->process(&outbuffer[(it - items.begin()) * BUF_SIZE * 2], emptybuffer, nBufferFrames, 0);
             }
 
             for (unsigned int k = 0; k < items.size(); k ++)
@@ -44,12 +53,12 @@ void Rack::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
             break;
         case SEQUENTIAL:
             for (auto it = items.begin(); it < items.end(); it++) {
-                (*it)->process(outputBuffer, inputBuffer, nBufferFrames, streamTime);
+                it->first->process(outputBuffer, inputBuffer, nBufferFrames, streamTime);
             }
             break;
         case SELECTIVE:
             if (focus_item != items.end())
-                (*focus_item)->process(outputBuffer, inputBuffer, nBufferFrames, 0);
+                focus_item->first->process(outputBuffer, inputBuffer, nBufferFrames, 0);
             break;
         default:
             break;
@@ -58,11 +67,11 @@ void Rack::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
 
 void Rack::draw(GFXcanvas1 * screen) {
     if (focus_item != items.end())
-        (*focus_item)->draw(screen);
+        focus_item->first->draw(screen);
 }
 
 void Rack::add(AMG *item) {
-    items.push_back(item);
+    items.push_back({item, MIDISTATUS::DONE});
     focus_item = items.begin();
 
     if (racktype == PARALLEL) {
@@ -72,8 +81,8 @@ void Rack::add(AMG *item) {
 }
 
 Rack *Rack::dive_in() {
-    if (dynamic_cast<Rack*>((*focus_item)) != nullptr)
-        return dynamic_cast<Rack*>((*focus_item));
+    if (dynamic_cast<Rack*>(focus_item->first) != nullptr)
+        return dynamic_cast<Rack*>(focus_item->first);
     return this;
 }
 
@@ -101,7 +110,7 @@ void Rack::set_focus_by_index(int i) {
 }
 
 AMG *Rack::get_focus() {
-    return *focus_item;
+    return focus_item->first;
 }
 
 int Rack::get_focus_index() {

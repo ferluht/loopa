@@ -11,7 +11,6 @@ int fd;
 uint8_t uartbuffer[256];
 uint8_t uartit = 0;
 #else
-KbdScreen *nguiscreen = nullptr;
 GLFWwindow* window = nullptr;
 
 class KbdScreen : public Screen {
@@ -69,6 +68,11 @@ public:
             cmd.data1 = S1;
             cmd.data2 = action ? 127 : 0;
             mdaw->midiIn(cmd);
+        } else if (key == 340) {
+            cmd.status = CC_HEADER;
+            cmd.data1 = S2;
+            cmd.data2 = action ? 127 : 0;
+            mdaw->midiIn(cmd);
         } else {
             return true;
         }
@@ -78,6 +82,8 @@ private:
     DAW * mdaw;
     MData cmd;
 };
+
+KbdScreen *nguiscreen = nullptr;
 
 
 class PixelDisplay : public nanogui::GLCanvas {

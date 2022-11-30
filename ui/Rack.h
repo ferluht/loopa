@@ -23,9 +23,10 @@ public:
         else emptybuffer = nullptr;
         outbuffer = nullptr;
         parent = nullptr;
+        rackMidiStatus = MIDISTATUS::DONE;
     }
 
-    void midiIn(MData& cmd) override;
+    MIDISTATUS midiIn(MData& cmd) override;
 
     void draw(GFXcanvas1 * screen) override;
 
@@ -46,8 +47,9 @@ public:
 private:
 
     RACKTYPE racktype;
-    std::vector<AMG*> items;
-    std::vector<AMG*>::iterator focus_item;
+    std::vector<std::pair<AMG*, MIDISTATUS>> items;
+    std::vector<std::pair<AMG*, MIDISTATUS>>::iterator focus_item;
+    MIDISTATUS rackMidiStatus;
 
     Rack * parent;
 
