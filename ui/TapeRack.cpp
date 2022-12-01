@@ -4,21 +4,6 @@
 
 #include "TapeRack.h"
 
-MIDISTATUS TapeRack::midiIn(MData &cmd) {
-    MIDISTATUS ret = MIDISTATUS::DONE;
-
-    if ((cmd.status & 0xF0) == CC_HEADER &&
-        cmd.data1 > MIDICC::TAPE &&
-        cmd.data1 < MIDICC::TAPE_END &&
-        cmd.data2 > 0) {
-        focus_tape = cmd.status - CC_HEADER;
-        cmd.status = CC_HEADER;
-        ret = tapes[focus_tape]->midiIn(cmd);
-    }
-
-    return ret;
-}
-
 void TapeRack::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) {
     float buf[4][BUF_SIZE * 2];
     float emptybuf[BUF_SIZE * 2];

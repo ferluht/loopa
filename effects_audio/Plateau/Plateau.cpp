@@ -17,13 +17,6 @@ void Plateau::process(float *outputBuffer, float * inputBuffer,
     }
 }
 
-MIDISTATUS Plateau::midiIn(MData &cmd) {
-    if (cmd.status == CC_HEADER && cmd.data1 == CC_E1) {
-        dry = (float)cmd.data2 / 127.0;
-    }
-    return MIDISTATUS::DONE;
-}
-
 void Plateau::draw(GFXcanvas1 * screen) {
     screen->setCursor(4, 16);
     screen->setTextSize(1);

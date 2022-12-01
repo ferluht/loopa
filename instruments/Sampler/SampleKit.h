@@ -16,11 +16,15 @@ public:
 
     SampleKit() : AMG("KIT") {
         for (int i = 0; i < 128; i ++) notes[i] = nullptr;
+
+        addHandler({NOTEON_HEADER, NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
+            if (notes[cmd.data1])
+                return notes[cmd.data1]->midiIn(cmd);
+            return MIDISTATUS::DONE;
+        });
     }
 
     void addSample(const char * sample_name_, const char note);
-
-    MIDISTATUS midiIn(MData & cmd) override;
 
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, double streamTime) override;

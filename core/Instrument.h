@@ -68,12 +68,21 @@ public:
     PolyInstrument(const char * name) : Instrument(name){
         pitch = 0;
         for (int i = 0; i < num_voices; i++) voices.push_back(new TVoiceState());
+
+        addHandler({NOTEON_HEADER, NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
+            keyPressed(cmd);
+            return MIDISTATUS::DONE;
+        });
+
+        addHandler(PITCHWHEEL_HEADER, [this](MData &cmd) -> MIDISTATUS {
+            pitch = (cmd.data1 + cmd.data2*128.0f) / (float)0xFFFF * pitch_distance;
+            return MIDISTATUS::DONE;
+        });
     }
 
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, double streamTime) override;
 
-    MIDISTATUS midiIn(MData& cmd) override;
     void keyPressed(MData& md);
 
     inline float getFrequency(float note)
@@ -96,35 +105,6 @@ public:
     virtual void processVoice(TVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
                               unsigned int nBufferFrames, double streamTime, uint8_t nvoices) {}
 };
-
-template <class TVoiceState>
-MIDISTATUS PolyInstrument<TVoiceState>::midiIn(MData& cmd) {
-    switch (cmd.status & 0xF0){
-        case NOTEON_HEADER:
-        case NOTEOFF_HEADER:
-            keyPressed(cmd);
-            break;
-        case CC_HEADER:
-//            switch (cmd.data1){
-//                case CC_E1:
-//                    instrument_volume = cmd.data2 / 127.0;
-//                    break;
-////                case CC_SOSTENUTO:
-////                    sostenuto = false;
-////                    if (cmd.data2 != 0xFF) sostenuto = true;
-////                    break;
-//                default:
-//                    break;
-//            }
-            break;
-        case PITCHWHEEL_HEADER:
-            pitch = (cmd.data1 + cmd.data2*128.0f) / (float)0xFFFF * pitch_distance;
-            break;
-        default:
-            break;
-    }
-    return MIDISTATUS::DONE;
-}
 
 template <class TVoiceState>
 void PolyInstrument<TVoiceState>::keyPressed(MData &md) {

@@ -109,35 +109,6 @@ void DAW::draw(GFXcanvas1 * screen) {
     }
 }
 
-//void DAW::KHandler(MData &cmd) {
-//    if (cc_states[S1] && cc_states[S2]) {
-//
-//    } else if (cc_states[S1]) {
-//
-//    } else if (cc_states[S2] && cc_states[cmd.data1]) {
-//        switch (cmd.data1) {
-//            case K1:
-//                focus_rack = focus_rack->dive_out();
-//                break;
-//            case K2:
-//                focus_rack->dive_next();
-//                break;
-//            case K3:
-//                focus_rack = focus_rack->dive_in();
-//                break;
-//            case K4:
-//                focus_rack->dive_prev();
-//                break;
-//            default:
-//                break;
-//        }
-//    } else {
-//        if (cmd.data2 > 0) cmd.status = NOTEON_HEADER;
-//        else cmd.status = NOTEOFF_HEADER;
-//    }
-//}
-
-
 Rack *DAW::spawnTracksRack(int n) {
     Rack * tracks_ = new Rack("ARRANGEMENT",Rack::SELECTIVE);
 

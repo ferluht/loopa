@@ -46,21 +46,38 @@ public:
 
     static const float looper_ratio;
 
-    Tape() : Tape(110) {
+    Tape() {
         audio.reserve(max_loop_size);
-    };
 
-    Tape(uint8_t cc_code) : AMG() {
+        addHandler( CC_HEADER,MIDICC::TAPE_TRIG, [this](MData &cmd) -> MIDISTATUS {
+            if (cmd.data2 > 0) return trig();
+            return MIDISTATUS::DONE;
+        });
+
+        addHandler( CC_HEADER,MIDICC::TAPE_CLEAR, [this](MData &cmd) -> MIDISTATUS {
+            if (cmd.data2 > 0) return clear();
+            return MIDISTATUS::DONE;
+        });
+
+        addHandler( CC_HEADER,MIDICC::TAPE_DOUBLE, [this](MData &cmd) -> MIDISTATUS {
+            if (cmd.data2 > 0) return double_loop();
+            return MIDISTATUS::DONE;
+        });
+
+        addHandler( CC_HEADER,MIDICC::TAPE_STOP, [this](MData &cmd) -> MIDISTATUS {
+            looper_state = STOP;
+            position = 0;
+            return MIDISTATUS::DONE;
+        });
+
         clear();
-    }
+    };
 
     MIDISTATUS trig() {
         switch (looper_state) {
             case STOP:
-                if (audio.size() > 0)
-                    looper_state = PLAY;
-                else
-                    looper_state = REC;
+                if (audio.size() > 0) looper_state = PLAY;
+                else looper_state = REC;
                 break;
             case REC:
                 looper_state = OVERDUB;
@@ -146,8 +163,6 @@ public:
             }
         }
     }
-
-    MIDISTATUS midiIn(MData &cmd) override;
 
     void draw(GFXcanvas1 * screen) override;
 

@@ -51,7 +51,6 @@ enum MIDICC {
     DAW_RIGHT,
     DAW_UP,
     DAW_DOWN,
-    DAW_END,
     TAPE = 50,
     TAPE_TRIG,
     TAPE_CLEAR,
@@ -82,7 +81,7 @@ public:
         addHandler(header, 0, 255, handler);
     }
 
-    void addHandler(std::vector<uint8_t> &headers, std::function<MIDISTATUS(MData&)> handler) {
+    void addHandler(std::vector<uint8_t> headers, std::function<MIDISTATUS(MData&)> handler) {
         addHandler(headers, 0, 255, handler);
     }
 
@@ -92,7 +91,7 @@ public:
         addHandler(headers, code_start, code_end, handler);
     }
 
-    void addHandler(std::vector<uint8_t> &headers, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
+    void addHandler(std::vector<uint8_t> headers, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
         std::vector<uint8_t> codes;
         for (uint8_t c = code_start; c < code_end; c ++)
             codes.push_back(c);
@@ -100,7 +99,21 @@ public:
         addHandler(headers, codes, handler);
     }
 
-    void addHandler(std::vector<uint8_t> &headers, std::vector<uint8_t> &codes, std::function<MIDISTATUS(MData&)> handler) {
+    void addHandler(uint8_t header_start, uint8_t header_end,
+                    uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
+        std::vector<uint8_t> headers;
+        for (uint8_t h = header_start; h < header_end; h ++)
+            headers.push_back(h);
+        headers.push_back(header_end);
+
+        std::vector<uint8_t> codes;
+        for (uint8_t c = code_start; c < code_end; c ++)
+            codes.push_back(c);
+        codes.push_back(code_end);
+        addHandler(headers, codes, handler);
+    }
+
+    void addHandler(std::vector<uint8_t> headers, std::vector<uint8_t> codes, std::function<MIDISTATUS(MData&)> handler) {
         handlers_array.push_back(handler);
         int handler_idx = handlers_array.size() - 1;
         for (auto ith = headers.begin(); ith < headers.end(); ith ++)
