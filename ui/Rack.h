@@ -38,8 +38,8 @@ public:
 
     Rack * dive_in();
     Rack * dive_out();
-    void dive_prev();
-    void dive_next();
+    Rack * dive_prev();
+    Rack * dive_next();
     void set_focus_by_index(int i);
     AMG * get_focus();
     int get_focus_index();

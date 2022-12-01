@@ -37,22 +37,6 @@
 #define CC_E1 105
 #define CC_E2 106
 
-#define S1 100
-#define S2 101
-
-#define K1 60
-#define K2 61
-#define K3 62
-#define K4 63
-#define K5 64
-#define K6 65
-#define K7 66
-
-#define P1 110
-#define P2 111
-#define P3 112
-#define P4 113
-
 enum MIDISTATUS {
     WAITING,
     DONE
@@ -84,13 +68,60 @@ struct MData {
 };
 
 class M {
+
+    std::map<uint8_t, std::map<uint8_t, int>> handlers;
+    std::vector<std::function<MIDISTATUS(MData&)>> handlers_array;
+
 public:
 
     M() {
 
     }
 
-    virtual MIDISTATUS midiIn(MData& cmd) {return DONE;}
+    void addHandler(uint8_t header, std::function<MIDISTATUS(MData&)> handler) {
+        addHandler(header, 0, 255, handler);
+    }
+
+    void addHandler(std::vector<uint8_t> &headers, std::function<MIDISTATUS(MData&)> handler) {
+        addHandler(headers, 0, 255, handler);
+    }
+
+    void addHandler(uint8_t header, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
+        std::vector<uint8_t> headers;
+        headers.push_back(header);
+        addHandler(headers, code_start, code_end, handler);
+    }
+
+    void addHandler(std::vector<uint8_t> &headers, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
+        std::vector<uint8_t> codes;
+        for (uint8_t c = code_start; c < code_end; c ++)
+            codes.push_back(c);
+        codes.push_back(code_end);
+        addHandler(headers, codes, handler);
+    }
+
+    void addHandler(std::vector<uint8_t> &headers, std::vector<uint8_t> &codes, std::function<MIDISTATUS(MData&)> handler) {
+        handlers_array.push_back(handler);
+        int handler_idx = handlers_array.size() - 1;
+        for (auto ith = headers.begin(); ith < headers.end(); ith ++)
+            for (auto itc = codes.begin(); itc < codes.end(); itc ++)
+                handlers[*ith][*itc] = handler_idx;
+    }
+
+    void addHandler(uint8_t header, uint8_t code, std::function<MIDISTATUS(MData&)> handler) {
+        handlers_array.push_back(handler);
+        int handler_idx = handlers_array.size() - 1;
+        handlers[header][code] = handler_idx;
+    }
+
+    virtual MIDISTATUS midiIn(MData& cmd) {
+        auto x = handlers.find(cmd.status);
+        if (x == handlers.end()) return MIDISTATUS::DONE;
+        auto xy = x->second.find(cmd.data1);
+        if (xy == x->second.end()) return MIDISTATUS::DONE;
+        int idx = xy->second;
+        return handlers_array[idx](cmd);
+    }
 };
 
 
@@ -135,21 +166,20 @@ private:
     uint8_t value;
 };
 
-class MIDIInterface : public M {
+class MIDIMap : public M {
 
-    std::map<uint8_t, std::map<uint8_t, HardwareControl *> * > imap;
+    std::map<uint8_t, std::map<uint8_t, HardwareControl *>> imap;
     std::map<std::string, HardwareControl*> knobs_by_names;
 
 public:
-    MIDIInterface() : M() {
-        for (int i = 0; i < 256; i++)
-            imap.insert({i, new std::map<uint8_t, HardwareControl *>});
+    MIDIMap() : M() {
+
     }
 
     void addHardwareControl(std::string name_, uint8_t header_, uint8_t code_) {
         HardwareControl * ctrl = new HardwareControl(name_, header_, code_);
-        imap.find(ctrl->header)->second->insert({ctrl->code, ctrl});
-        knobs_by_names.insert({ctrl->name, ctrl});
+        imap[ctrl->header][ctrl->code] = ctrl;
+        knobs_by_names[ctrl->name] = ctrl;
     }
 
     void addMapping(std::vector<std::string> ctrl_seq, uint8_t mheader, uint8_t mcode) {
@@ -165,15 +195,15 @@ public:
     MIDISTATUS midiIn(MData& cmd) override {
         auto x = imap.find(cmd.status);
         if (x == imap.end()) return MIDISTATUS::DONE;
-        auto xy = x->second->find(cmd.data1);
-        if (xy == x->second->end()) return MIDISTATUS::DONE;
+        auto xy = x->second.find(cmd.data1);
+        if (xy == x->second.end()) return MIDISTATUS::DONE;
         HardwareControl * ctrl = xy->second;
         if (ctrl) {
             ctrl->midiIn(cmd);
             for (auto it = ctrl->ctrl_seqs.begin(); it < ctrl->ctrl_seqs.end(); it ++) {
                 bool flag = true;
                 for (auto xy = it->first.begin(); xy < it->first.end(); xy ++) {
-                    HardwareControl * c = imap.find(xy->first)->second->find(xy->second)->second;
+                    HardwareControl * c = imap.find(xy->first)->second.find(xy->second)->second;
                     if (!c->isPressed())
                         flag = false;
                 }

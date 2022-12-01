@@ -91,14 +91,16 @@ Rack *Rack::dive_out() {
     return this;
 }
 
-void Rack::dive_prev() {
+Rack * Rack::dive_prev() {
     if (focus_item != items.begin()) focus_item --;
     else focus_item = items.end() - 1;
+    return this;
 }
 
-void Rack::dive_next() {
+Rack * Rack::dive_next() {
     if (focus_item + 1 != items.end()) focus_item ++;
     else focus_item = items.begin();
+    return this;
 }
 
 void Rack::attach(Rack *parent_) {

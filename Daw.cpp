@@ -7,8 +7,6 @@
 #include <cmath>
 
 MIDISTATUS DAW::midiIn(MData& cmd) {
-//    std::cout << (int)cmd.status << " " << (int)cmd.data1 << " " << (int)cmd.data2 << std::endl;
-
     if (dawMidiStatus != MIDISTATUS::DONE)
         return MIDISTATUS::DONE;
 
@@ -33,24 +31,8 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
     while (ms == MIDISTATUS::DONE && !midiQueue.empty()) {
 
         MData cmd = midiQueue.front();
-        midiInterface->midiIn(cmd);
-
-        if (cmd.status == DAW_CTRL_HEADER && cmd.data2 > 0) switch (cmd.data1) {
-            case MIDICC::DAW_UP:
-                focus_rack = focus_rack->dive_out();
-                break;
-            case MIDICC::DAW_DOWN:
-                focus_rack->dive_next();
-                break;
-            case MIDICC::DAW_RIGHT:
-                focus_rack = focus_rack->dive_in();
-                break;
-            case MIDICC::DAW_LEFT:
-                focus_rack->dive_prev();
-                break;
-            default:
-                break;
-        }
+        midiMap->midiIn(cmd);
+        M::midiIn(cmd);
 
         bool tracks_done = tracks->midiIn(cmd) == MIDISTATUS::DONE;
         bool tapes_done = tapes->midiIn(cmd) == MIDISTATUS::DONE;
