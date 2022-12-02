@@ -4,21 +4,12 @@
 
 #pragma once
 
-#include <AMG.h>
+#include <Effect.h>
 #include "Dattorro.hpp"
 
-class Plateau : public AMG{
+class Plateau : public AudioEffect{
 public:
-    Plateau() : AMG("PLATEAU") {
-        dattorro = new Dattorro();
-        dattorro->size = 0.95;
-        dattorro->decay = 0.9;
-
-        addHandler( CC_HEADER,CC_E1, [this](MData &cmd) -> MIDISTATUS {
-            dry = (float)cmd.data2 / 127.0;
-            return MIDISTATUS::DONE;
-        });
-    }
+    Plateau();
 
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, double streamTime) override;

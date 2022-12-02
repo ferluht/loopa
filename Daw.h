@@ -67,25 +67,25 @@ public:
         midiMap->addMapping({"CTRL", "P4"}, CC_HEADER + 3, MIDICC::TAPE_DOUBLE);
         midiMap->addMapping({"SHIFT", "CTRL", "P4"}, CC_HEADER + 3, MIDICC::TAPE_STOP);
 
-        addHandler( DAW_CTRL_HEADER,MIDICC::DAW_LEFT, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler(DAW_CTRL_HEADER, MIDICC::DAW_LEFT, [this](MData &cmd) -> MIDISTATUS {
             if (cmd.data2 > 0)
                 this->focus_rack = this->focus_rack->dive_out();
             return MIDISTATUS::DONE;
         });
 
-        addHandler(DAW_CTRL_HEADER, MIDICC::DAW_DOWN, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler(DAW_CTRL_HEADER, MIDICC::DAW_DOWN, [this](MData &cmd) -> MIDISTATUS {
             if (cmd.data2 > 0)
                 this->focus_rack = this->focus_rack->dive_next();
             return MIDISTATUS::DONE;
         });
 
-        addHandler(DAW_CTRL_HEADER, MIDICC::DAW_RIGHT, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler(DAW_CTRL_HEADER, MIDICC::DAW_RIGHT, [this](MData &cmd) -> MIDISTATUS {
             if (cmd.data2 > 0)
                 this->focus_rack = this->focus_rack->dive_in();
             return MIDISTATUS::DONE;
         });
 
-        addHandler(DAW_CTRL_HEADER, MIDICC::DAW_UP, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler(DAW_CTRL_HEADER, MIDICC::DAW_UP, [this](MData &cmd) -> MIDISTATUS {
             if (cmd.data2 > 0)
                 this->focus_rack = this->focus_rack->dive_prev();
             return MIDISTATUS::DONE;

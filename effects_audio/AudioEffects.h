@@ -4,16 +4,17 @@
 
 #pragma once
 
+#include <Effect.h>
 #include "Chronoblob/Chronoblob.h"
 #include "Delay/Delay.hpp"
 #include "Limiter/SoftClipper.h"
 #include "Plateau/Plateau.h"
 #include "Tape/Tape.h"
 
-class DummyAudio : public AMG {
+class DummyAudioFX : public AudioEffect {
 
 public:
-    DummyAudio() : AMG("NO FX") {
+    DummyAudioFX() : AudioEffect("NO FX") {
 
     }
 

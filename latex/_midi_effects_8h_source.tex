@@ -1,0 +1,29 @@
+\hypertarget{_midi_effects_8h_source}{}\doxysection{Midi\+Effects.\+h}
+\label{_midi_effects_8h_source}\index{effects\_midi/MidiEffects.h@{effects\_midi/MidiEffects.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//}}
+\DoxyCodeLine{2 \textcolor{comment}{// Created by ferluht on 22/07/2022.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 }
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include "{}Scale.h"{}}}
+\DoxyCodeLine{8 }
+\DoxyCodeLine{9 \textcolor{keyword}{class }\mbox{\hyperlink{class_dummy_midi_f_x}{DummyMidiFX}} : \textcolor{keyword}{public} \mbox{\hyperlink{class_m_i_d_i_effect}{MIDIEffect}} \{}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{keyword}{public}:}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13     \mbox{\hyperlink{class_dummy_midi_f_x}{DummyMidiFX}}() : \mbox{\hyperlink{class_m_i_d_i_effect}{MIDIEffect}}(\textcolor{stringliteral}{"{}NO FX"{}}) \{}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15     \}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_dummy_midi_f_x_a1f3abbeb3f2069287ff03eaa08aec172}{draw}}(GFXcanvas1 * screen)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{18         screen-\/>setCursor(4, 16);}
+\DoxyCodeLine{19         screen-\/>setTextSize(1);}
+\DoxyCodeLine{20         screen-\/>print(\textcolor{stringliteral}{"{}NO MIDI FX"{}});}
+\DoxyCodeLine{21     \}}
+\DoxyCodeLine{22 \};}
+\DoxyCodeLine{23 }
+
+\end{DoxyCode}

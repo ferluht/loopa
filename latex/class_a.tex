@@ -1,0 +1,61 @@
+\hypertarget{class_a}{}\doxysection{A Class Reference}
+\label{class_a}\index{A@{A}}
+
+
+{\ttfamily \#include $<$A.\+h$>$}
+
+Inheritance diagram for A\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.989324cm]{class_a}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{class_a_ab4b066f9adb0738afbddfb491557caab}{process}} (float $\ast$output\+Buffer, float $\ast$input\+Buffer, unsigned int n\+Buffer\+Frames, double stream\+Time)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{class_a}{A}} stands for Audio. The base class for all audio objects. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_a_ab4b066f9adb0738afbddfb491557caab}\label{class_a_ab4b066f9adb0738afbddfb491557caab}} 
+\index{A@{A}!process@{process}}
+\index{process@{process}!A@{A}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily virtual void A\+::process (\begin{DoxyParamCaption}\item[{float $\ast$}]{output\+Buffer,  }\item[{float $\ast$}]{input\+Buffer,  }\item[{unsigned int}]{n\+Buffer\+Frames,  }\item[{double}]{stream\+Time }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Virtual audio process method
+
+
+\begin{DoxyParams}{Parameters}
+{\em output\+Buffer} & output buffer of floats \\
+\hline
+{\em input\+Buffer} & input buffer of floats \\
+\hline
+{\em n\+Buffer\+Frames} & amount samples in buffers \\
+\hline
+{\em stream\+Time} & time since start\\
+\hline
+\end{DoxyParams}
+Pass-\/thru example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_a_ab4b066f9adb0738afbddfb491557caab}{process}}(\textcolor{keywordtype}{float} *outputBuffer, \textcolor{keywordtype}{float} *inputBuffer, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nBufferFrames, \textcolor{keywordtype}{double} streamTime)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 0; i < 2*nBufferFrames; i += 2) \{}
+\DoxyCodeLine{    outputBuffer[i + 0] = inputBuffer[i + 0];}
+\DoxyCodeLine{    outputBuffer[i + 1] = inputBuffer[i + 1];}
+\DoxyCodeLine{  \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented in \mbox{\hyperlink{class_poly_instrument_a56b9765c2366de8c6b2815a208285993}{Poly\+Instrument$<$ TVoice\+State $>$}}, \mbox{\hyperlink{class_poly_instrument_a56b9765c2366de8c6b2815a208285993}{Poly\+Instrument$<$ Sampler\+State $>$}}, \mbox{\hyperlink{class_poly_instrument_a56b9765c2366de8c6b2815a208285993}{Poly\+Instrument$<$ Simple\+Instrument\+Voice\+State $>$}}, \mbox{\hyperlink{class_poly_instrument_a56b9765c2366de8c6b2815a208285993}{Poly\+Instrument$<$ Single\+Tone\+Voice\+State $>$}}, \mbox{\hyperlink{class_d_a_w_a1faa3a5ecd7e339f27e89ca3c4161d92}{DAW}}, \mbox{\hyperlink{class_plateau_ad423dd98c37e361b9fd77b9682488a1f}{Plateau}}, \mbox{\hyperlink{class_tape_a3ca2529191c7710a84709a4fd1a9f406}{Tape}}, \mbox{\hyperlink{class_sample_kit_a38234a651f5120a196258948f4ff5328}{Sample\+Kit}}, \mbox{\hyperlink{class_rack_af7ae34a3b74aba6f77f265dbda707d10}{Rack}}, and \mbox{\hyperlink{class_tape_rack_adfc0aa743250c11b2e5ca6ec5c5dec70}{Tape\+Rack}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/A.\+h\end{DoxyCompactItemize}

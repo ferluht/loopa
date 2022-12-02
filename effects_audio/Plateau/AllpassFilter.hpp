@@ -8,6 +8,7 @@
 #define APF_HPP
 #include "InterpDelay2.hpp"
 
+/// @private
 template<class T>
 class AllpassFilter {
 public:
@@ -57,6 +58,7 @@ private:
     T _outSum;
 };
 
+/// @private
 template<class T>
 class NestedAllPassType1 {
 public:

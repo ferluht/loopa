@@ -1,0 +1,47 @@
+\hypertarget{class_dummy_midi_f_x}{}\doxysection{Dummy\+Midi\+FX Class Reference}
+\label{class_dummy_midi_f_x}\index{DummyMidiFX@{DummyMidiFX}}
+Inheritance diagram for Dummy\+Midi\+FX\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=5.000000cm]{class_dummy_midi_f_x}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_dummy_midi_f_x_a1f3abbeb3f2069287ff03eaa08aec172}{draw}} (GFXcanvas1 $\ast$screen) override
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_dummy_midi_f_x_a1f3abbeb3f2069287ff03eaa08aec172}\label{class_dummy_midi_f_x_a1f3abbeb3f2069287ff03eaa08aec172}} 
+\index{DummyMidiFX@{DummyMidiFX}!draw@{draw}}
+\index{draw@{draw}!DummyMidiFX@{DummyMidiFX}}
+\doxysubsubsection{\texorpdfstring{draw()}{draw()}}
+{\footnotesize\ttfamily void Dummy\+Midi\+FX\+::draw (\begin{DoxyParamCaption}\item[{GFXcanvas1 $\ast$}]{screen }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Virtual draw method
+
+
+\begin{DoxyParams}{Parameters}
+{\em screen} & GFXcanvas1\\
+\hline
+\end{DoxyParams}
+Example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_dummy_midi_f_x_a1f3abbeb3f2069287ff03eaa08aec172}{draw}}(GFXcanvas1 * screen)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  screen-\/>setCursor(0, 0);}
+\DoxyCodeLine{  screen-\/>setTextSize(1);}
+\DoxyCodeLine{  screen-\/>print(\textcolor{stringliteral}{"{}SAMPLE TEXT"{}});}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented from \mbox{\hyperlink{class_g_af0dc304f77853286afe764c1022fab55}{G}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+effects\+\_\+midi/Midi\+Effects.\+h\end{DoxyCompactItemize}

@@ -7,22 +7,14 @@
 #include <Instrument.h>
 #include "Sampler.h"
 
-class SampleKit : public AMG {
+class SampleKit : public Instrument {
 
     AMG * notes[128];
     std::list<AMG *> activeChains;
 
 public:
 
-    SampleKit() : AMG("KIT") {
-        for (int i = 0; i < 128; i ++) notes[i] = nullptr;
-
-        addHandler({NOTEON_HEADER, NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
-            if (notes[cmd.data1])
-                return notes[cmd.data1]->midiIn(cmd);
-            return MIDISTATUS::DONE;
-        });
-    }
+    SampleKit();
 
     void addSample(const char * sample_name_, const char note);
 

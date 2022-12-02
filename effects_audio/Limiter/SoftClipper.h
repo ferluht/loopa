@@ -9,6 +9,7 @@
 #include "Utils.hpp"
 #include <cmath>
 
+/// @private
 class SoftClipper : public A {
 public:
 

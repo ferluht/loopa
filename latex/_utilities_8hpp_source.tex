@@ -1,0 +1,37 @@
+\hypertarget{_utilities_8hpp_source}{}\doxysection{Utilities.\+hpp}
+\label{_utilities_8hpp_source}\index{effects\_audio/Plateau/Utilities.hpp@{effects\_audio/Plateau/Utilities.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef UTIL\_HPP}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define UTIL\_HPP}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <cstdint>}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#include <string>}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{comment}{// template<typename T = float>}}
+\DoxyCodeLine{8 \textcolor{comment}{// T linterp(T a, T b, T f) \{}}
+\DoxyCodeLine{9 \textcolor{comment}{//     return a + f * (b -\/ a);}}
+\DoxyCodeLine{10 \textcolor{comment}{// \}}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{13 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T = \textcolor{keywordtype}{float}>}
+\DoxyCodeLine{14 T clip(T a, T min, T max) \{}
+\DoxyCodeLine{15     \textcolor{keywordflow}{return} a < min ? min : (a > max ? max : a);}
+\DoxyCodeLine{16 \}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T = \textcolor{keywordtype}{float}>}
+\DoxyCodeLine{20 T scale(T a, T inMin, T inMax, T outMin, T outMax) \{}
+\DoxyCodeLine{21     \textcolor{keywordflow}{return} (a -\/ inMin)/(inMax -\/ inMin) * (outMax -\/ outMin) + outMin;}
+\DoxyCodeLine{22 \}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{25 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T = \textcolor{keywordtype}{float}>}
+\DoxyCodeLine{26 T semitone(T x) \{}
+\DoxyCodeLine{27     \textcolor{keywordflow}{return} ((\textcolor{keywordtype}{int})(x * 12)) * 0.0833333f;}
+\DoxyCodeLine{28 \}}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30 uint32\_t mwcRand(uint32\_t\& w, uint32\_t\& z);}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32 std::string extractDirectoryFromFilePath(\textcolor{keyword}{const} std::string\& filepath); }
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

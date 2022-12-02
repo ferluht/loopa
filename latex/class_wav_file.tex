@@ -1,0 +1,196 @@
+\hypertarget{class_wav_file}{}\doxysection{Wav\+File\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\label{class_wav_file}\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_wav_file_a49e41b3c54f7cec024b5556340c3f18e}\label{class_wav_file_a49e41b3c54f7cec024b5556340c3f18e}} 
+typedef std\+::vector$<$ std\+::vector$<$ T $>$ $>$ {\bfseries Audio\+Buffer}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_wav_file_ac0a07a6d676213e741636a1e1a7d9d4e}{Wav\+File}} ()
+\item 
+bool \mbox{\hyperlink{class_wav_file_af84e7b319177df7dc1bd73070ce73640}{load}} (std\+::string file\+Path)
+\item 
+bool \mbox{\hyperlink{class_wav_file_a6c51878d38570398f8aea01dc22f8bf1}{save}} (std\+::string file\+Path, Wav\+File\+Format format=Wav\+File\+Format\+::\+Wave)
+\item 
+uint32\+\_\+t \mbox{\hyperlink{class_wav_file_a80a00ca7f1189a453163b3bc42a5788a}{get\+Sample\+Rate}} () const
+\item 
+int \mbox{\hyperlink{class_wav_file_a0a003a7506e29c752b020137cdb3e35d}{get\+Num\+Channels}} () const
+\item 
+bool \mbox{\hyperlink{class_wav_file_a6ddc0dea1ab936fa0a33cf4ddd121683}{is\+Mono}} () const
+\item 
+bool \mbox{\hyperlink{class_wav_file_adc29fc165a74484e918833d2e6c4369a}{is\+Stereo}} () const
+\item 
+int \mbox{\hyperlink{class_wav_file_ae960c476d382d3f0a5644dc7b9283300}{get\+Bit\+Depth}} () const
+\item 
+int \mbox{\hyperlink{class_wav_file_a03e659627d6e74ba58dca2058789bfeb}{get\+Num\+Samples\+Per\+Channel}} () const
+\item 
+double \mbox{\hyperlink{class_wav_file_acda92ee27e271b594ea75acdaa039400}{get\+Length\+In\+Seconds}} () const
+\item 
+void \mbox{\hyperlink{class_wav_file_afc4a933fdcedbcfd1cbaa6cd4abb1555}{print\+Summary}} () const
+\item 
+bool \mbox{\hyperlink{class_wav_file_ab3345113f7798009b1d834644fdea892}{set\+Audio\+Buffer}} (Audio\+Buffer \&new\+Buffer)
+\item 
+void \mbox{\hyperlink{class_wav_file_a9e66810727d3cc0744c4f597d15ce42f}{set\+Audio\+Buffer\+Size}} (int num\+Channels, int num\+Samples)
+\item 
+void \mbox{\hyperlink{class_wav_file_aba63f01a31c976264e43bdc923fcddcc}{set\+Num\+Samples\+Per\+Channel}} (int num\+Samples)
+\item 
+void \mbox{\hyperlink{class_wav_file_ae367080efd7b4117aecd0a701651bf8f}{set\+Num\+Channels}} (int num\+Channels)
+\item 
+void \mbox{\hyperlink{class_wav_file_a79da6f852960d1326b21e0014c00cdd6}{set\+Bit\+Depth}} (int num\+Bits\+Per\+Sample)
+\item 
+void \mbox{\hyperlink{class_wav_file_a46c0584a7790e7bca847f03c7bdac6cf}{set\+Sample\+Rate}} (uint32\+\_\+t new\+Sample\+Rate)
+\item 
+\mbox{\Hypertarget{class_wav_file_a7c73f3407c5ec25281543da6ac50a3bc}\label{class_wav_file_a7c73f3407c5ec25281543da6ac50a3bc}} 
+int16\+\_\+t {\bfseries sample\+To\+Sixteen\+Bit\+Int} (T sample)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Audio\+Buffer \mbox{\hyperlink{class_wav_file_ae6766c3649437613a62054b0be692d4d}{samples}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_wav_file_ac0a07a6d676213e741636a1e1a7d9d4e}\label{class_wav_file_ac0a07a6d676213e741636a1e1a7d9d4e}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!WavFile@{WavFile}}
+\index{WavFile@{WavFile}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{WavFile()}{WavFile()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\mbox{\hyperlink{class_wav_file}{\+::\+Wav\+File}}}
+
+Constructor 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_wav_file_ae960c476d382d3f0a5644dc7b9283300}\label{class_wav_file_ae960c476d382d3f0a5644dc7b9283300}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!getBitDepth@{getBitDepth}}
+\index{getBitDepth@{getBitDepth}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{getBitDepth()}{getBitDepth()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::get\+Bit\+Depth}
+
+@\+Returns the bit depth of each sample \mbox{\Hypertarget{class_wav_file_acda92ee27e271b594ea75acdaa039400}\label{class_wav_file_acda92ee27e271b594ea75acdaa039400}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!getLengthInSeconds@{getLengthInSeconds}}
+\index{getLengthInSeconds@{getLengthInSeconds}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{getLengthInSeconds()}{getLengthInSeconds()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+double \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::get\+Length\+In\+Seconds}
+
+@\+Returns the length in seconds of the audio file based on the number of samples and sample rate \mbox{\Hypertarget{class_wav_file_a0a003a7506e29c752b020137cdb3e35d}\label{class_wav_file_a0a003a7506e29c752b020137cdb3e35d}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!getNumChannels@{getNumChannels}}
+\index{getNumChannels@{getNumChannels}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{getNumChannels()}{getNumChannels()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::get\+Num\+Channels}
+
+@\+Returns the number of audio channels in the buffer \mbox{\Hypertarget{class_wav_file_a03e659627d6e74ba58dca2058789bfeb}\label{class_wav_file_a03e659627d6e74ba58dca2058789bfeb}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!getNumSamplesPerChannel@{getNumSamplesPerChannel}}
+\index{getNumSamplesPerChannel@{getNumSamplesPerChannel}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{getNumSamplesPerChannel()}{getNumSamplesPerChannel()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+int \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::get\+Num\+Samples\+Per\+Channel}
+
+@\+Returns the number of samples per channel \mbox{\Hypertarget{class_wav_file_a80a00ca7f1189a453163b3bc42a5788a}\label{class_wav_file_a80a00ca7f1189a453163b3bc42a5788a}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!getSampleRate@{getSampleRate}}
+\index{getSampleRate@{getSampleRate}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{getSampleRate()}{getSampleRate()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+uint32\+\_\+t \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::get\+Sample\+Rate}
+
+@\+Returns the sample rate \mbox{\Hypertarget{class_wav_file_a6ddc0dea1ab936fa0a33cf4ddd121683}\label{class_wav_file_a6ddc0dea1ab936fa0a33cf4ddd121683}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!isMono@{isMono}}
+\index{isMono@{isMono}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{isMono()}{isMono()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::is\+Mono}
+
+@\+Returns true if the audio file is mono \mbox{\Hypertarget{class_wav_file_adc29fc165a74484e918833d2e6c4369a}\label{class_wav_file_adc29fc165a74484e918833d2e6c4369a}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!isStereo@{isStereo}}
+\index{isStereo@{isStereo}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{isStereo()}{isStereo()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::is\+Stereo}
+
+@\+Returns true if the audio file is stereo \mbox{\Hypertarget{class_wav_file_af84e7b319177df7dc1bd73070ce73640}\label{class_wav_file_af84e7b319177df7dc1bd73070ce73640}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!load@{load}}
+\index{load@{load}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::load (\begin{DoxyParamCaption}\item[{std\+::string}]{file\+Path }\end{DoxyParamCaption})}
+
+Loads an audio file from a given file path. @\+Returns true if the file was successfully loaded \mbox{\Hypertarget{class_wav_file_afc4a933fdcedbcfd1cbaa6cd4abb1555}\label{class_wav_file_afc4a933fdcedbcfd1cbaa6cd4abb1555}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!printSummary@{printSummary}}
+\index{printSummary@{printSummary}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{printSummary()}{printSummary()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::print\+Summary}
+
+Prints a summary of the audio file to the console \mbox{\Hypertarget{class_wav_file_a6c51878d38570398f8aea01dc22f8bf1}\label{class_wav_file_a6c51878d38570398f8aea01dc22f8bf1}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!save@{save}}
+\index{save@{save}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{save()}{save()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::save (\begin{DoxyParamCaption}\item[{std\+::string}]{file\+Path,  }\item[{Wav\+File\+Format}]{format = {\ttfamily WavFileFormat\+:\+:Wave} }\end{DoxyParamCaption})}
+
+Saves an audio file to a given file path. @\+Returns true if the file was successfully saved \mbox{\Hypertarget{class_wav_file_ab3345113f7798009b1d834644fdea892}\label{class_wav_file_ab3345113f7798009b1d834644fdea892}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!setAudioBuffer@{setAudioBuffer}}
+\index{setAudioBuffer@{setAudioBuffer}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{setAudioBuffer()}{setAudioBuffer()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+bool \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::set\+Audio\+Buffer (\begin{DoxyParamCaption}\item[{Audio\+Buffer \&}]{new\+Buffer }\end{DoxyParamCaption})}
+
+Set the audio buffer for this Audio\+File by copying samples from another buffer. @\+Returns true if the buffer was copied successfully. \mbox{\Hypertarget{class_wav_file_a9e66810727d3cc0744c4f597d15ce42f}\label{class_wav_file_a9e66810727d3cc0744c4f597d15ce42f}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!setAudioBufferSize@{setAudioBufferSize}}
+\index{setAudioBufferSize@{setAudioBufferSize}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{setAudioBufferSize()}{setAudioBufferSize()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::set\+Audio\+Buffer\+Size (\begin{DoxyParamCaption}\item[{int}]{num\+Channels,  }\item[{int}]{num\+Samples }\end{DoxyParamCaption})}
+
+Sets the audio buffer to a given number of channels and number of samples per channel. This will try to preserve the existing audio, adding zeros to any new channels or new samples in a given channel. \mbox{\Hypertarget{class_wav_file_a79da6f852960d1326b21e0014c00cdd6}\label{class_wav_file_a79da6f852960d1326b21e0014c00cdd6}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!setBitDepth@{setBitDepth}}
+\index{setBitDepth@{setBitDepth}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{setBitDepth()}{setBitDepth()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::set\+Bit\+Depth (\begin{DoxyParamCaption}\item[{int}]{num\+Bits\+Per\+Sample }\end{DoxyParamCaption})}
+
+Sets the bit depth for the audio file. If you use the \mbox{\hyperlink{class_wav_file_a6c51878d38570398f8aea01dc22f8bf1}{save()}} function, this bit depth rate will be used \mbox{\Hypertarget{class_wav_file_ae367080efd7b4117aecd0a701651bf8f}\label{class_wav_file_ae367080efd7b4117aecd0a701651bf8f}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!setNumChannels@{setNumChannels}}
+\index{setNumChannels@{setNumChannels}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{setNumChannels()}{setNumChannels()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::set\+Num\+Channels (\begin{DoxyParamCaption}\item[{int}]{num\+Channels }\end{DoxyParamCaption})}
+
+Sets the number of channels. New channels will have the correct number of samples and be initialised to zero \mbox{\Hypertarget{class_wav_file_aba63f01a31c976264e43bdc923fcddcc}\label{class_wav_file_aba63f01a31c976264e43bdc923fcddcc}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!setNumSamplesPerChannel@{setNumSamplesPerChannel}}
+\index{setNumSamplesPerChannel@{setNumSamplesPerChannel}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{setNumSamplesPerChannel()}{setNumSamplesPerChannel()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::set\+Num\+Samples\+Per\+Channel (\begin{DoxyParamCaption}\item[{int}]{num\+Samples }\end{DoxyParamCaption})}
+
+Sets the number of samples per channel in the audio buffer. This will try to preserve the existing audio, adding zeros to new samples in a given channel if the number of samples is increased. \mbox{\Hypertarget{class_wav_file_a46c0584a7790e7bca847f03c7bdac6cf}\label{class_wav_file_a46c0584a7790e7bca847f03c7bdac6cf}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!setSampleRate@{setSampleRate}}
+\index{setSampleRate@{setSampleRate}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{setSampleRate()}{setSampleRate()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::set\+Sample\+Rate (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{new\+Sample\+Rate }\end{DoxyParamCaption})}
+
+Sets the sample rate for the audio file. If you use the \mbox{\hyperlink{class_wav_file_a6c51878d38570398f8aea01dc22f8bf1}{save()}} function, this sample rate will be used 
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{class_wav_file_ae6766c3649437613a62054b0be692d4d}\label{class_wav_file_ae6766c3649437613a62054b0be692d4d}} 
+\index{WavFile$<$ T $>$@{WavFile$<$ T $>$}!samples@{samples}}
+\index{samples@{samples}!WavFile$<$ T $>$@{WavFile$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{samples}{samples}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+Audio\+Buffer \mbox{\hyperlink{class_wav_file}{Wav\+File}}$<$ T $>$\+::samples}
+
+\mbox{\hyperlink{class_a}{A}} vector of vectors holding the audio samples for the Audio\+File. You can access the samples by channel and then by sample index, i.\+e\+: \begin{DoxyVerb} samples[channel][sampleIndex]
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+utils/Wav\+File.\+hpp\item 
+utils/Wav\+File.\+cpp\end{DoxyCompactItemize}

@@ -11,6 +11,7 @@
 #define _1_FACT_5 0.008333333333
 #define _2M_PI 2.0 * M_PI
 
+/// @private
 template<typename T>
 T fastexp(T x) {
     T xx = x * x;
@@ -21,6 +22,7 @@ T fastexp(T x) {
     return x + (x5 * _1_FACT_5);
 }
 
+/// @private
 class OnePoleLPFilter {
 public:
     OnePoleLPFilter(float cutoffFreq = 22050.0, float initSampleRate = 44100.0);
@@ -46,6 +48,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+/// @private
 class OnePoleHPFilter {
 public:
     OnePoleHPFilter(float initCutoffFreq = 10.0, float initSampleRate = 44100.0);
@@ -71,6 +74,7 @@ private:
     float _b1 = 0.0;
 };
 
+/// @private
 class DCBlocker {
 public:
     DCBlocker();

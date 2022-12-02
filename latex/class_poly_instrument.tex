@@ -1,0 +1,100 @@
+\hypertarget{class_poly_instrument}{}\doxysection{Poly\+Instrument\texorpdfstring{$<$}{<} TVoice\+State \texorpdfstring{$>$}{>} Class Template Reference}
+\label{class_poly_instrument}\index{PolyInstrument$<$ TVoiceState $>$@{PolyInstrument$<$ TVoiceState $>$}}
+Inheritance diagram for Poly\+Instrument\texorpdfstring{$<$}{<} TVoice\+State \texorpdfstring{$>$}{>}\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.848797cm]{class_poly_instrument}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_poly_instrument_a152a9cbfa4b2808d2353e0468a540d86}\label{class_poly_instrument_a152a9cbfa4b2808d2353e0468a540d86}} 
+{\bfseries Poly\+Instrument} (const char $\ast$name)
+\item 
+void \mbox{\hyperlink{class_poly_instrument_a56b9765c2366de8c6b2815a208285993}{process}} (float $\ast$output\+Buffer, float $\ast$input\+Buffer, unsigned int n\+Buffer\+Frames, double stream\+Time) override
+\item 
+\mbox{\Hypertarget{class_poly_instrument_a29aec43142a93c43314e708accbe8b71}\label{class_poly_instrument_a29aec43142a93c43314e708accbe8b71}} 
+void {\bfseries key\+Pressed} (\mbox{\hyperlink{struct_m_data}{MData}} \&md)
+\item 
+\mbox{\Hypertarget{class_poly_instrument_a1cbc6df24d63de8fd2daa4e07f1fb6dc}\label{class_poly_instrument_a1cbc6df24d63de8fd2daa4e07f1fb6dc}} 
+float {\bfseries get\+Frequency} (float note)
+\item 
+\mbox{\Hypertarget{class_poly_instrument_af7e00dd2e59a20455612d262b6eeba4f}\label{class_poly_instrument_af7e00dd2e59a20455612d262b6eeba4f}} 
+float {\bfseries get\+Phase\+Increment} (float note)
+\item 
+\mbox{\Hypertarget{class_poly_instrument_a9f34841d9d6abe5213813734d3520b8d}\label{class_poly_instrument_a9f34841d9d6abe5213813734d3520b8d}} 
+void {\bfseries set\+\_\+voices} (uint8\+\_\+t nvoices)
+\item 
+\mbox{\Hypertarget{class_poly_instrument_affd28f4745675099d9895b6bf3245a3b}\label{class_poly_instrument_affd28f4745675099d9895b6bf3245a3b}} 
+virtual void {\bfseries update\+Voice} (TVoice\+State $\ast$voice\+State, \mbox{\hyperlink{struct_m_data}{MData}} cmd)
+\item 
+\mbox{\Hypertarget{class_poly_instrument_ad73b147033448819532003a2411449e6}\label{class_poly_instrument_ad73b147033448819532003a2411449e6}} 
+virtual void {\bfseries process\+Voice} (TVoice\+State $\ast$voice\+State, float $\ast$output\+Buffer, float $\ast$input\+Buffer, unsigned int n\+Buffer\+Frames, double stream\+Time, uint8\+\_\+t nvoices)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_poly_instrument_aaef94f26c443c2846dce41e5e26de5af}\label{class_poly_instrument_aaef94f26c443c2846dce41e5e26de5af}} 
+float {\bfseries base\+\_\+note} = 69.\+0
+\item 
+\mbox{\Hypertarget{class_poly_instrument_a58e88c4523055fca5073a81066c7372c}\label{class_poly_instrument_a58e88c4523055fca5073a81066c7372c}} 
+float {\bfseries power\+\_\+base} = 2.\+0
+\item 
+\mbox{\Hypertarget{class_poly_instrument_ac0a01b44afedcf319ca2937c850b4a8a}\label{class_poly_instrument_ac0a01b44afedcf319ca2937c850b4a8a}} 
+float {\bfseries semitones} = 12.\+0
+\item 
+\mbox{\Hypertarget{class_poly_instrument_a6cd939874528b98f85cf516819c828b0}\label{class_poly_instrument_a6cd939874528b98f85cf516819c828b0}} 
+float {\bfseries instrument\+\_\+volume} = 1
+\item 
+\mbox{\Hypertarget{class_poly_instrument_afe01333120d888ef6fa966a410631854}\label{class_poly_instrument_afe01333120d888ef6fa966a410631854}} 
+double {\bfseries base\+\_\+frequency} = 440.\+0
+\item 
+\mbox{\Hypertarget{class_poly_instrument_ac9a2eaa43591c1f99c763ecbdee29ab8}\label{class_poly_instrument_ac9a2eaa43591c1f99c763ecbdee29ab8}} 
+float {\bfseries pitch} = 0
+\item 
+\mbox{\Hypertarget{class_poly_instrument_aa0d48cef6f0ff21630b9d917251725b1}\label{class_poly_instrument_aa0d48cef6f0ff21630b9d917251725b1}} 
+float {\bfseries pitch\+\_\+distance} = 12.\+0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_poly_instrument_a56b9765c2366de8c6b2815a208285993}\label{class_poly_instrument_a56b9765c2366de8c6b2815a208285993}} 
+\index{PolyInstrument$<$ TVoiceState $>$@{PolyInstrument$<$ TVoiceState $>$}!process@{process}}
+\index{process@{process}!PolyInstrument$<$ TVoiceState $>$@{PolyInstrument$<$ TVoiceState $>$}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily template$<$class TVoice\+State $>$ \\
+void \mbox{\hyperlink{class_poly_instrument}{Poly\+Instrument}}$<$ TVoice\+State $>$\+::process (\begin{DoxyParamCaption}\item[{float $\ast$}]{output\+Buffer,  }\item[{float $\ast$}]{input\+Buffer,  }\item[{unsigned int}]{n\+Buffer\+Frames,  }\item[{double}]{stream\+Time }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Virtual audio process method
+
+
+\begin{DoxyParams}{Parameters}
+{\em output\+Buffer} & output buffer of floats \\
+\hline
+{\em input\+Buffer} & input buffer of floats \\
+\hline
+{\em n\+Buffer\+Frames} & amount samples in buffers \\
+\hline
+{\em stream\+Time} & time since start\\
+\hline
+\end{DoxyParams}
+Pass-\/thru example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_poly_instrument_a56b9765c2366de8c6b2815a208285993}{process}}(\textcolor{keywordtype}{float} *outputBuffer, \textcolor{keywordtype}{float} *inputBuffer, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nBufferFrames, \textcolor{keywordtype}{double} streamTime)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 0; i < 2*nBufferFrames; i += 2) \{}
+\DoxyCodeLine{    outputBuffer[i + 0] = inputBuffer[i + 0];}
+\DoxyCodeLine{    outputBuffer[i + 1] = inputBuffer[i + 1];}
+\DoxyCodeLine{  \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented from \mbox{\hyperlink{class_a_ab4b066f9adb0738afbddfb491557caab}{A}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/Instrument.\+h\end{DoxyCompactItemize}

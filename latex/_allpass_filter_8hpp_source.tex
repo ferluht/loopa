@@ -1,0 +1,111 @@
+\hypertarget{_allpass_filter_8hpp_source}{}\doxysection{Allpass\+Filter.\+hpp}
+\label{_allpass_filter_8hpp_source}\index{effects\_audio/Plateau/AllpassFilter.hpp@{effects\_audio/Plateau/AllpassFilter.hpp}}
+\mbox{\hyperlink{_allpass_filter_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef APF\_HPP}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define APF\_HPP}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{_interp_delay2_8hpp}{InterpDelay2.hpp}}"{}}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{12 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{13 \textcolor{keyword}{class }AllpassFilter \{}
+\DoxyCodeLine{14 \textcolor{keyword}{public}:}
+\DoxyCodeLine{15     AllpassFilter() \{}
+\DoxyCodeLine{16         clear();}
+\DoxyCodeLine{17         gain = 0;}
+\DoxyCodeLine{18     \}}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20     AllpassFilter(\textcolor{keywordtype}{long} maxDelay, \textcolor{keywordtype}{long} initDelay, T gain) \{}
+\DoxyCodeLine{21         clear();}
+\DoxyCodeLine{22         delay = InterpDelay2<T>(maxDelay, initDelay);}
+\DoxyCodeLine{23         this-\/>gain = gain;}
+\DoxyCodeLine{24     \}}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26     T \textcolor{keyword}{inline} process() \{}
+\DoxyCodeLine{27         \_inSum = input + delay.output * gain;}
+\DoxyCodeLine{28         output = delay.output + \_inSum * gain * -\/1;}
+\DoxyCodeLine{29         delay.input = \_inSum;}
+\DoxyCodeLine{30         delay.process();}
+\DoxyCodeLine{31         \textcolor{keywordflow}{return} output;}
+\DoxyCodeLine{32     \}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34     \textcolor{keywordtype}{void} blockProcess(\textcolor{keyword}{const} T* inputBuffer, T* outputBuffer, \textcolor{keyword}{const} uint64\_t blockSize) \{}
+\DoxyCodeLine{35         \textcolor{keywordflow}{for} (uint64\_t i = 0; i < blockSize; ++i) \{}
+\DoxyCodeLine{36             \_inSum = inputBuffer[i] + delay.output * gain;}
+\DoxyCodeLine{37             output = delay.output + \_inSum * gain * -\/1;}
+\DoxyCodeLine{38             delay.input = \_inSum;}
+\DoxyCodeLine{39             delay.process();}
+\DoxyCodeLine{40             outputBuffer[i] = output;}
+\DoxyCodeLine{41         \}}
+\DoxyCodeLine{42     \}}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44     \textcolor{keywordtype}{void} clear() \{}
+\DoxyCodeLine{45         input = 0;}
+\DoxyCodeLine{46         output = 0;}
+\DoxyCodeLine{47         \_inSum = 0;}
+\DoxyCodeLine{48         \_outSum = 0;}
+\DoxyCodeLine{49         delay.clear();}
+\DoxyCodeLine{50     \}}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52     T input;}
+\DoxyCodeLine{53     T gain;}
+\DoxyCodeLine{54     T output;}
+\DoxyCodeLine{55     InterpDelay2<T> delay;}
+\DoxyCodeLine{56 \textcolor{keyword}{private}:}
+\DoxyCodeLine{57     T \_inSum;}
+\DoxyCodeLine{58     T \_outSum;}
+\DoxyCodeLine{59 \};}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{62 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{63 \textcolor{keyword}{class }NestedAllPassType1 \{}
+\DoxyCodeLine{64 \textcolor{keyword}{public}:}
+\DoxyCodeLine{65     NestedAllPassType1() \{}
+\DoxyCodeLine{66         gain1 = 0;}
+\DoxyCodeLine{67         gain2 = 0;}
+\DoxyCodeLine{68         decay1 = 0;}
+\DoxyCodeLine{69         decay2 = 0;}
+\DoxyCodeLine{70         clear();}
+\DoxyCodeLine{71     \}}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73     NestedAllPassType1(\textcolor{keywordtype}{long} maxDelay, \textcolor{keywordtype}{long} delayTime1, \textcolor{keywordtype}{long} delayTime2) \{}
+\DoxyCodeLine{74         delay1 = InterpDelay2<T>(maxDelay, delayTime1);}
+\DoxyCodeLine{75         delay2 = InterpDelay2<T>(maxDelay, delayTime2);}
+\DoxyCodeLine{76         gain1 = 0;}
+\DoxyCodeLine{77         gain2 = 0;}
+\DoxyCodeLine{78         decay1 = 0;}
+\DoxyCodeLine{79         decay2 = 0;}
+\DoxyCodeLine{80         clear();}
+\DoxyCodeLine{81     \}}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83     T \textcolor{keyword}{inline} process() \{}
+\DoxyCodeLine{84         \_inSum1 = input + delay1.output * gain1;}
+\DoxyCodeLine{85         \_inSum2 = \_inSum1 + delay2.output * gain2;}
+\DoxyCodeLine{86         delay2.input = \_inSum2;}
+\DoxyCodeLine{87         delay1.input = delay2.output * decay2 + \_inSum2 * -\/gain2;}
+\DoxyCodeLine{88         output = delay1.output * decay1 + \_inSum1 * -\/gain1;}
+\DoxyCodeLine{89         delay1.process();}
+\DoxyCodeLine{90         delay2.process();}
+\DoxyCodeLine{91         \textcolor{keywordflow}{return} output;}
+\DoxyCodeLine{92     \}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94     \textcolor{keywordtype}{void} clear() \{}
+\DoxyCodeLine{95         input = 0;}
+\DoxyCodeLine{96         output = 0;}
+\DoxyCodeLine{97         \_inSum1 = 0;}
+\DoxyCodeLine{98         \_inSum2 = 0;}
+\DoxyCodeLine{99         delay1.clear();}
+\DoxyCodeLine{100         delay2.clear();}
+\DoxyCodeLine{101     \}}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103     T input;}
+\DoxyCodeLine{104     T gain1, gain2;;}
+\DoxyCodeLine{105     T output;}
+\DoxyCodeLine{106     T decay1, decay2;}
+\DoxyCodeLine{107     InterpDelay2<T> delay1, delay2;}
+\DoxyCodeLine{108 \textcolor{keyword}{private}:}
+\DoxyCodeLine{109     T \_inSum1, \_inSum2;}
+\DoxyCodeLine{110 \};}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

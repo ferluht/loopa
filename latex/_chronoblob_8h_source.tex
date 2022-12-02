@@ -1,0 +1,34 @@
+\hypertarget{_chronoblob_8h_source}{}\doxysection{Chronoblob.\+h}
+\label{_chronoblob_8h_source}\index{effects\_audio/Chronoblob/Chronoblob.h@{effects\_audio/Chronoblob/Chronoblob.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//}}
+\DoxyCodeLine{2 \textcolor{comment}{// Created by ferluht on 09/07/2022.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 }
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include "{}PingPong.hpp"{}}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include <AMG.h>}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{11 \textcolor{keyword}{class }Chronoblob : \textcolor{keyword}{public} \mbox{\hyperlink{class_a_m_g}{AMG}}\{}
+\DoxyCodeLine{12 \textcolor{keyword}{public}:}
+\DoxyCodeLine{13     Chronoblob() : \mbox{\hyperlink{class_a_m_g}{AMG}}(\textcolor{stringliteral}{"{}CHRNBLB"{}}) \{}
+\DoxyCodeLine{14         pingpong = \textcolor{keyword}{new} PingPong();}
+\DoxyCodeLine{15         pingpong-\/>sync = \textcolor{keyword}{false};}
+\DoxyCodeLine{16         pingpong-\/>mode = \textcolor{keyword}{false};}
+\DoxyCodeLine{17         pingpong-\/>leftTime = 4.257;}
+\DoxyCodeLine{18         pingpong-\/>rightTime = 1.257;}
+\DoxyCodeLine{19         pingpong-\/>feedback = 0.85;}
+\DoxyCodeLine{20         pingpong-\/>dw = 0.95;}
+\DoxyCodeLine{21     \}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_a_ab4b066f9adb0738afbddfb491557caab}{process}}(\textcolor{keywordtype}{float} *outputBuffer, \textcolor{keywordtype}{float} * inputBuffer,}
+\DoxyCodeLine{24                  \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nBufferFrames, \textcolor{keywordtype}{double} streamTime) \textcolor{keyword}{override};}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{keyword}{private}:}
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28     PingPong * pingpong;}
+\DoxyCodeLine{29 \};}
+
+\end{DoxyCode}

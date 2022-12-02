@@ -1,0 +1,59 @@
+\hypertarget{_delay_8hpp_source}{}\doxysection{Delay.\+hpp}
+\label{_delay_8hpp_source}\index{effects\_audio/Delay/Delay.hpp@{effects\_audio/Delay/Delay.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//}}
+\DoxyCodeLine{2 \textcolor{comment}{// Created by ferluht on 09/07/2022.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 }
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include <cstdio>}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include <cstdlib>}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include <libsamplerate/include/samplerate.h>}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <RingBuffer.hpp>}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include <cmath>}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include <cassert>}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include <algorithm>}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#define HISTORY\_SIZE (1<<21)}}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{18 \textcolor{keyword}{class }Delay \{}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20     DoubleRingBuffer<float, HISTORY\_SIZE> historyBuffer;}
+\DoxyCodeLine{21     DoubleRingBuffer<float, 16> outBuffer;}
+\DoxyCodeLine{22     SRC\_STATE* src;}
+\DoxyCodeLine{23     \textcolor{keywordtype}{float} lastWet = 0.f;}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{keyword}{public}:}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27     \textcolor{keywordtype}{float} in = 0;}
+\DoxyCodeLine{28     \textcolor{keywordtype}{float} out = 0;}
+\DoxyCodeLine{29     \textcolor{keywordtype}{float} feedback = 0;}
+\DoxyCodeLine{30     \textcolor{keywordtype}{float} mix = 0;}
+\DoxyCodeLine{31     \textcolor{keywordtype}{float} delay = 0;}
+\DoxyCodeLine{32     \textcolor{keywordtype}{float} wet = 0;}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34     Delay() \{}
+\DoxyCodeLine{35         src = src\_new(SRC\_SINC\_FASTEST, 1, \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{36         assert(src);}
+\DoxyCodeLine{37     \}}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39     \string~Delay() \{}
+\DoxyCodeLine{40         src\_delete(src);}
+\DoxyCodeLine{41     \}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43     \textcolor{keywordtype}{void} process();}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45 \textcolor{keyword}{private}:}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47     \textcolor{keyword}{inline} \textcolor{keywordtype}{float} clamp(\textcolor{keywordtype}{float} x, \textcolor{keywordtype}{float} a, \textcolor{keywordtype}{float} b) \{}
+\DoxyCodeLine{48         \textcolor{keywordflow}{return} std::max(std::min(x, b), a);}
+\DoxyCodeLine{49     \}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51     \textcolor{keyword}{inline} \textcolor{keywordtype}{float} crossfade(\textcolor{keywordtype}{float} a, \textcolor{keywordtype}{float} b, \textcolor{keywordtype}{float} p) \{}
+\DoxyCodeLine{52         \textcolor{keywordflow}{return} a + (b -\/ a) * p;}
+\DoxyCodeLine{53     \}}
+\DoxyCodeLine{54 \};}
+
+\end{DoxyCode}

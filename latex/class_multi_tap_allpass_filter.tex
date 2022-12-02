@@ -1,0 +1,83 @@
+\hypertarget{class_multi_tap_allpass_filter}{}\doxysection{Multi\+Tap\+Allpass\+Filter\texorpdfstring{$<$}{<} T, num\+Taps \texorpdfstring{$>$}{>} Class Template Reference}
+\label{class_multi_tap_allpass_filter}\index{MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_multi_tap_allpass_filter_a2a60feadd40315465e7c532abe951f9c}{Multi\+Tap\+Allpass\+Filter}} (uint64\+\_\+t max\+Delay=2, uint64\+\_\+t init\+Delay=0, T init\+Gain=T(0))
+\item 
+\mbox{\hyperlink{class_multi_tap_allpass_filter_a8f5f5e7b262ca5be792ee3158a59331b}{Multi\+Tap\+Allpass\+Filter}} (uint64\+\_\+t max\+Delay, const std\+::array$<$ T, num\+Taps $>$ \&init\+Times, T init\+Gain=T(0))
+\item 
+T \mbox{\hyperlink{class_multi_tap_allpass_filter_a878d667af264703d833ea294f86ce61a}{process}} ()
+\item 
+void \mbox{\hyperlink{class_multi_tap_allpass_filter_a7c5c3a210f6339bbe65bffb527e3266e}{block\+Process}} (const T $\ast$input\+Buffer, T $\ast$output\+Buffer, const uint64\+\_\+t block\+Size)
+\item 
+void \mbox{\hyperlink{class_multi_tap_allpass_filter_a72eb3f1288c172bfde1c4f08d8ec4c54}{clear}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_multi_tap_allpass_filter_a9b3ea9eaac287da026f928323c65a3fa}\label{class_multi_tap_allpass_filter_a9b3ea9eaac287da026f928323c65a3fa}} 
+T {\bfseries input} = T(0)
+\item 
+\mbox{\Hypertarget{class_multi_tap_allpass_filter_a94be7a96e33b065fc144adc462d1aea1}\label{class_multi_tap_allpass_filter_a94be7a96e33b065fc144adc462d1aea1}} 
+T {\bfseries output} = T(0)
+\item 
+\mbox{\Hypertarget{class_multi_tap_allpass_filter_a5b4dafa9cdefeef573a90f06904d9528}\label{class_multi_tap_allpass_filter_a5b4dafa9cdefeef573a90f06904d9528}} 
+T {\bfseries gain} = T(0)
+\item 
+\mbox{\Hypertarget{class_multi_tap_allpass_filter_a0e92fe6bf55c1d9407337ca587842b59}\label{class_multi_tap_allpass_filter_a0e92fe6bf55c1d9407337ca587842b59}} 
+\mbox{\hyperlink{class_multi_tap_interp_delay}{Multi\+Tap\+Interp\+Delay}}$<$ T, num\+Taps $>$ {\bfseries delay}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_multi_tap_allpass_filter_a2a60feadd40315465e7c532abe951f9c}\label{class_multi_tap_allpass_filter_a2a60feadd40315465e7c532abe951f9c}} 
+\index{MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}!MultiTapAllpassFilter@{MultiTapAllpassFilter}}
+\index{MultiTapAllpassFilter@{MultiTapAllpassFilter}!MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}}
+\doxysubsubsection{\texorpdfstring{MultiTapAllpassFilter()}{MultiTapAllpassFilter()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T  = float, uint64\+\_\+t num\+Taps = 1$>$ \\
+\mbox{\hyperlink{class_multi_tap_allpass_filter}{Multi\+Tap\+Allpass\+Filter}}$<$ T, num\+Taps $>$\mbox{\hyperlink{class_multi_tap_allpass_filter}{\+::\+Multi\+Tap\+Allpass\+Filter}} (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{max\+Delay = {\ttfamily 2},  }\item[{uint64\+\_\+t}]{init\+Delay = {\ttfamily 0},  }\item[{T}]{init\+Gain = {\ttfamily T(0)} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Construct a new \mbox{\hyperlink{class_multi_tap_allpass_filter}{Multi\+Tap\+Allpass\+Filter}}, either from default or developer specified arguments \mbox{\Hypertarget{class_multi_tap_allpass_filter_a8f5f5e7b262ca5be792ee3158a59331b}\label{class_multi_tap_allpass_filter_a8f5f5e7b262ca5be792ee3158a59331b}} 
+\index{MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}!MultiTapAllpassFilter@{MultiTapAllpassFilter}}
+\index{MultiTapAllpassFilter@{MultiTapAllpassFilter}!MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}}
+\doxysubsubsection{\texorpdfstring{MultiTapAllpassFilter()}{MultiTapAllpassFilter()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T  = float, uint64\+\_\+t num\+Taps = 1$>$ \\
+\mbox{\hyperlink{class_multi_tap_allpass_filter}{Multi\+Tap\+Allpass\+Filter}}$<$ T, num\+Taps $>$\mbox{\hyperlink{class_multi_tap_allpass_filter}{\+::\+Multi\+Tap\+Allpass\+Filter}} (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{max\+Delay,  }\item[{const std\+::array$<$ T, num\+Taps $>$ \&}]{init\+Times,  }\item[{T}]{init\+Gain = {\ttfamily T(0)} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Construct a new \mbox{\hyperlink{class_multi_tap_allpass_filter}{Multi\+Tap\+Allpass\+Filter}}, either from default or developer specified arguments 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_multi_tap_allpass_filter_a7c5c3a210f6339bbe65bffb527e3266e}\label{class_multi_tap_allpass_filter_a7c5c3a210f6339bbe65bffb527e3266e}} 
+\index{MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}!blockProcess@{blockProcess}}
+\index{blockProcess@{blockProcess}!MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}}
+\doxysubsubsection{\texorpdfstring{blockProcess()}{blockProcess()}}
+{\footnotesize\ttfamily template$<$typename T  = float, uint64\+\_\+t num\+Taps = 1$>$ \\
+void \mbox{\hyperlink{class_multi_tap_allpass_filter}{Multi\+Tap\+Allpass\+Filter}}$<$ T, num\+Taps $>$\+::block\+Process (\begin{DoxyParamCaption}\item[{const T $\ast$}]{input\+Buffer,  }\item[{T $\ast$}]{output\+Buffer,  }\item[{const uint64\+\_\+t}]{block\+Size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Block process. The all-\/pass filtering uses only the 0th or first tap only. 
+\begin{DoxyParams}{Parameters}
+{\em input\+Buffer} & The input audio buffer to be all-\/pass filtered. The size of this array equals 1 x block\+Size \\
+\hline
+{\em output\+Buffer} & The output audio buffer. The size of this array equals 1 x block\+Size. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_multi_tap_allpass_filter_a72eb3f1288c172bfde1c4f08d8ec4c54}\label{class_multi_tap_allpass_filter_a72eb3f1288c172bfde1c4f08d8ec4c54}} 
+\index{MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}!clear@{clear}}
+\index{clear@{clear}!MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily template$<$typename T  = float, uint64\+\_\+t num\+Taps = 1$>$ \\
+void \mbox{\hyperlink{class_multi_tap_allpass_filter}{Multi\+Tap\+Allpass\+Filter}}$<$ T, num\+Taps $>$\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Clears the I/O and internal delay of this all-\/pass filter. \mbox{\Hypertarget{class_multi_tap_allpass_filter_a878d667af264703d833ea294f86ce61a}\label{class_multi_tap_allpass_filter_a878d667af264703d833ea294f86ce61a}} 
+\index{MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}!process@{process}}
+\index{process@{process}!MultiTapAllpassFilter$<$ T, numTaps $>$@{MultiTapAllpassFilter$<$ T, numTaps $>$}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily template$<$typename T  = float, uint64\+\_\+t num\+Taps = 1$>$ \\
+T \mbox{\hyperlink{class_multi_tap_allpass_filter}{Multi\+Tap\+Allpass\+Filter}}$<$ T, num\+Taps $>$\+::process (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Single tick process. The all-\/pass filtering uses only the 0th or first tap only. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+effects\+\_\+audio/\+Plateau/\mbox{\hyperlink{_multi_tap_allpass_filter_8hpp}{Multi\+Tap\+Allpass\+Filter.\+hpp}}\end{DoxyCompactItemize}

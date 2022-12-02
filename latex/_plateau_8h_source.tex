@@ -1,0 +1,29 @@
+\hypertarget{_plateau_8h_source}{}\doxysection{Plateau.\+h}
+\label{_plateau_8h_source}\index{effects\_audio/Plateau/Plateau.h@{effects\_audio/Plateau/Plateau.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//}}
+\DoxyCodeLine{2 \textcolor{comment}{// Created by ferluht on 09/07/2022.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 }
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include <Effect.h>}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include "{}Dattorro.hpp"{}}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{keyword}{class }\mbox{\hyperlink{class_plateau}{Plateau}} : \textcolor{keyword}{public} \mbox{\hyperlink{class_audio_effect}{AudioEffect}}\{}
+\DoxyCodeLine{11 \textcolor{keyword}{public}:}
+\DoxyCodeLine{12     \mbox{\hyperlink{class_plateau}{Plateau}}();}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_plateau_ad423dd98c37e361b9fd77b9682488a1f}{process}}(\textcolor{keywordtype}{float} *outputBuffer, \textcolor{keywordtype}{float} * inputBuffer,}
+\DoxyCodeLine{15                  \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nBufferFrames, \textcolor{keywordtype}{double} streamTime) \textcolor{keyword}{override};}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_plateau_a48e034b828dbecde3c18132fa7aae8ed}{draw}}(GFXcanvas1 * screen) \textcolor{keyword}{override};}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{keyword}{private}:}
+\DoxyCodeLine{20     \textcolor{keywordtype}{float} dry = 0.5;}
+\DoxyCodeLine{21     Dattorro * dattorro;}
+\DoxyCodeLine{22 \};}
+\DoxyCodeLine{23 }
+
+\end{DoxyCode}

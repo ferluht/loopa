@@ -6,11 +6,11 @@
 
 #include "Scale.h"
 
-class DummyMidi : public AMG {
+class DummyMidiFX : public MIDIEffect {
 
 public:
 
-    DummyMidi() : AMG("NO FX") {
+    DummyMidiFX() : MIDIEffect("NO FX") {
 
     }
 

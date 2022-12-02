@@ -1,0 +1,129 @@
+\hypertarget{_wav_file_8hpp_source}{}\doxysection{Wav\+File.\+hpp}
+\label{_wav_file_8hpp_source}\index{utils/WavFile.hpp@{utils/WavFile.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//=======================================================================}}
+\DoxyCodeLine{21 \textcolor{comment}{}\textcolor{comment}{//=======================================================================}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#include <iostream>}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{\#include <vector>}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#include <assert.h>}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#include <string>}}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{36 \textcolor{comment}{}\textcolor{keyword}{enum class} WavFileFormat}
+\DoxyCodeLine{37 \{}
+\DoxyCodeLine{38     Error,}
+\DoxyCodeLine{39     NotLoaded,}
+\DoxyCodeLine{40     Wave,}
+\DoxyCodeLine{41     Aiff}
+\DoxyCodeLine{42 \};}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{45 \textcolor{keyword}{template} <\textcolor{keyword}{class} T>}
+\DoxyCodeLine{46 \textcolor{keyword}{class }WavFile}
+\DoxyCodeLine{47 \{}
+\DoxyCodeLine{48 \textcolor{keyword}{public}:}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{51     \textcolor{keyword}{typedef} std::vector<std::vector<T> > AudioBuffer;}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{55 \textcolor{comment}{}    WavFile();}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{61 \textcolor{comment}{}    \textcolor{keywordtype}{bool} load (std::string filePath);}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{66     \textcolor{keywordtype}{bool} save (std::string filePath, WavFileFormat format = WavFileFormat::Wave);}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{70 \textcolor{comment}{}    uint32\_t getSampleRate() \textcolor{keyword}{const};}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{73     \textcolor{keywordtype}{int} getNumChannels() \textcolor{keyword}{const};}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{76     \textcolor{keywordtype}{bool} isMono() \textcolor{keyword}{const};}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{79     \textcolor{keywordtype}{bool} isStereo() \textcolor{keyword}{const};}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{82     \textcolor{keywordtype}{int} getBitDepth() \textcolor{keyword}{const};}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{85     \textcolor{keywordtype}{int} getNumSamplesPerChannel() \textcolor{keyword}{const};}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{88     \textcolor{keywordtype}{double} getLengthInSeconds() \textcolor{keyword}{const};}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{91     \textcolor{keywordtype}{void} printSummary() \textcolor{keyword}{const};}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{98     \textcolor{keywordtype}{bool} setAudioBuffer (AudioBuffer\& newBuffer);}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{103     \textcolor{keywordtype}{void} setAudioBufferSize (\textcolor{keywordtype}{int} numChannels, \textcolor{keywordtype}{int} numSamples);}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{108     \textcolor{keywordtype}{void} setNumSamplesPerChannel (\textcolor{keywordtype}{int} numSamples);}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{111     \textcolor{keywordtype}{void} setNumChannels (\textcolor{keywordtype}{int} numChannels);}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{114     \textcolor{keywordtype}{void} setBitDepth (\textcolor{keywordtype}{int} numBitsPerSample);}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{117     \textcolor{keywordtype}{void} setSampleRate (uint32\_t newSampleRate);}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{125 \textcolor{comment}{}    AudioBuffer samples;}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127     int16\_t sampleToSixteenBitInt (T sample);}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129 \textcolor{keyword}{private}:}
+\DoxyCodeLine{130 }
+\DoxyCodeLine{131     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{132     \textcolor{keyword}{enum class} Endianness}
+\DoxyCodeLine{133     \{}
+\DoxyCodeLine{134         LittleEndian,}
+\DoxyCodeLine{135         BigEndian}
+\DoxyCodeLine{136     \};}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{139     WavFileFormat determineAudioFileFormat (std::vector<uint8\_t>\& fileData);}
+\DoxyCodeLine{140     \textcolor{keywordtype}{bool} decodeWaveFile (std::vector<uint8\_t>\& fileData);}
+\DoxyCodeLine{141     \textcolor{keywordtype}{bool} decodeAiffFile (std::vector<uint8\_t>\& fileData);}
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{144     \textcolor{keywordtype}{bool} saveToWaveFile (std::string filePath);}
+\DoxyCodeLine{145     \textcolor{keywordtype}{bool} saveToAiffFile (std::string filePath);}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{148     \textcolor{keywordtype}{void} clearAudioBuffer();}
+\DoxyCodeLine{149 }
+\DoxyCodeLine{150     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{151     int32\_t fourBytesToInt (std::vector<uint8\_t>\& source, \textcolor{keywordtype}{int} startIndex, Endianness endianness = Endianness::LittleEndian);}
+\DoxyCodeLine{152     int16\_t twoBytesToInt (std::vector<uint8\_t>\& source, \textcolor{keywordtype}{int} startIndex, Endianness endianness = Endianness::LittleEndian);}
+\DoxyCodeLine{153     \textcolor{keywordtype}{int} getIndexOfString (std::vector<uint8\_t>\& source, std::string s);}
+\DoxyCodeLine{154 }
+\DoxyCodeLine{155     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{156     T sixteenBitIntToSample (int16\_t sample);}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{158     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{159     uint8\_t sampleToSingleByte (T sample);}
+\DoxyCodeLine{160     T singleByteToSample (uint8\_t sample);}
+\DoxyCodeLine{161 }
+\DoxyCodeLine{162     uint32\_t getAiffSampleRate (std::vector<uint8\_t>\& fileData, \textcolor{keywordtype}{int} sampleRateStartIndex);}
+\DoxyCodeLine{163     \textcolor{keywordtype}{bool} tenByteMatch (std::vector<uint8\_t>\& v1, \textcolor{keywordtype}{int} startIndex1, std::vector<uint8\_t>\& v2, \textcolor{keywordtype}{int} startIndex2);}
+\DoxyCodeLine{164     \textcolor{keywordtype}{void} addSampleRateToAiffData (std::vector<uint8\_t>\& fileData, uint32\_t sampleRate);}
+\DoxyCodeLine{165     T clamp (T v1, T minValue, T maxValue);}
+\DoxyCodeLine{166 }
+\DoxyCodeLine{167     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{168     \textcolor{keywordtype}{void} addStringToFileData (std::vector<uint8\_t>\& fileData, std::string s);}
+\DoxyCodeLine{169     \textcolor{keywordtype}{void} addInt32ToFileData (std::vector<uint8\_t>\& fileData, int32\_t i, Endianness endianness = Endianness::LittleEndian);}
+\DoxyCodeLine{170     \textcolor{keywordtype}{void} addInt16ToFileData (std::vector<uint8\_t>\& fileData, int16\_t i, Endianness endianness = Endianness::LittleEndian);}
+\DoxyCodeLine{171 }
+\DoxyCodeLine{172     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{173     \textcolor{keywordtype}{bool} writeDataToFile (std::vector<uint8\_t>\& fileData, std::string filePath);}
+\DoxyCodeLine{174 }
+\DoxyCodeLine{175     \textcolor{comment}{//=============================================================}}
+\DoxyCodeLine{176     WavFileFormat audioFileFormat;}
+\DoxyCodeLine{177     uint32\_t sampleRate;}
+\DoxyCodeLine{178     \textcolor{keywordtype}{int} bitDepth;}
+\DoxyCodeLine{179 \};}
+
+\end{DoxyCode}

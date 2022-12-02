@@ -7,6 +7,9 @@
 #include <cmath>
 #include <cstdint>
 
+/**
+ * @private
+ */
 class ADSR {
 
     enum STAGES {

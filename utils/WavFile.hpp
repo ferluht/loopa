@@ -41,7 +41,7 @@ enum class WavFileFormat
     Aiff
 };
 
-//=============================================================
+/// @private
 template <class T>
 class WavFile
 {

@@ -1,7 +1,6 @@
-//
-// Created by ferluht on 10/07/2022.
-//
-
 #pragma once
 
+/**
+ * @private
+ */
 float soft_clip(float in);

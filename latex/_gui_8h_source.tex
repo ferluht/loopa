@@ -1,0 +1,40 @@
+\hypertarget{_gui_8h_source}{}\doxysection{Gui.\+h}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//}}
+\DoxyCodeLine{2 \textcolor{comment}{// Created by ferluht on 25/11/2022.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 }
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include <stdint.h>}}
+\DoxyCodeLine{8 }
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#ifdef \_\_APPLE\_\_}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{    \#define GLFW\_INCLUDE\_GLCOREARB}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{    \#define GL\_GLEXT\_PROTOTYPES}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#ifndef \_\_APPLE\_\_}}
+\DoxyCodeLine{16 \textcolor{preprocessor}{    \#include <wiringSerial.h>}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{    \#define GLFW\_INCLUDE\_GLU}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{    \#include <GLFW/glfw3.h>}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{    \#include <nanogui/nanogui.h>}}
+\DoxyCodeLine{21     \textcolor{keyword}{using namespace }nanogui;}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#include "{}Daw.h"{}}}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{preprocessor}{\#define SCREEN\_WIDTH 128}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#define SCREEN\_HEIGHT 32}}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 \textcolor{preprocessor}{\#include "{}Adafruit-\/GFX-\/offscreen/Adafruit\_GFX.h"{}}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{keywordtype}{void} init\_gui();}
+\DoxyCodeLine{32 \textcolor{keywordtype}{bool} process\_gui();}
+\DoxyCodeLine{33 \textcolor{keywordtype}{void} scan\_buttons();}
+\DoxyCodeLine{34 \textcolor{keywordtype}{void} close\_gui();}
+\DoxyCodeLine{35 }
+
+\end{DoxyCode}

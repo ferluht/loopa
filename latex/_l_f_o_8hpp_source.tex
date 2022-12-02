@@ -1,0 +1,182 @@
+\hypertarget{_l_f_o_8hpp_source}{}\doxysection{LFO.\+hpp}
+\label{_l_f_o_8hpp_source}\index{effects\_audio/Plateau/LFO.hpp@{effects\_audio/Plateau/LFO.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef DSJ\_LFO\_HPP}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define DSJ\_LFO\_HPP}}
+\DoxyCodeLine{3 \textcolor{preprocessor}{\#include <vector>}}
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <cmath>}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#include <cstdint>}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{8 \textcolor{keyword}{class }LFO \{}
+\DoxyCodeLine{9 \textcolor{keyword}{public}:}
+\DoxyCodeLine{10     \textcolor{keywordtype}{float} output = 0.0;}
+\DoxyCodeLine{11     \textcolor{keywordtype}{float} phase = 0.0;}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13     LFO() \{}
+\DoxyCodeLine{14         \_frequency = 1.0;}
+\DoxyCodeLine{15         \_sampleRate = 44100.0;}
+\DoxyCodeLine{16         \_stepSize = \_frequency * (float)kTableLength / \_sampleRate;}
+\DoxyCodeLine{17         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i = 0; i < kTableLength; ++i) \{}
+\DoxyCodeLine{18             \_sine.push\_back(sin(2.0 * M\_PI * (\textcolor{keywordtype}{float})i / (\textcolor{keywordtype}{float})kTableLength));}
+\DoxyCodeLine{19         \}}
+\DoxyCodeLine{20         \_phasor = 0.0;}
+\DoxyCodeLine{21     \}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23     \textcolor{keywordtype}{float} process() \{}
+\DoxyCodeLine{24         \_plusPhase = \_phasor + phase * kTableLength;}
+\DoxyCodeLine{25         \textcolor{keywordflow}{if}(\_plusPhase < 0.0) \{}
+\DoxyCodeLine{26             \_plusPhase += kTableLength;}
+\DoxyCodeLine{27         \}}
+\DoxyCodeLine{28         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(\_plusPhase >= kTableLength) \{}
+\DoxyCodeLine{29             \_plusPhase -\/= kTableLength;}
+\DoxyCodeLine{30         \}}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32         \_a = (long)\_plusPhase;}
+\DoxyCodeLine{33         \_frac = \_plusPhase -\/ \_a;}
+\DoxyCodeLine{34         \_b = \_a + 1.0;}
+\DoxyCodeLine{35         \_b \%= kTableLength;}
+\DoxyCodeLine{36         output = \_sine[\_a] * (1.0 -\/ \_frac) + \_sine[\_b] * \_frac;}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38         \_phasor += \_stepSize;}
+\DoxyCodeLine{39         \textcolor{keywordflow}{if}(\_phasor >= kTableLength) \{}
+\DoxyCodeLine{40             \_phasor -\/= kTableLength;}
+\DoxyCodeLine{41         \}}
+\DoxyCodeLine{42         \textcolor{keywordflow}{return} output;}
+\DoxyCodeLine{43     \}}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45     \textcolor{keywordtype}{void} setFrequency(\textcolor{keywordtype}{float} frequency) \{}
+\DoxyCodeLine{46         \_frequency = frequency;}
+\DoxyCodeLine{47         calcStepSize();}
+\DoxyCodeLine{48     \}}
+\DoxyCodeLine{49     \textcolor{keywordtype}{void} setSamplerate(\textcolor{keywordtype}{float} sampleRate) \{}
+\DoxyCodeLine{50         \_sampleRate = sampleRate;}
+\DoxyCodeLine{51         calcStepSize();}
+\DoxyCodeLine{52     \}}
+\DoxyCodeLine{53 \textcolor{keyword}{private}:}
+\DoxyCodeLine{54     \textcolor{keywordtype}{float} \_frequency;}
+\DoxyCodeLine{55     \textcolor{keywordtype}{float} \_sampleRate;}
+\DoxyCodeLine{56     \textcolor{keywordtype}{float} \_stepSize;}
+\DoxyCodeLine{57     \textcolor{keywordtype}{float} \_phasor;}
+\DoxyCodeLine{58     \textcolor{keywordtype}{float} \_plusPhase;}
+\DoxyCodeLine{59     \textcolor{keywordtype}{long} \_a, \_b;}
+\DoxyCodeLine{60     \textcolor{keywordtype}{float} \_frac;}
+\DoxyCodeLine{61     \textcolor{keyword}{const} \textcolor{keywordtype}{long} kTableLength = 4096;}
+\DoxyCodeLine{62     std::vector<float> \_sine;}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64     \textcolor{keywordtype}{void} calcStepSize() \{}
+\DoxyCodeLine{65         \_stepSize = \_frequency * (float)kTableLength / \_sampleRate;}
+\DoxyCodeLine{66     \}}
+\DoxyCodeLine{67 \};}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{70 \textcolor{keyword}{class }TriSawLFO \{}
+\DoxyCodeLine{71 \textcolor{keyword}{public}:}
+\DoxyCodeLine{72     TriSawLFO(\textcolor{keywordtype}{float} sampleRate = 44100.0, \textcolor{keywordtype}{float} frequency = 1.0) \{}
+\DoxyCodeLine{73         phase = 0.0;}
+\DoxyCodeLine{74         \_output = 0.0;}
+\DoxyCodeLine{75         \_sampleRate = sampleRate;}
+\DoxyCodeLine{76         \_step = 0.0;}
+\DoxyCodeLine{77         \_rising = \textcolor{keyword}{true};}
+\DoxyCodeLine{78         setFrequency(frequency);}
+\DoxyCodeLine{79         setRevPoint(0.5);}
+\DoxyCodeLine{80     \}}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82     \textcolor{keywordtype}{float} process() \{}
+\DoxyCodeLine{83         \textcolor{keywordflow}{if}(\_step > 1.0) \{}
+\DoxyCodeLine{84             \_step -\/= 1.0;}
+\DoxyCodeLine{85             \_rising = \textcolor{keyword}{true};}
+\DoxyCodeLine{86         \}}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{88         \textcolor{keywordflow}{if}(\_step >= \_revPoint) \{}
+\DoxyCodeLine{89             \_rising = \textcolor{keyword}{false};}
+\DoxyCodeLine{90         \}}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92         \textcolor{keywordflow}{if}(\_rising) \{}
+\DoxyCodeLine{93             \_output = \_step * \_riseRate;}
+\DoxyCodeLine{94         \}}
+\DoxyCodeLine{95         \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{96             \_output = \_step * \_fallRate -\/ \_fallRate;}
+\DoxyCodeLine{97         \}}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99         \_step += \_stepSize;}
+\DoxyCodeLine{100         \_output *= 2.0;}
+\DoxyCodeLine{101         \_output -\/= 1.0;}
+\DoxyCodeLine{102         \textcolor{keywordflow}{return} \_output;}
+\DoxyCodeLine{103     \}}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105     \textcolor{keywordtype}{void} blockProcess(\textcolor{keywordtype}{float}* outputBuffer, \textcolor{keyword}{const} uint64\_t blockSize) \{}
+\DoxyCodeLine{106         \textcolor{keywordflow}{for} (uint64\_t i = 0; i < blockSize; ++i) \{}
+\DoxyCodeLine{107             \textcolor{keywordflow}{if}(\_step > 1.0) \{}
+\DoxyCodeLine{108                 \_step -\/= 1.0;}
+\DoxyCodeLine{109                 \_rising = \textcolor{keyword}{true};}
+\DoxyCodeLine{110             \}}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112             \textcolor{keywordflow}{if}(\_step >= \_revPoint) \{}
+\DoxyCodeLine{113                 \_rising = \textcolor{keyword}{false};}
+\DoxyCodeLine{114             \}}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116             \textcolor{keywordflow}{if}(\_rising) \{}
+\DoxyCodeLine{117                 \_output = \_step * \_riseRate;}
+\DoxyCodeLine{118             \}}
+\DoxyCodeLine{119             \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{120                 \_output = \_step * \_fallRate -\/ \_fallRate;}
+\DoxyCodeLine{121             \}}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123             \_step += \_stepSize;}
+\DoxyCodeLine{124             \_output *= 2.0;}
+\DoxyCodeLine{125             \_output -\/= 1.0;}
+\DoxyCodeLine{126             outputBuffer[i] = \_output;}
+\DoxyCodeLine{127         \}}
+\DoxyCodeLine{128     \}}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130     \textcolor{keywordtype}{void} setFrequency(\textcolor{keywordtype}{float} frequency) \{}
+\DoxyCodeLine{131         \textcolor{keywordflow}{if} (frequency == \_frequency) \{}
+\DoxyCodeLine{132             \textcolor{keywordflow}{return};}
+\DoxyCodeLine{133         \}}
+\DoxyCodeLine{134         \_frequency = frequency;}
+\DoxyCodeLine{135         calcStepSize();}
+\DoxyCodeLine{136     \}}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138     \textcolor{keywordtype}{void} setRevPoint(\textcolor{keywordtype}{float} revPoint) \{}
+\DoxyCodeLine{139         \_revPoint = revPoint;}
+\DoxyCodeLine{140         \textcolor{keywordflow}{if}(\_revPoint < 0.0001) \{}
+\DoxyCodeLine{141             \_revPoint = 0.0001;}
+\DoxyCodeLine{142         \}}
+\DoxyCodeLine{143         \textcolor{keywordflow}{if}(\_revPoint > 0.999) \{}
+\DoxyCodeLine{144             \_revPoint = 0.999;}
+\DoxyCodeLine{145         \}}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147         \_riseRate = 1.0 / \_revPoint;}
+\DoxyCodeLine{148         \_fallRate = -\/1.0 / (1.0 -\/ \_revPoint);}
+\DoxyCodeLine{149     \}}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151     \textcolor{keywordtype}{void} setSamplerate(\textcolor{keywordtype}{float} sampleRate) \{}
+\DoxyCodeLine{152         \_sampleRate = sampleRate;}
+\DoxyCodeLine{153         calcStepSize();}
+\DoxyCodeLine{154     \}}
+\DoxyCodeLine{155 }
+\DoxyCodeLine{156     \textcolor{keywordtype}{float} getOutput()\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{157         \textcolor{keywordflow}{return} \_output;}
+\DoxyCodeLine{158     \}}
+\DoxyCodeLine{159 }
+\DoxyCodeLine{160     \textcolor{keywordtype}{float} phase;}
+\DoxyCodeLine{161 }
+\DoxyCodeLine{162 \textcolor{keyword}{private}:}
+\DoxyCodeLine{163     \textcolor{keywordtype}{float} \_output;}
+\DoxyCodeLine{164     \textcolor{keywordtype}{float} \_sampleRate;}
+\DoxyCodeLine{165     \textcolor{keywordtype}{float} \_frequency = 0.0;}
+\DoxyCodeLine{166     \textcolor{keywordtype}{float} \_revPoint;}
+\DoxyCodeLine{167     \textcolor{keywordtype}{float} \_riseRate;}
+\DoxyCodeLine{168     \textcolor{keywordtype}{float} \_fallRate;}
+\DoxyCodeLine{169     \textcolor{keywordtype}{float} \_step;}
+\DoxyCodeLine{170     \textcolor{keywordtype}{float} \_stepSize;}
+\DoxyCodeLine{171     \textcolor{keywordtype}{bool} \_rising;}
+\DoxyCodeLine{172 }
+\DoxyCodeLine{173     \textcolor{keywordtype}{void} calcStepSize() \{}
+\DoxyCodeLine{174         \_stepSize = \_frequency / \_sampleRate;}
+\DoxyCodeLine{175     \}}
+\DoxyCodeLine{176 \};}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -4,6 +4,17 @@
 
 #include "Plateau.h"
 
+Plateau::Plateau() : AudioEffect("PLATEAU") {
+    dattorro = new Dattorro();
+    dattorro->size = 0.95;
+    dattorro->decay = 0.9;
+
+    addMIDIHandler(CC_HEADER, CC_E1, [this](MData &cmd) -> MIDISTATUS {
+        dry = (float) cmd.data2 / 127.0;
+        return MIDISTATUS::DONE;
+    });
+}
+
 void Plateau::process(float *outputBuffer, float * inputBuffer,
                       unsigned int nBufferFrames, double streamTime) {
     for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {

@@ -1,0 +1,33 @@
+\hypertarget{_a_m_g_8h_source}{}\doxysection{AMG.\+h}
+\label{_a_m_g_8h_source}\index{core/AMG.h@{core/AMG.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//}}
+\DoxyCodeLine{2 \textcolor{comment}{// Created by ferluht on 21/07/2022.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 }
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include "{}A.h"{}}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include "{}M.h"{}}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include "{}G.h"{}}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <cstring>}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{15 \textcolor{keyword}{class }\mbox{\hyperlink{class_a_m_g}{AMG}} : \textcolor{keyword}{public} \mbox{\hyperlink{class_a}{A}}, \textcolor{keyword}{public} \mbox{\hyperlink{class_m}{M}}, \textcolor{keyword}{public} \mbox{\hyperlink{class_g}{G}} \{}
+\DoxyCodeLine{16     \textcolor{keywordtype}{char} name[50];}
+\DoxyCodeLine{17 \textcolor{keyword}{public}:}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19     \mbox{\hyperlink{class_a_m_g}{AMG}}() \{}
+\DoxyCodeLine{20         std::strcpy(name, \textcolor{stringliteral}{"{}name"{}});}
+\DoxyCodeLine{21     \}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23     \mbox{\hyperlink{class_a_m_g}{AMG}}(\textcolor{keyword}{const} \textcolor{keywordtype}{char} * name\_) : \mbox{\hyperlink{class_a}{A}}(), \mbox{\hyperlink{class_m}{M}}(), \mbox{\hyperlink{class_g}{G}}() \{}
+\DoxyCodeLine{24         std::strcpy(name, name\_);}
+\DoxyCodeLine{25     \}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27     \textcolor{keyword}{inline} \textcolor{keyword}{const} \textcolor{keywordtype}{char} * getName() \{}
+\DoxyCodeLine{28         \textcolor{keywordflow}{return} name;}
+\DoxyCodeLine{29     \}}
+\DoxyCodeLine{30 \};}
+
+\end{DoxyCode}

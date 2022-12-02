@@ -1,0 +1,139 @@
+\hypertarget{class_rack}{}\doxysection{Rack Class Reference}
+\label{class_rack}\index{Rack@{Rack}}
+Inheritance diagram for Rack\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_rack}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_rack_a16f68a2da2c6497f8eb437f3fad014b0}\label{class_rack_a16f68a2da2c6497f8eb437f3fad014b0}} 
+enum {\bfseries RACKTYPE} \{ {\bfseries PARALLEL}
+, {\bfseries SEQUENTIAL}
+, {\bfseries SELECTIVE}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_rack_ac9a7f73e9255cedce27404be2e022437}\label{class_rack_ac9a7f73e9255cedce27404be2e022437}} 
+{\bfseries Rack} (const char $\ast$name, RACKTYPE racktype\+\_\+)
+\item 
+MIDISTATUS \mbox{\hyperlink{class_rack_a842952c85e86cc2efc0194523d12ab0b}{midi\+In}} (\mbox{\hyperlink{struct_m_data}{MData}} \&cmd) override
+\item 
+void \mbox{\hyperlink{class_rack_ac3c28450a5e039ea2633c009d69e6b70}{draw}} (GFXcanvas1 $\ast$screen) override
+\item 
+void \mbox{\hyperlink{class_rack_af7ae34a3b74aba6f77f265dbda707d10}{process}} (float $\ast$output\+Buffer, float $\ast$input\+Buffer, unsigned int n\+Buffer\+Frames, double stream\+Time) override
+\item 
+\mbox{\Hypertarget{class_rack_ad8aec5884deecb2836672a760341d8a1}\label{class_rack_ad8aec5884deecb2836672a760341d8a1}} 
+void {\bfseries add} (\mbox{\hyperlink{class_a_m_g}{AMG}} $\ast$item)
+\item 
+\mbox{\Hypertarget{class_rack_a2848f00f9b3225d0dc9cfdef12caa263}\label{class_rack_a2848f00f9b3225d0dc9cfdef12caa263}} 
+void {\bfseries attach} (\mbox{\hyperlink{class_rack}{Rack}} $\ast$parent\+\_\+)
+\item 
+\mbox{\Hypertarget{class_rack_a87fe7d656136ba3a0c26a3c1c3c2e7c3}\label{class_rack_a87fe7d656136ba3a0c26a3c1c3c2e7c3}} 
+\mbox{\hyperlink{class_rack}{Rack}} $\ast$ {\bfseries dive\+\_\+in} ()
+\item 
+\mbox{\Hypertarget{class_rack_a3f8fca2446588295212467adffcc9c08}\label{class_rack_a3f8fca2446588295212467adffcc9c08}} 
+\mbox{\hyperlink{class_rack}{Rack}} $\ast$ {\bfseries dive\+\_\+out} ()
+\item 
+\mbox{\Hypertarget{class_rack_a8b81e5dd5ec35df7e67607f6f9e18e9c}\label{class_rack_a8b81e5dd5ec35df7e67607f6f9e18e9c}} 
+\mbox{\hyperlink{class_rack}{Rack}} $\ast$ {\bfseries dive\+\_\+prev} ()
+\item 
+\mbox{\Hypertarget{class_rack_afc60dd2baccb34409bd932b503aedf37}\label{class_rack_afc60dd2baccb34409bd932b503aedf37}} 
+\mbox{\hyperlink{class_rack}{Rack}} $\ast$ {\bfseries dive\+\_\+next} ()
+\item 
+\mbox{\Hypertarget{class_rack_a55a2495d860c3186e11008fd3d9dba90}\label{class_rack_a55a2495d860c3186e11008fd3d9dba90}} 
+void {\bfseries set\+\_\+focus\+\_\+by\+\_\+index} (int i)
+\item 
+\mbox{\Hypertarget{class_rack_a0c8ef3c65bebf01a1ddad7a6f4e1a3fa}\label{class_rack_a0c8ef3c65bebf01a1ddad7a6f4e1a3fa}} 
+\mbox{\hyperlink{class_a_m_g}{AMG}} $\ast$ {\bfseries get\+\_\+focus} ()
+\item 
+\mbox{\Hypertarget{class_rack_a1e5f1564d1dbb0c289244bd2ba869257}\label{class_rack_a1e5f1564d1dbb0c289244bd2ba869257}} 
+int {\bfseries get\+\_\+focus\+\_\+index} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_rack_ac3c28450a5e039ea2633c009d69e6b70}\label{class_rack_ac3c28450a5e039ea2633c009d69e6b70}} 
+\index{Rack@{Rack}!draw@{draw}}
+\index{draw@{draw}!Rack@{Rack}}
+\doxysubsubsection{\texorpdfstring{draw()}{draw()}}
+{\footnotesize\ttfamily void Rack\+::draw (\begin{DoxyParamCaption}\item[{GFXcanvas1 $\ast$}]{screen }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Virtual draw method
+
+
+\begin{DoxyParams}{Parameters}
+{\em screen} & GFXcanvas1\\
+\hline
+\end{DoxyParams}
+Example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_rack_ac3c28450a5e039ea2633c009d69e6b70}{draw}}(GFXcanvas1 * screen)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  screen-\/>setCursor(0, 0);}
+\DoxyCodeLine{  screen-\/>setTextSize(1);}
+\DoxyCodeLine{  screen-\/>print(\textcolor{stringliteral}{"{}SAMPLE TEXT"{}});}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented from \mbox{\hyperlink{class_g_af0dc304f77853286afe764c1022fab55}{G}}.
+
+\mbox{\Hypertarget{class_rack_a842952c85e86cc2efc0194523d12ab0b}\label{class_rack_a842952c85e86cc2efc0194523d12ab0b}} 
+\index{Rack@{Rack}!midiIn@{midiIn}}
+\index{midiIn@{midiIn}!Rack@{Rack}}
+\doxysubsubsection{\texorpdfstring{midiIn()}{midiIn()}}
+{\footnotesize\ttfamily MIDISTATUS Rack\+::midi\+In (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_m_data}{MData}} \&}]{cmd }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+MIDI receiver method. When received midi command calls matching callback if exists If no callback exists just returns MIDISTATUS\+::\+DONE 
+\begin{DoxyParams}{Parameters}
+{\em cmd} & midi command \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{class_m_a165f3e89d1329bdb7d738164ff5689cf}{M}}.
+
+\mbox{\Hypertarget{class_rack_af7ae34a3b74aba6f77f265dbda707d10}\label{class_rack_af7ae34a3b74aba6f77f265dbda707d10}} 
+\index{Rack@{Rack}!process@{process}}
+\index{process@{process}!Rack@{Rack}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily void Rack\+::process (\begin{DoxyParamCaption}\item[{float $\ast$}]{output\+Buffer,  }\item[{float $\ast$}]{input\+Buffer,  }\item[{unsigned int}]{n\+Buffer\+Frames,  }\item[{double}]{stream\+Time }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Virtual audio process method
+
+
+\begin{DoxyParams}{Parameters}
+{\em output\+Buffer} & output buffer of floats \\
+\hline
+{\em input\+Buffer} & input buffer of floats \\
+\hline
+{\em n\+Buffer\+Frames} & amount samples in buffers \\
+\hline
+{\em stream\+Time} & time since start\\
+\hline
+\end{DoxyParams}
+Pass-\/thru example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_rack_af7ae34a3b74aba6f77f265dbda707d10}{process}}(\textcolor{keywordtype}{float} *outputBuffer, \textcolor{keywordtype}{float} *inputBuffer, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nBufferFrames, \textcolor{keywordtype}{double} streamTime)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 0; i < 2*nBufferFrames; i += 2) \{}
+\DoxyCodeLine{    outputBuffer[i + 0] = inputBuffer[i + 0];}
+\DoxyCodeLine{    outputBuffer[i + 1] = inputBuffer[i + 1];}
+\DoxyCodeLine{  \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented from \mbox{\hyperlink{class_a_ab4b066f9adb0738afbddfb491557caab}{A}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+ui/Rack.\+h\item 
+ui/Rack.\+cpp\end{DoxyCompactItemize}

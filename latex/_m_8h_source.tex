@@ -1,0 +1,240 @@
+\hypertarget{_m_8h_source}{}\doxysection{M.\+h}
+\label{_m_8h_source}\index{core/M.h@{core/M.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//}}
+\DoxyCodeLine{2 \textcolor{comment}{// Created by ferluht on 08/07/2022.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 }
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include <stdlib.h>}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include <vector>}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include <queue>}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <cmath>}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include <list>}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include <string>}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include <map>}}
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include <algorithm>}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#define NOTEOFF\_HEADER 128}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#define NOTEON\_HEADER 144}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#define POLYPRESSURE\_HEADER 160}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#define CC\_HEADER 176}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#define PITCHWHEEL\_HEADER 224}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#define DAW\_CTRL\_HEADER 100}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#define CC\_MODWHEEL 1}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#define CC\_BREATH\_CONTROLLER 2}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{\#define CC\_AFTERTOUCH 3}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#define CC\_FOOT\_CONTROLLER 4}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#define CC\_PORTAMENTO\_TIME 5}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{\#define CC\_DATA\_ENTRY 6}}
+\DoxyCodeLine{30 \textcolor{preprocessor}{\#define CC\_MAIN\_VOLUME 7}}
+\DoxyCodeLine{31 \textcolor{preprocessor}{\#define CC\_DAMPER\_PEDAL 64}}
+\DoxyCodeLine{32 \textcolor{preprocessor}{\#define CC\_PORTAMENTO 65}}
+\DoxyCodeLine{33 \textcolor{preprocessor}{\#define CC\_SOSTENUTO 66}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{\#define CC\_SOFT\_PEDAL 67}}
+\DoxyCodeLine{35 \textcolor{preprocessor}{\#define CC\_CHORUS 93}}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{preprocessor}{\#define CC\_E1 105}}
+\DoxyCodeLine{38 \textcolor{preprocessor}{\#define CC\_E2 106}}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40 \textcolor{keyword}{enum} MIDISTATUS \{}
+\DoxyCodeLine{41     WAITING,}
+\DoxyCodeLine{42     DONE}
+\DoxyCodeLine{43 \};}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45 \textcolor{keyword}{enum} MIDICC \{}
+\DoxyCodeLine{46     NONE,}
+\DoxyCodeLine{47     DAW\_ = 40,}
+\DoxyCodeLine{48     DAW\_ALT1,}
+\DoxyCodeLine{49     DAW\_ALT2,}
+\DoxyCodeLine{50     DAW\_LEFT,}
+\DoxyCodeLine{51     DAW\_RIGHT,}
+\DoxyCodeLine{52     DAW\_UP,}
+\DoxyCodeLine{53     DAW\_DOWN,}
+\DoxyCodeLine{54     TAPE = 50,}
+\DoxyCodeLine{55     TAPE\_TRIG,}
+\DoxyCodeLine{56     TAPE\_CLEAR,}
+\DoxyCodeLine{57     TAPE\_DOUBLE,}
+\DoxyCodeLine{58     TAPE\_STOP,}
+\DoxyCodeLine{59     TAPE\_END}
+\DoxyCodeLine{60 \};}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62 \textcolor{keyword}{struct }\mbox{\hyperlink{struct_m_data}{MData}} \{}
+\DoxyCodeLine{63     \textcolor{keywordtype}{double} beat;}
+\DoxyCodeLine{64     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} status;}
+\DoxyCodeLine{65     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data1;}
+\DoxyCodeLine{66     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data2;}
+\DoxyCodeLine{67 \};}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{72 \textcolor{keyword}{class }\mbox{\hyperlink{class_m}{M}} \{}
+\DoxyCodeLine{73 }
+\DoxyCodeLine{74     std::map<uint8\_t, std::map<uint8\_t, int>> handlers;}
+\DoxyCodeLine{75     std::vector<std::function<MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}}\&)>> handlers\_array;}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77 \textcolor{keyword}{public}:}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79     \mbox{\hyperlink{class_m}{M}}() \{}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81     \}}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{89     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_m_af2037e5190cff1802d694edd919c9a90}{addMIDIHandler}}(uint8\_t header, std::function<MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}}\&)> handler) \{}
+\DoxyCodeLine{90         \mbox{\hyperlink{class_m_af2037e5190cff1802d694edd919c9a90}{addMIDIHandler}}(header, 0, 255, handler);}
+\DoxyCodeLine{91     \}}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{99     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_m_ae3aeb807434e8c4cbde4ab3467d91b41}{addMIDIHandler}}(std::vector<uint8\_t> headers, std::function<MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}}\&)> handler) \{}
+\DoxyCodeLine{100         \mbox{\hyperlink{class_m_af2037e5190cff1802d694edd919c9a90}{addMIDIHandler}}(headers, 0, 255, handler);}
+\DoxyCodeLine{101     \}}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{109     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_m_a95a9942e85d7a52433474f682e048020}{addMIDIHandler}}(uint8\_t header, uint8\_t code\_start, uint8\_t code\_end, std::function<MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}}\&)> handler) \{}
+\DoxyCodeLine{110         std::vector<uint8\_t> headers;}
+\DoxyCodeLine{111         headers.push\_back(header);}
+\DoxyCodeLine{112         \mbox{\hyperlink{class_m_af2037e5190cff1802d694edd919c9a90}{addMIDIHandler}}(headers, code\_start, code\_end, handler);}
+\DoxyCodeLine{113     \}}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{123     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_m_a50b227a2ecc7070c5718bc4f6caf124b}{addMIDIHandler}}(std::vector<uint8\_t> headers, uint8\_t code\_start, uint8\_t code\_end, std::function<MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}}\&)> handler) \{}
+\DoxyCodeLine{124         std::vector<uint8\_t> codes;}
+\DoxyCodeLine{125         \textcolor{keywordflow}{for} (uint8\_t c = code\_start; c < code\_end; c ++)}
+\DoxyCodeLine{126             codes.push\_back(c);}
+\DoxyCodeLine{127         codes.push\_back(code\_end);}
+\DoxyCodeLine{128         \mbox{\hyperlink{class_m_af2037e5190cff1802d694edd919c9a90}{addMIDIHandler}}(headers, codes, handler);}
+\DoxyCodeLine{129     \}}
+\DoxyCodeLine{130 }
+\DoxyCodeLine{140     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_m_acf137eabb66f2e3922e26188ed17c908}{addMIDIHandler}}(uint8\_t header\_start, uint8\_t header\_end,}
+\DoxyCodeLine{141                         uint8\_t code\_start, uint8\_t code\_end, std::function<MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}}\&)> handler) \{}
+\DoxyCodeLine{142         std::vector<uint8\_t> headers;}
+\DoxyCodeLine{143         \textcolor{keywordflow}{for} (uint8\_t h = header\_start; h < header\_end; h ++)}
+\DoxyCodeLine{144             headers.push\_back(h);}
+\DoxyCodeLine{145         headers.push\_back(header\_end);}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147         std::vector<uint8\_t> codes;}
+\DoxyCodeLine{148         \textcolor{keywordflow}{for} (uint8\_t c = code\_start; c < code\_end; c ++)}
+\DoxyCodeLine{149             codes.push\_back(c);}
+\DoxyCodeLine{150         codes.push\_back(code\_end);}
+\DoxyCodeLine{151         \mbox{\hyperlink{class_m_af2037e5190cff1802d694edd919c9a90}{addMIDIHandler}}(headers, codes, handler);}
+\DoxyCodeLine{152     \}}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{161     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_m_ae7130e971f81e35458e46a9599aa3403}{addMIDIHandler}}(std::vector<uint8\_t> headers, std::vector<uint8\_t> codes, std::function<MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}}\&)> handler) \{}
+\DoxyCodeLine{162         handlers\_array.push\_back(handler);}
+\DoxyCodeLine{163         \textcolor{keywordtype}{int} handler\_idx = handlers\_array.size() -\/ 1;}
+\DoxyCodeLine{164         \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} ith = headers.begin(); ith < headers.end(); ith ++)}
+\DoxyCodeLine{165             \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} itc = codes.begin(); itc < codes.end(); itc ++)}
+\DoxyCodeLine{166                 handlers[*ith][*itc] = handler\_idx;}
+\DoxyCodeLine{167     \}}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{176     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_m_ad65a426542615b93b2790022e720b16e}{addMIDIHandler}}(uint8\_t header, uint8\_t code, std::function<MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}}\&)> handler) \{}
+\DoxyCodeLine{177         handlers\_array.push\_back(handler);}
+\DoxyCodeLine{178         \textcolor{keywordtype}{int} handler\_idx = handlers\_array.size() -\/ 1;}
+\DoxyCodeLine{179         handlers[header][code] = handler\_idx;}
+\DoxyCodeLine{180     \}}
+\DoxyCodeLine{181 }
+\DoxyCodeLine{188     \textcolor{keyword}{virtual} MIDISTATUS \mbox{\hyperlink{class_m_a165f3e89d1329bdb7d738164ff5689cf}{midiIn}}(\mbox{\hyperlink{struct_m_data}{MData}}\& cmd) \{}
+\DoxyCodeLine{189         \textcolor{keyword}{auto} x = handlers.find(cmd.status);}
+\DoxyCodeLine{190         \textcolor{keywordflow}{if} (x == handlers.end()) \textcolor{keywordflow}{return} MIDISTATUS::DONE;}
+\DoxyCodeLine{191         \textcolor{keyword}{auto} xy = x-\/>second.find(cmd.data1);}
+\DoxyCodeLine{192         \textcolor{keywordflow}{if} (xy == x-\/>second.end()) \textcolor{keywordflow}{return} MIDISTATUS::DONE;}
+\DoxyCodeLine{193         \textcolor{keywordtype}{int} idx = xy-\/>second;}
+\DoxyCodeLine{194         \textcolor{keywordflow}{return} handlers\_array[idx](cmd);}
+\DoxyCodeLine{195     \}}
+\DoxyCodeLine{196 \};}
+\DoxyCodeLine{197 }
+\DoxyCodeLine{202 \textcolor{keyword}{class }HardwareControl \{}
+\DoxyCodeLine{203 }
+\DoxyCodeLine{204 \textcolor{keyword}{public}:}
+\DoxyCodeLine{205 }
+\DoxyCodeLine{213     HardwareControl(std::string label, uint8\_t header, uint8\_t code) \{}
+\DoxyCodeLine{214         value = 0;}
+\DoxyCodeLine{215         this-\/>header = header;}
+\DoxyCodeLine{216         this-\/>code = code;}
+\DoxyCodeLine{217         this-\/>label = label;}
+\DoxyCodeLine{218     \}}
+\DoxyCodeLine{219 }
+\DoxyCodeLine{220 \textcolor{keyword}{private}:}
+\DoxyCodeLine{221     uint8\_t value;}
+\DoxyCodeLine{222     uint8\_t header;}
+\DoxyCodeLine{223     uint8\_t code;}
+\DoxyCodeLine{224     std::string label;}
+\DoxyCodeLine{225     std::vector<std::pair<std::vector<std::pair<uint8\_t, uint8\_t>>, std::pair<uint8\_t, uint8\_t>>> ctrl\_seqs;}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227     \textcolor{keywordtype}{void} midiIn(\mbox{\hyperlink{struct_m_data}{MData}} \&cmd) \{}
+\DoxyCodeLine{228         value = cmd.data2;}
+\DoxyCodeLine{229     \}}
+\DoxyCodeLine{230 }
+\DoxyCodeLine{231     \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} isPressed() \{}
+\DoxyCodeLine{232         \textcolor{keywordflow}{return} value > 0;}
+\DoxyCodeLine{233     \}}
+\DoxyCodeLine{234 }
+\DoxyCodeLine{235     \textcolor{keyword}{inline} uint8\_t getValue() \{}
+\DoxyCodeLine{236         \textcolor{keywordflow}{return} value;}
+\DoxyCodeLine{237     \}}
+\DoxyCodeLine{238 }
+\DoxyCodeLine{239     \textcolor{keyword}{inline} \textcolor{keywordtype}{void} addCtrlSequence(std::vector<std::pair<uint8\_t, uint8\_t>> ctrl\_seq, uint8\_t mheader, uint8\_t mcode) \{}
+\DoxyCodeLine{240         ctrl\_seqs.push\_back(\{ctrl\_seq, \{mheader, mcode\}\});}
+\DoxyCodeLine{241 }
+\DoxyCodeLine{242         std::sort(ctrl\_seqs.begin(), ctrl\_seqs.end(),}
+\DoxyCodeLine{243                   [](std::pair<std::vector<std::pair<unsigned char, unsigned char>>, std::pair<unsigned char, unsigned char>> a,}
+\DoxyCodeLine{244                            std::pair<std::vector<std::pair<unsigned char, unsigned char>>, std::pair<unsigned char, unsigned char>> b) -\/> \textcolor{keywordtype}{bool}}
+\DoxyCodeLine{245              \{}
+\DoxyCodeLine{246                  return a.first.size() > b.first.size();}
+\DoxyCodeLine{247              \});}
+\DoxyCodeLine{248     \}}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{250     \textcolor{keyword}{friend} \textcolor{keyword}{class }\mbox{\hyperlink{class_m_i_d_i_map}{MIDIMap}};}
+\DoxyCodeLine{251 \};}
+\DoxyCodeLine{252 }
+\DoxyCodeLine{273 \textcolor{keyword}{class }\mbox{\hyperlink{class_m_i_d_i_map}{MIDIMap}} : \textcolor{keyword}{public} \mbox{\hyperlink{class_m}{M}} \{}
+\DoxyCodeLine{274 }
+\DoxyCodeLine{275     std::map<uint8\_t, std::map<uint8\_t, HardwareControl *>> imap;}
+\DoxyCodeLine{276     std::map<std::string, HardwareControl*> knobs\_by\_names;}
+\DoxyCodeLine{277 }
+\DoxyCodeLine{278 \textcolor{keyword}{public}:}
+\DoxyCodeLine{279     \mbox{\hyperlink{class_m_i_d_i_map}{MIDIMap}}() : \mbox{\hyperlink{class_m}{M}}() \{}
+\DoxyCodeLine{280 }
+\DoxyCodeLine{281     \}}
+\DoxyCodeLine{282 }
+\DoxyCodeLine{295     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_m_i_d_i_map_a8a4f41ca5d0f193b72c781e6e4f31424}{addHardwareControl}}(std::string label, uint8\_t header, uint8\_t code) \{}
+\DoxyCodeLine{296         HardwareControl * ctrl = \textcolor{keyword}{new} HardwareControl(label, header, code);}
+\DoxyCodeLine{297         imap[ctrl-\/>header][ctrl-\/>code] = ctrl;}
+\DoxyCodeLine{298         knobs\_by\_names[ctrl-\/>label] = ctrl;}
+\DoxyCodeLine{299     \}}
+\DoxyCodeLine{300 }
+\DoxyCodeLine{313     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_m_i_d_i_map_a77f1f550fea05e6d09b23b3bed961297}{addMapping}}(std::vector<std::string> ctrl\_seq, uint8\_t mheader, uint8\_t mcode) \{}
+\DoxyCodeLine{314         std::vector<std::pair<uint8\_t, uint8\_t>> ctrl\_seq\_num;}
+\DoxyCodeLine{315         \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} it = ctrl\_seq.begin(); it < ctrl\_seq.end() -\/ 1; it ++) \{}
+\DoxyCodeLine{316             HardwareControl * ctrl = knobs\_by\_names.find(*it)-\/>second;}
+\DoxyCodeLine{317             ctrl\_seq\_num.emplace\_back(ctrl-\/>header, ctrl-\/>code);}
+\DoxyCodeLine{318         \}}
+\DoxyCodeLine{319         HardwareControl * ctrl = knobs\_by\_names.find(*(ctrl\_seq.end()-\/1))-\/>second;}
+\DoxyCodeLine{320         ctrl-\/>addCtrlSequence(ctrl\_seq\_num, mheader, mcode);}
+\DoxyCodeLine{321     \}}
+\DoxyCodeLine{322 }
+\DoxyCodeLine{326     MIDISTATUS midiIn(\mbox{\hyperlink{struct_m_data}{MData}}\& cmd)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{327         \textcolor{keyword}{auto} x = imap.find(cmd.status);}
+\DoxyCodeLine{328         \textcolor{keywordflow}{if} (x == imap.end()) \textcolor{keywordflow}{return} MIDISTATUS::DONE;}
+\DoxyCodeLine{329         \textcolor{keyword}{auto} xy = x-\/>second.find(cmd.data1);}
+\DoxyCodeLine{330         \textcolor{keywordflow}{if} (xy == x-\/>second.end()) \textcolor{keywordflow}{return} MIDISTATUS::DONE;}
+\DoxyCodeLine{331         HardwareControl * ctrl = xy-\/>second;}
+\DoxyCodeLine{332         \textcolor{keywordflow}{if} (ctrl) \{}
+\DoxyCodeLine{333             ctrl-\/>midiIn(cmd);}
+\DoxyCodeLine{334             \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} it = ctrl-\/>ctrl\_seqs.begin(); it < ctrl-\/>ctrl\_seqs.end(); it ++) \{}
+\DoxyCodeLine{335                 \textcolor{keywordtype}{bool} flag = \textcolor{keyword}{true};}
+\DoxyCodeLine{336                 \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} xy = it-\/>first.begin(); xy < it-\/>first.end(); xy ++) \{}
+\DoxyCodeLine{337                     HardwareControl * c = imap.find(xy-\/>first)-\/>second.find(xy-\/>second)-\/>second;}
+\DoxyCodeLine{338                     \textcolor{keywordflow}{if} (!c-\/>isPressed())}
+\DoxyCodeLine{339                         flag = \textcolor{keyword}{false};}
+\DoxyCodeLine{340                 \}}
+\DoxyCodeLine{341                 \textcolor{keywordflow}{if} (flag) \{}
+\DoxyCodeLine{342                     cmd.status = it-\/>second.first;}
+\DoxyCodeLine{343                     cmd.data1 = it-\/>second.second;}
+\DoxyCodeLine{344                     \textcolor{keywordflow}{break};}
+\DoxyCodeLine{345                 \}}
+\DoxyCodeLine{346             \}}
+\DoxyCodeLine{347         \}}
+\DoxyCodeLine{348         \textcolor{keywordflow}{return} MIDISTATUS::DONE;}
+\DoxyCodeLine{349     \}}
+\DoxyCodeLine{350 \};}
+
+\end{DoxyCode}

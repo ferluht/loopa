@@ -10,6 +10,7 @@
 #include <ExpFilter.hpp>
 #include <Delay/Delay.hpp>
 
+/// @private
 class PingPong {
 public:
 

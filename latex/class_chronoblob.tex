@@ -1,0 +1,55 @@
+\hypertarget{class_chronoblob}{}\doxysection{Chronoblob Class Reference}
+\label{class_chronoblob}\index{Chronoblob@{Chronoblob}}
+Inheritance diagram for Chronoblob\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_chronoblob}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_chronoblob_ab374afaab5276f6c47ff726b97ab933b}{process}} (float $\ast$output\+Buffer, float $\ast$input\+Buffer, unsigned int n\+Buffer\+Frames, double stream\+Time) override
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_chronoblob_ab374afaab5276f6c47ff726b97ab933b}\label{class_chronoblob_ab374afaab5276f6c47ff726b97ab933b}} 
+\index{Chronoblob@{Chronoblob}!process@{process}}
+\index{process@{process}!Chronoblob@{Chronoblob}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily void Chronoblob\+::process (\begin{DoxyParamCaption}\item[{float $\ast$}]{output\+Buffer,  }\item[{float $\ast$}]{input\+Buffer,  }\item[{unsigned int}]{n\+Buffer\+Frames,  }\item[{double}]{stream\+Time }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Virtual audio process method
+
+
+\begin{DoxyParams}{Parameters}
+{\em output\+Buffer} & output buffer of floats \\
+\hline
+{\em input\+Buffer} & input buffer of floats \\
+\hline
+{\em n\+Buffer\+Frames} & amount samples in buffers \\
+\hline
+{\em stream\+Time} & time since start\\
+\hline
+\end{DoxyParams}
+Pass-\/thru example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_chronoblob_ab374afaab5276f6c47ff726b97ab933b}{process}}(\textcolor{keywordtype}{float} *outputBuffer, \textcolor{keywordtype}{float} *inputBuffer, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nBufferFrames, \textcolor{keywordtype}{double} streamTime)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 0; i < 2*nBufferFrames; i += 2) \{}
+\DoxyCodeLine{    outputBuffer[i + 0] = inputBuffer[i + 0];}
+\DoxyCodeLine{    outputBuffer[i + 1] = inputBuffer[i + 1];}
+\DoxyCodeLine{  \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented from \mbox{\hyperlink{class_a_ab4b066f9adb0738afbddfb491557caab}{A}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+effects\+\_\+audio/\+Chronoblob/Chronoblob.\+h\item 
+effects\+\_\+audio/\+Chronoblob/Chronoblob.\+cpp\end{DoxyCompactItemize}

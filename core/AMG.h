@@ -9,9 +9,12 @@
 #include "G.h"
 #include <cstring>
 
+/**
+ * AMG stands for Audio+MIDI+Graphics. The base class for all audio+midi+graphic objects.
+*/
 class AMG : public A, public M, public G {
-public:
     char name[50];
+public:
 
     AMG() {
         std::strcpy(name, "name");
@@ -19,5 +22,9 @@ public:
 
     AMG(const char * name_) : A(), M(), G() {
         std::strcpy(name, name_);
+    }
+
+    inline const char * getName() {
+        return name;
     }
 };

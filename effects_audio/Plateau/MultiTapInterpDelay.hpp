@@ -12,6 +12,7 @@
 #include <cstdint>
 #include "Utilities.hpp"
 
+/// @private
 template<typename T = float, uint64_t numTaps = 1>
 class MultiTapInterpDelay {
 public:

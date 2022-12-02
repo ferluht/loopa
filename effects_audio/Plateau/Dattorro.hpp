@@ -11,6 +11,7 @@
 #include <A.h>
 //#include <iostream>
 
+/// @private
 class Dattorro {
 public:
     Dattorro() : Dattorro(false) {};

@@ -1,6 +1,9 @@
 #pragma once
 #include "ExpFilter.hpp"
 
+/**
+ * @private
+ */
 class SmoothCrossFade {
 
 public:

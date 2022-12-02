@@ -7,6 +7,7 @@
 #include "PingPong.hpp"
 #include <AMG.h>
 
+/// @private
 class Chronoblob : public AMG{
 public:
     Chronoblob() : AMG("CHRNBLB") {

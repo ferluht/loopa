@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdint>
 
+/// @private
 class LFO {
 public:
     float output = 0.0;
@@ -65,6 +66,7 @@ private:
     }
 };
 
+/// @private
 class TriSawLFO {
 public:
     TriSawLFO(float sampleRate = 44100.0, float frequency = 1.0) {

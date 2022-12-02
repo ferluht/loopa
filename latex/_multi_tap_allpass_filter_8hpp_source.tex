@@ -1,0 +1,67 @@
+\hypertarget{_multi_tap_allpass_filter_8hpp_source}{}\doxysection{Multi\+Tap\+Allpass\+Filter.\+hpp}
+\label{_multi_tap_allpass_filter_8hpp_source}\index{effects\_audio/Plateau/MultiTapAllpassFilter.hpp@{effects\_audio/Plateau/MultiTapAllpassFilter.hpp}}
+\mbox{\hyperlink{_multi_tap_allpass_filter_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef MTAF\_HPP}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define MTAF\_HPP}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{_multi_tap_interp_delay_8hpp}{MultiTapInterpDelay.hpp}}"{}}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{13 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T = \textcolor{keywordtype}{float}, u\textcolor{keywordtype}{int}64\_t numTaps = 1>}
+\DoxyCodeLine{14 \textcolor{keyword}{class }MultiTapAllpassFilter \{}
+\DoxyCodeLine{15 \textcolor{keyword}{public}:}
+\DoxyCodeLine{18     MultiTapAllpassFilter(uint64\_t maxDelay = 2, uint64\_t initDelay = 0, T initGain = T(0)) :}
+\DoxyCodeLine{19         delay(maxDelay, initDelay)}
+\DoxyCodeLine{20     \{}
+\DoxyCodeLine{21         gain = initGain;}
+\DoxyCodeLine{22     \}}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{26     MultiTapAllpassFilter(uint64\_t maxDelay,}
+\DoxyCodeLine{27                           \textcolor{keyword}{const} std::array<T, numTaps>\& initTimes,}
+\DoxyCodeLine{28                           T initGain = T(0)) :}
+\DoxyCodeLine{29         delay(maxDelay, initTimes)}
+\DoxyCodeLine{30     \{}
+\DoxyCodeLine{31         gain = initGain;}
+\DoxyCodeLine{32     \}}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{35     T \textcolor{keyword}{inline} process() \{}
+\DoxyCodeLine{36         \_inSum = input + delay.output[0] * gain;}
+\DoxyCodeLine{37         output = delay.output[0] + \_inSum * gain * T(-\/1);}
+\DoxyCodeLine{38         delay.input = \_inSum;}
+\DoxyCodeLine{39         delay.process();}
+\DoxyCodeLine{40         \textcolor{keywordflow}{return} output;}
+\DoxyCodeLine{41     \}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{48     \textcolor{keywordtype}{void} blockProcess(\textcolor{keyword}{const} T* inputBuffer, T* outputBuffer, \textcolor{keyword}{const} uint64\_t blockSize) \{}
+\DoxyCodeLine{49         \textcolor{keywordflow}{for} (uint64\_t i = 0; i < blockSize; ++i) \{}
+\DoxyCodeLine{50             \_inSum = inputBuffer[i] + delay.output[0] * gain;}
+\DoxyCodeLine{51             output = delay.output[0] + \_inSum * gain * T(-\/1);}
+\DoxyCodeLine{52             delay.input = \_inSum;}
+\DoxyCodeLine{53             delay.process();}
+\DoxyCodeLine{54             outputBuffer[i] = output;}
+\DoxyCodeLine{55         \}}
+\DoxyCodeLine{56     \}}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{59     \textcolor{keywordtype}{void} clear() \{}
+\DoxyCodeLine{60         input = 0;}
+\DoxyCodeLine{61         output = 0;}
+\DoxyCodeLine{62         \_inSum = 0;}
+\DoxyCodeLine{63         \_outSum = 0;}
+\DoxyCodeLine{64         delay.clear();}
+\DoxyCodeLine{65     \}}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67     T input = T(0);}
+\DoxyCodeLine{68     T output = T(0);}
+\DoxyCodeLine{69     T gain = T(0);}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71     MultiTapInterpDelay<T, numTaps> delay;}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \textcolor{keyword}{private}:}
+\DoxyCodeLine{74     T \_inSum = T(0);}
+\DoxyCodeLine{75     T \_outSum = T(0);}
+\DoxyCodeLine{76 \};}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

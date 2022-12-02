@@ -1,3 +1,6 @@
+/**
+ * @private
+ */
 class OneSampleDelay {
 public:
 

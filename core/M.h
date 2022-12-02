@@ -66,6 +66,9 @@ struct MData {
     unsigned char data2;
 };
 
+/**
+ * M stands for MIDI. The base class for all MIDI objects.
+*/
 class M {
 
     std::map<uint8_t, std::map<uint8_t, int>> handlers;
@@ -77,30 +80,65 @@ public:
 
     }
 
-    void addHandler(uint8_t header, std::function<MIDISTATUS(MData&)> handler) {
-        addHandler(header, 0, 255, handler);
+    /**
+     * Add MIDI handler for specific header
+     *
+     * @param header status (first) byte of midi command
+     * @param handler callback to call when matching midi header is received
+     */
+    void addMIDIHandler(uint8_t header, std::function<MIDISTATUS(MData&)> handler) {
+        addMIDIHandler(header, 0, 255, handler);
     }
 
-    void addHandler(std::vector<uint8_t> headers, std::function<MIDISTATUS(MData&)> handler) {
-        addHandler(headers, 0, 255, handler);
+    /**
+     * Add MIDI handler for set of headers
+     *
+     * @param headers set of midi headers
+     * @param handler callback to call when matching midi header is received
+     */
+    void addMIDIHandler(std::vector<uint8_t> headers, std::function<MIDISTATUS(MData&)> handler) {
+        addMIDIHandler(headers, 0, 255, handler);
     }
 
-    void addHandler(uint8_t header, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
+    /**
+     * Add MIDI handler for set of headers
+     *
+     * @param headers set of midi headers
+     * @param handler callback to call when matching midi header is received
+     */
+    void addMIDIHandler(uint8_t header, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
         std::vector<uint8_t> headers;
         headers.push_back(header);
-        addHandler(headers, code_start, code_end, handler);
+        addMIDIHandler(headers, code_start, code_end, handler);
     }
 
-    void addHandler(std::vector<uint8_t> headers, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
+    /**
+     * Add MIDI handler for set of headers and range of codes [code_start .. code_end]
+     *
+     * @param headers set of midi headers
+     * @param code_start first midi code to include in handler
+     * @param code_end last midi code to include in handler
+     * @param handler callback to call when matching midi header and code are received
+     */
+    void addMIDIHandler(std::vector<uint8_t> headers, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
         std::vector<uint8_t> codes;
         for (uint8_t c = code_start; c < code_end; c ++)
             codes.push_back(c);
         codes.push_back(code_end);
-        addHandler(headers, codes, handler);
+        addMIDIHandler(headers, codes, handler);
     }
 
-    void addHandler(uint8_t header_start, uint8_t header_end,
-                    uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
+    /**
+     * Add MIDI handler for range of headers [header_start .. header_end] and range of codes [code_start .. code_end]
+     *
+     * @param header_start first midi header to include in handler
+     * @param header_end last midi header to include in handler
+     * @param code_start first midi code to include in handler
+     * @param code_end last midi code to include in handler
+     * @param handler callback to call when matching midi header and code are received
+     */
+    void addMIDIHandler(uint8_t header_start, uint8_t header_end,
+                        uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
         std::vector<uint8_t> headers;
         for (uint8_t h = header_start; h < header_end; h ++)
             headers.push_back(h);
@@ -110,10 +148,17 @@ public:
         for (uint8_t c = code_start; c < code_end; c ++)
             codes.push_back(c);
         codes.push_back(code_end);
-        addHandler(headers, codes, handler);
+        addMIDIHandler(headers, codes, handler);
     }
 
-    void addHandler(std::vector<uint8_t> headers, std::vector<uint8_t> codes, std::function<MIDISTATUS(MData&)> handler) {
+    /**
+     * Add MIDI handler for set of headers and set of codes
+     *
+     * @param headers set of midi headers
+     * @param codes set of midi codes
+     * @param handler callback to call when matching midi header and code are received
+     */
+    void addMIDIHandler(std::vector<uint8_t> headers, std::vector<uint8_t> codes, std::function<MIDISTATUS(MData&)> handler) {
         handlers_array.push_back(handler);
         int handler_idx = handlers_array.size() - 1;
         for (auto ith = headers.begin(); ith < headers.end(); ith ++)
@@ -121,12 +166,25 @@ public:
                 handlers[*ith][*itc] = handler_idx;
     }
 
-    void addHandler(uint8_t header, uint8_t code, std::function<MIDISTATUS(MData&)> handler) {
+    /**
+     * Add MIDI handler for just one header and one code
+     *
+     * @param header header
+     * @param code code
+     * @param handler callback to call when matching midi header and code are received
+     */
+    void addMIDIHandler(uint8_t header, uint8_t code, std::function<MIDISTATUS(MData&)> handler) {
         handlers_array.push_back(handler);
         int handler_idx = handlers_array.size() - 1;
         handlers[header][code] = handler_idx;
     }
 
+    /**
+     * MIDI receiver method.
+     * When received midi command calls matching callback if exists
+     * If no callback exists just returns MIDISTATUS::DONE
+     * @param cmd midi command
+     */
     virtual MIDISTATUS midiIn(MData& cmd) {
         auto x = handlers.find(cmd.status);
         if (x == handlers.end()) return MIDISTATUS::DONE;
@@ -137,20 +195,34 @@ public:
     }
 };
 
-
+/**
+ * Hardware control class. Used in MIDIMap for mapping hardware knobs to virtual midi commands.
+ * @private
+*/
 class HardwareControl {
+
 public:
+
+    /**
+     * HardwareControl constructor
+     *
+     * @param label knob label
+     * @param header first byte of assigned midi command
+     * @param code second byte of assigned midi command
+     */
+    HardwareControl(std::string label, uint8_t header, uint8_t code) {
+        value = 0;
+        this->header = header;
+        this->code = code;
+        this->label = label;
+    }
+
+private:
+    uint8_t value;
     uint8_t header;
     uint8_t code;
-    std::string name;
+    std::string label;
     std::vector<std::pair<std::vector<std::pair<uint8_t, uint8_t>>, std::pair<uint8_t, uint8_t>>> ctrl_seqs;
-
-    HardwareControl(std::string name_, uint8_t header_, uint8_t code_) {
-        value = 0;
-        header = header_;
-        code = code_;
-        name = name_;
-    }
 
     void midiIn(MData &cmd) {
         value = cmd.data2;
@@ -175,10 +247,29 @@ public:
              });
     }
 
-private:
-    uint8_t value;
+    friend class MIDIMap;
 };
 
+/**
+ * Middleware midi handler that maps hardware knobs to virtual midi commands.
+ *
+ * Example of usage:
+ * @code
+ * MIDIMap * midiMap = new MIDIMap();
+ * midiMap->addHardwareControl("SHIFT", CC_HEADER, 101);
+ * midiMap->addHardwareControl("K1", CC_HEADER, 110);
+ * midiMap->addMapping({"K1"}, CC_HEADER + 5, 102);
+ * midiMap->addMapping({"SHIFT", "K1"}, CC_HEADER, 150);
+ *
+ * ...
+ *
+ * MIDIMap->midiIn(cmd);
+ * @endcode
+ *
+ * When pressed SHIFT, midiIn will not change cmd
+ *
+ * When pressed K1 while holding SHIFT cmd.status will change to CC_HEADER and cmd.data1 will change to 150
+*/
 class MIDIMap : public M {
 
     std::map<uint8_t, std::map<uint8_t, HardwareControl *>> imap;
@@ -189,12 +280,36 @@ public:
 
     }
 
-    void addHardwareControl(std::string name_, uint8_t header_, uint8_t code_) {
-        HardwareControl * ctrl = new HardwareControl(name_, header_, code_);
+    /**
+     * Add hardware knob
+     *
+     * @param label knob label
+     * @param header first byte of assigned midi command
+     * @param code second byte of assigned midi command
+     *
+     * Usage example:
+     * @code
+     * addHardwareControl("K1", CC_HEADER, 60);
+     * @endcode
+     */
+    void addHardwareControl(std::string label, uint8_t header, uint8_t code) {
+        HardwareControl * ctrl = new HardwareControl(label, header, code);
         imap[ctrl->header][ctrl->code] = ctrl;
-        knobs_by_names[ctrl->name] = ctrl;
+        knobs_by_names[ctrl->label] = ctrl;
     }
 
+    /**
+     * Add mapping of control sequence of knobs to virtual midi command
+     *
+     * @param ctrl_seq sequence of hardware knob names which triggers midi command
+     * @param mheader first byte of assigned midi command
+     * @param mcode second byte of assigned midi command
+     *
+     * Usage example:
+     * @code
+     * addMapping({"K1", "K2"}, CC_HEADER, 100);
+     * @endcode
+     */
     void addMapping(std::vector<std::string> ctrl_seq, uint8_t mheader, uint8_t mcode) {
         std::vector<std::pair<uint8_t, uint8_t>> ctrl_seq_num;
         for (auto it = ctrl_seq.begin(); it < ctrl_seq.end() - 1; it ++) {
@@ -205,6 +320,9 @@ public:
         ctrl->addCtrlSequence(ctrl_seq_num, mheader, mcode);
     }
 
+    /**
+     * @private
+     */
     MIDISTATUS midiIn(MData& cmd) override {
         auto x = imap.find(cmd.status);
         if (x == imap.end()) return MIDISTATUS::DONE;

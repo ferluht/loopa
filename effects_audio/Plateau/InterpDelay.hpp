@@ -7,6 +7,7 @@
 #define MAX_DELAY_TAP_GROUPS 512
 #define MAX_DELAY_LENGTH 65536
 
+/// @private
 template<class T>
 class InterpDelay
 {
@@ -102,6 +103,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/// @private
 template<class T, const int kNumTaps>
 class MultiTapInterpDelay {
 public:

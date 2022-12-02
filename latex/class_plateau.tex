@@ -1,0 +1,83 @@
+\hypertarget{class_plateau}{}\doxysection{Plateau Class Reference}
+\label{class_plateau}\index{Plateau@{Plateau}}
+Inheritance diagram for Plateau\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=5.000000cm]{class_plateau}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_plateau_ad423dd98c37e361b9fd77b9682488a1f}{process}} (float $\ast$output\+Buffer, float $\ast$input\+Buffer, unsigned int n\+Buffer\+Frames, double stream\+Time) override
+\item 
+void \mbox{\hyperlink{class_plateau_a48e034b828dbecde3c18132fa7aae8ed}{draw}} (GFXcanvas1 $\ast$screen) override
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_plateau_a48e034b828dbecde3c18132fa7aae8ed}\label{class_plateau_a48e034b828dbecde3c18132fa7aae8ed}} 
+\index{Plateau@{Plateau}!draw@{draw}}
+\index{draw@{draw}!Plateau@{Plateau}}
+\doxysubsubsection{\texorpdfstring{draw()}{draw()}}
+{\footnotesize\ttfamily void Plateau\+::draw (\begin{DoxyParamCaption}\item[{GFXcanvas1 $\ast$}]{screen }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Virtual draw method
+
+
+\begin{DoxyParams}{Parameters}
+{\em screen} & GFXcanvas1\\
+\hline
+\end{DoxyParams}
+Example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_plateau_a48e034b828dbecde3c18132fa7aae8ed}{draw}}(GFXcanvas1 * screen)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  screen-\/>setCursor(0, 0);}
+\DoxyCodeLine{  screen-\/>setTextSize(1);}
+\DoxyCodeLine{  screen-\/>print(\textcolor{stringliteral}{"{}SAMPLE TEXT"{}});}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented from \mbox{\hyperlink{class_g_af0dc304f77853286afe764c1022fab55}{G}}.
+
+\mbox{\Hypertarget{class_plateau_ad423dd98c37e361b9fd77b9682488a1f}\label{class_plateau_ad423dd98c37e361b9fd77b9682488a1f}} 
+\index{Plateau@{Plateau}!process@{process}}
+\index{process@{process}!Plateau@{Plateau}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily void Plateau\+::process (\begin{DoxyParamCaption}\item[{float $\ast$}]{output\+Buffer,  }\item[{float $\ast$}]{input\+Buffer,  }\item[{unsigned int}]{n\+Buffer\+Frames,  }\item[{double}]{stream\+Time }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Virtual audio process method
+
+
+\begin{DoxyParams}{Parameters}
+{\em output\+Buffer} & output buffer of floats \\
+\hline
+{\em input\+Buffer} & input buffer of floats \\
+\hline
+{\em n\+Buffer\+Frames} & amount samples in buffers \\
+\hline
+{\em stream\+Time} & time since start\\
+\hline
+\end{DoxyParams}
+Pass-\/thru example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_plateau_ad423dd98c37e361b9fd77b9682488a1f}{process}}(\textcolor{keywordtype}{float} *outputBuffer, \textcolor{keywordtype}{float} *inputBuffer, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} nBufferFrames, \textcolor{keywordtype}{double} streamTime)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 0; i < 2*nBufferFrames; i += 2) \{}
+\DoxyCodeLine{    outputBuffer[i + 0] = inputBuffer[i + 0];}
+\DoxyCodeLine{    outputBuffer[i + 1] = inputBuffer[i + 1];}
+\DoxyCodeLine{  \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented from \mbox{\hyperlink{class_a_ab4b066f9adb0738afbddfb491557caab}{A}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+effects\+\_\+audio/\+Plateau/Plateau.\+h\item 
+effects\+\_\+audio/\+Plateau/Plateau.\+cpp\end{DoxyCompactItemize}

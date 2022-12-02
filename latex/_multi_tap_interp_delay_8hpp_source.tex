@@ -1,0 +1,129 @@
+\hypertarget{_multi_tap_interp_delay_8hpp_source}{}\doxysection{Multi\+Tap\+Interp\+Delay.\+hpp}
+\label{_multi_tap_interp_delay_8hpp_source}\index{effects\_audio/Plateau/MultiTapInterpDelay.hpp@{effects\_audio/Plateau/MultiTapInterpDelay.hpp}}
+\mbox{\hyperlink{_multi_tap_interp_delay_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#ifndef MTID\_HPP}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#define MTID\_HPP}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <vector>}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include <array>}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include <cstdint>}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}Utilities.hpp"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{16 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T = \textcolor{keywordtype}{float}, u\textcolor{keywordtype}{int}64\_t numTaps = 1>}
+\DoxyCodeLine{17 \textcolor{keyword}{class }MultiTapInterpDelay \{}
+\DoxyCodeLine{18 \textcolor{keyword}{public}:}
+\DoxyCodeLine{19     T input = T(0);}
+\DoxyCodeLine{20     T output[numTaps];}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22     MultiTapInterpDelay(uint64\_t maxLength = 512, T initDelayTime = 0) \{}
+\DoxyCodeLine{23         l = maxLength;}
+\DoxyCodeLine{24         buffer = std::vector<T>(l, T(0));}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26         \textcolor{keywordflow}{for} (uint64\_t tap = 0; tap < numTaps; ++tap) \{}
+\DoxyCodeLine{27             output[tap] = T(0);}
+\DoxyCodeLine{28             f[tap] = T(0);}
+\DoxyCodeLine{29             t[tap] = 0;}
+\DoxyCodeLine{30         \}}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32         std::array<T, numTaps> initDelayTimes;}
+\DoxyCodeLine{33         initDelayTimes.fill(initDelayTime);}
+\DoxyCodeLine{34         setDelayTimes(initDelayTimes);}
+\DoxyCodeLine{35     \}}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37     MultiTapInterpDelay(uint64\_t maxLength, \textcolor{keyword}{const} std::array<T, numTaps>\& initDelayTimes) \{}
+\DoxyCodeLine{38         l = maxLength;}
+\DoxyCodeLine{39         buffer = std::vector<T>(l, T(0));}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41         \textcolor{keywordflow}{for} (uint64\_t tap = 0; tap < numTaps; ++tap) \{}
+\DoxyCodeLine{42             output[tap] = T(0);}
+\DoxyCodeLine{43             f[tap] = T(0);}
+\DoxyCodeLine{44             t[tap] = 0;}
+\DoxyCodeLine{45         \}}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47         setDelayTimes(initDelayTimes);}
+\DoxyCodeLine{48     \}}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50     \textcolor{keywordtype}{void} process() \{}
+\DoxyCodeLine{51         buffer[w] = input;}
+\DoxyCodeLine{52         \textcolor{keywordflow}{for} (uint64\_t tap = 0; tap < numTaps; ++tap) \{}
+\DoxyCodeLine{53             int64\_t r = w -\/ t[tap];}
+\DoxyCodeLine{54             \textcolor{keywordflow}{if} (r < 0) \{}
+\DoxyCodeLine{55                 r += l;}
+\DoxyCodeLine{56             \}}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58             int64\_t upperR = r -\/ 1;}
+\DoxyCodeLine{59             \textcolor{keywordflow}{if} (upperR < 0) \{}
+\DoxyCodeLine{60                 upperR += l;}
+\DoxyCodeLine{61             \}}
+\DoxyCodeLine{62             output[tap] = linterp(buffer[r], buffer[upperR], f[tap]);}
+\DoxyCodeLine{63         \}}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65         ++w;}
+\DoxyCodeLine{66         \textcolor{keywordflow}{if} (w == l) \{}
+\DoxyCodeLine{67             w = 0;}
+\DoxyCodeLine{68         \}}
+\DoxyCodeLine{69     \}}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71     \textcolor{keywordtype}{void} blockProcess(\textcolor{keyword}{const} T* inputBuffer, T* outputBuffer, \textcolor{keyword}{const} uint64\_t blockSize) \{}
+\DoxyCodeLine{72         \textcolor{keywordflow}{for} (uint64\_t i = 0; i < blockSize; ++i) \{}
+\DoxyCodeLine{73             buffer[w] = inputBuffer[i];}
+\DoxyCodeLine{74             \textcolor{keywordflow}{for} (uint64\_t tap = 0; tap < numTaps; ++tap) \{}
+\DoxyCodeLine{75                 int64\_t r = w -\/ t[tap];}
+\DoxyCodeLine{76                 \textcolor{keywordflow}{if} (r < 0) \{}
+\DoxyCodeLine{77                     r += l;}
+\DoxyCodeLine{78                 \}}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80                 int64\_t upperR = r -\/ 1;}
+\DoxyCodeLine{81                 \textcolor{keywordflow}{if} (upperR < 0) \{}
+\DoxyCodeLine{82                     upperR += l;}
+\DoxyCodeLine{83                 \}}
+\DoxyCodeLine{84                 outputBuffer[i * numTaps + tap] = linterp(buffer[r], buffer[upperR], f[tap]);}
+\DoxyCodeLine{85             \}}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87             ++w;}
+\DoxyCodeLine{88             \textcolor{keywordflow}{if} (w == l) \{}
+\DoxyCodeLine{89                 w = 0;}
+\DoxyCodeLine{90             \}}
+\DoxyCodeLine{91         \}}
+\DoxyCodeLine{92     \}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94     \textcolor{keywordtype}{void} setDelayTimes(\textcolor{keyword}{const} std::array<T, numTaps>\& newDelayTimes) \{}
+\DoxyCodeLine{95         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} tap = 0; tap < numTaps; ++tap) \{}
+\DoxyCodeLine{96             T newT = newDelayTimes[tap];}
+\DoxyCodeLine{97             t[tap] = \textcolor{keyword}{static\_cast<}int64\_t\textcolor{keyword}{>}(newT);}
+\DoxyCodeLine{98             f[tap] = newT -\/ \textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(t[tap]);}
+\DoxyCodeLine{99         \}}
+\DoxyCodeLine{100     \}}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102     \textcolor{keywordtype}{void} setDelayTime(uint64\_t tap, T newDelayTime) \{}
+\DoxyCodeLine{103         \textcolor{keywordflow}{if} (newDelayTime >= l) \{}
+\DoxyCodeLine{104             newDelayTime = l -\/ 1;}
+\DoxyCodeLine{105         \}}
+\DoxyCodeLine{106         \textcolor{keywordflow}{if} (newDelayTime < 0) \{}
+\DoxyCodeLine{107             newDelayTime = 0;}
+\DoxyCodeLine{108         \}}
+\DoxyCodeLine{109         t[tap] = \textcolor{keyword}{static\_cast<}int64\_t\textcolor{keyword}{>}(newDelayTime);}
+\DoxyCodeLine{110         f[tap] = newDelayTime -\/ \textcolor{keyword}{static\_cast<}T\textcolor{keyword}{>}(t[tap]);}
+\DoxyCodeLine{111     \}}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113     \textcolor{keywordtype}{void} clear() \{}
+\DoxyCodeLine{114         std::fill(buffer.begin(), buffer.end(), T(0));}
+\DoxyCodeLine{115         input = T(0);}
+\DoxyCodeLine{116         \textcolor{keywordflow}{for} (\textcolor{keyword}{auto}\& o : output) \{}
+\DoxyCodeLine{117             o = T(0);}
+\DoxyCodeLine{118         \}}
+\DoxyCodeLine{119     \}}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121 \textcolor{keyword}{private}:}
+\DoxyCodeLine{122     int64\_t w = 0;}
+\DoxyCodeLine{123     int64\_t t[numTaps];}
+\DoxyCodeLine{124     T f[numTaps];}
+\DoxyCodeLine{125     int64\_t l = 512;}
+\DoxyCodeLine{126     std::vector<T> buffer;}
+\DoxyCodeLine{127 \};}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

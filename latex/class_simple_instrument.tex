@@ -1,0 +1,73 @@
+\hypertarget{class_simple_instrument}{}\doxysection{Simple\+Instrument Class Reference}
+\label{class_simple_instrument}\index{SimpleInstrument@{SimpleInstrument}}
+Inheritance diagram for Simple\+Instrument\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.321471cm]{class_simple_instrument}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_simple_instrument_a94d5b95856ed204ed95f27339c0f8f64}{update\+Voice}} (\mbox{\hyperlink{class_simple_instrument_voice_state}{Simple\+Instrument\+Voice\+State}} $\ast$voice\+State, \mbox{\hyperlink{struct_m_data}{MData}} cmd) override
+\item 
+void \mbox{\hyperlink{class_simple_instrument_a83ecda57e2e7f4887452ec0023f1b832}{process\+Voice}} (\mbox{\hyperlink{class_simple_instrument_voice_state}{Simple\+Instrument\+Voice\+State}} $\ast$voice\+State, float $\ast$output\+Buffer, float $\ast$input\+Buffer, unsigned int n\+Buffer\+Frames, double stream\+Time, uint8\+\_\+t nvoices) override
+\item 
+void \mbox{\hyperlink{class_simple_instrument_a8b231eeb852c5b72cd3cecb45a5dc57d}{draw}} (GFXcanvas1 $\ast$screen) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_simple_instrument_a8b231eeb852c5b72cd3cecb45a5dc57d}\label{class_simple_instrument_a8b231eeb852c5b72cd3cecb45a5dc57d}} 
+\index{SimpleInstrument@{SimpleInstrument}!draw@{draw}}
+\index{draw@{draw}!SimpleInstrument@{SimpleInstrument}}
+\doxysubsubsection{\texorpdfstring{draw()}{draw()}}
+{\footnotesize\ttfamily void Simple\+Instrument\+::draw (\begin{DoxyParamCaption}\item[{GFXcanvas1 $\ast$}]{screen }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Virtual draw method
+
+
+\begin{DoxyParams}{Parameters}
+{\em screen} & GFXcanvas1\\
+\hline
+\end{DoxyParams}
+Example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_simple_instrument_a8b231eeb852c5b72cd3cecb45a5dc57d}{draw}}(GFXcanvas1 * screen)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  screen-\/>setCursor(0, 0);}
+\DoxyCodeLine{  screen-\/>setTextSize(1);}
+\DoxyCodeLine{  screen-\/>print(\textcolor{stringliteral}{"{}SAMPLE TEXT"{}});}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented from \mbox{\hyperlink{class_g_af0dc304f77853286afe764c1022fab55}{G}}.
+
+\mbox{\Hypertarget{class_simple_instrument_a83ecda57e2e7f4887452ec0023f1b832}\label{class_simple_instrument_a83ecda57e2e7f4887452ec0023f1b832}} 
+\index{SimpleInstrument@{SimpleInstrument}!processVoice@{processVoice}}
+\index{processVoice@{processVoice}!SimpleInstrument@{SimpleInstrument}}
+\doxysubsubsection{\texorpdfstring{processVoice()}{processVoice()}}
+{\footnotesize\ttfamily void Simple\+Instrument\+::process\+Voice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_simple_instrument_voice_state}{Simple\+Instrument\+Voice\+State}} $\ast$}]{voice\+State,  }\item[{float $\ast$}]{output\+Buffer,  }\item[{float $\ast$}]{input\+Buffer,  }\item[{unsigned int}]{n\+Buffer\+Frames,  }\item[{double}]{stream\+Time,  }\item[{uint8\+\_\+t}]{nvoices }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_poly_instrument}{Poly\+Instrument$<$ Simple\+Instrument\+Voice\+State $>$}}.
+
+\mbox{\Hypertarget{class_simple_instrument_a94d5b95856ed204ed95f27339c0f8f64}\label{class_simple_instrument_a94d5b95856ed204ed95f27339c0f8f64}} 
+\index{SimpleInstrument@{SimpleInstrument}!updateVoice@{updateVoice}}
+\index{updateVoice@{updateVoice}!SimpleInstrument@{SimpleInstrument}}
+\doxysubsubsection{\texorpdfstring{updateVoice()}{updateVoice()}}
+{\footnotesize\ttfamily void Simple\+Instrument\+::update\+Voice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_simple_instrument_voice_state}{Simple\+Instrument\+Voice\+State}} $\ast$}]{voice\+State,  }\item[{\mbox{\hyperlink{struct_m_data}{MData}}}]{cmd }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_poly_instrument}{Poly\+Instrument$<$ Simple\+Instrument\+Voice\+State $>$}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+instruments/\+Simple\+Instrument/Simple\+Instrument.\+h\item 
+instruments/\+Simple\+Instrument/Simple\+Instrument.\+cpp\end{DoxyCompactItemize}

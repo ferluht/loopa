@@ -9,16 +9,19 @@
 //     return a + f * (b - a);
 // }
 
+/// @private
 template<typename T = float>
 T clip(T a, T min, T max) {
     return a < min ? min : (a > max ? max : a);
 }
 
+/// @private
 template<typename T = float>
 T scale(T a, T inMin, T inMax, T outMin, T outMax) {
     return (a - inMin)/(inMax - inMin) * (outMax - outMin) + outMin;
 }
 
+/// @private
 template<typename T = float>
 T semitone(T x) {
     return ((int)(x * 12)) * 0.0833333f;

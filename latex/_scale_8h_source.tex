@@ -1,0 +1,45 @@
+\hypertarget{_scale_8h_source}{}\doxysection{Scale.\+h}
+\label{_scale_8h_source}\index{effects\_midi/Scale.h@{effects\_midi/Scale.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{//}}
+\DoxyCodeLine{2 \textcolor{comment}{// Created by ferluht on 20/07/2022.}}
+\DoxyCodeLine{3 \textcolor{comment}{//}}
+\DoxyCodeLine{4 }
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include <Effect.h>}}
+\DoxyCodeLine{8 }
+\DoxyCodeLine{9 \textcolor{keyword}{class }\mbox{\hyperlink{class_scale}{Scale}} : \textcolor{keyword}{public} \mbox{\hyperlink{class_m_i_d_i_effect}{MIDIEffect}} \{}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11     std::vector<std::pair<const char *, std::vector<int>>> scales = \{}
+\DoxyCodeLine{12             \{\textcolor{stringliteral}{"{}MIXOLYDIAN"{}}, \{0, 2, 4, 5, 7, 9, 10\}\},}
+\DoxyCodeLine{13             \{\textcolor{stringliteral}{"{}CHROMATIC"{}}, \{0, 1, 2, 3,4, 5, 6,7, 8,9, 10,11\}\},}
+\DoxyCodeLine{14             \{\textcolor{stringliteral}{"{}MAJOR"{}}, \{0, 2, 4, 5, 7, 9, 11\}\},}
+\DoxyCodeLine{15             \{\textcolor{stringliteral}{"{}MINOR"{}}, \{0, 2, 3, 5, 7, 8, 10\}\},}
+\DoxyCodeLine{16             \{\textcolor{stringliteral}{"{}HARM MINOR"{}}, \{0, 2, 3, 5, 7, 8, 11\}\},}
+\DoxyCodeLine{17     \};}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19     std::vector<std::pair<const char *, std::vector<int>>>::iterator selected\_scale;}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{keyword}{public}:}
+\DoxyCodeLine{22     \mbox{\hyperlink{class_scale}{Scale}}() : \mbox{\hyperlink{class_m_i_d_i_effect}{MIDIEffect}}(\textcolor{stringliteral}{"{}SCALE"{}}) \{}
+\DoxyCodeLine{23         selected\_scale = scales.begin();}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25         \mbox{\hyperlink{class_m_af2037e5190cff1802d694edd919c9a90}{addMIDIHandler}}(\{NOTEON\_HEADER, NOTEOFF\_HEADER\}, [\textcolor{keyword}{this}](\mbox{\hyperlink{struct_m_data}{MData}} \&cmd) -\/> MIDISTATUS \{}
+\DoxyCodeLine{26             std::vector<int> * scale = \&selected\_scale-\/>second;}
+\DoxyCodeLine{27             cmd.data1 = (*scale)[(cmd.data1 -\/ 36) \% scale-\/>size()] + (int)((cmd.data1 -\/ 36) / scale-\/>size()) * 12;}
+\DoxyCodeLine{28             \textcolor{keywordflow}{return} MIDISTATUS::DONE;}
+\DoxyCodeLine{29         \});}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31         \mbox{\hyperlink{class_m_af2037e5190cff1802d694edd919c9a90}{addMIDIHandler}}(CC\_HEADER, CC\_E1, [\textcolor{keyword}{this}](\mbox{\hyperlink{struct_m_data}{MData}} \&cmd) -\/> MIDISTATUS \{}
+\DoxyCodeLine{32             \textcolor{keywordflow}{if} (selected\_scale + 1 != scales.end()) selected\_scale++;}
+\DoxyCodeLine{33             \textcolor{keywordflow}{else} selected\_scale = scales.begin();}
+\DoxyCodeLine{34             \textcolor{keywordflow}{return} MIDISTATUS::DONE;}
+\DoxyCodeLine{35         \});}
+\DoxyCodeLine{36     \}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38     \textcolor{keywordtype}{void} \mbox{\hyperlink{class_scale_a04ef5572a07d0557facb05b8d1446798}{draw}}(GFXcanvas1 * screen) \textcolor{keyword}{override};}
+\DoxyCodeLine{39 \};}
+
+\end{DoxyCode}

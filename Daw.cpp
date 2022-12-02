@@ -73,17 +73,17 @@ void DAW::draw(GFXcanvas1 * screen) {
     auto selected_track = (Rack *) (tracks->get_focus());
     screen->setCursor(4, 6);
     screen->setTextSize(1);
-    screen->print(selected_track->name);
+    screen->print(selected_track->getName());
 
     auto selected_stage = (Rack *) (selected_track->get_focus());
     screen->setCursor(34, 6);
     screen->setTextSize(1);
-    screen->print(selected_stage->name);
+    screen->print(selected_stage->getName());
 
     auto selected_fx = (Rack *) (selected_stage->get_focus());
     screen->setCursor(66, 6);
     screen->setTextSize(1);
-    screen->print(selected_fx->name);
+    screen->print(selected_fx->getName());
 
     if (focus_rack == tracks) {
         screen->drawFastHLine(0, 9, 32, 1);
@@ -95,7 +95,7 @@ void DAW::draw(GFXcanvas1 * screen) {
 
     screen->setCursor(101, 6);
     screen->setTextSize(1);
-    screen->print(tapes->name);
+    screen->print(tapes->getName());
 
     focus_rack->draw(screen);
     tapes->draw(screen);
@@ -155,7 +155,7 @@ Rack *DAW::spawnSingleTrack(const char * name, int i, int j, int k) {
 
 Rack *DAW::spawnMidiRack() {
     Rack * midirack = new Rack("MIDI FX",Rack::SELECTIVE);
-    midirack->add(new DummyMidi());
+    midirack->add(new DummyMidiFX());
     midirack->add(new Scale());
     return midirack;
 }
@@ -179,7 +179,7 @@ Rack *DAW::spawnInstrumentRack() {
 
 Rack *DAW::spawnEffectRack() {
     Rack * effects = new Rack("AUDIO FX", Rack::SELECTIVE);
-    effects->add(new DummyAudio());
+    effects->add(new DummyAudioFX());
     effects->add(new Plateau());
     return effects;
 }

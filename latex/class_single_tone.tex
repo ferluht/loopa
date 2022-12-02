@@ -1,0 +1,73 @@
+\hypertarget{class_single_tone}{}\doxysection{Single\+Tone Class Reference}
+\label{class_single_tone}\index{SingleTone@{SingleTone}}
+Inheritance diagram for Single\+Tone\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.733333cm]{class_single_tone}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_single_tone_ab4c0a762d615685436a75e6ba5b65bf5}{update\+Voice}} (\mbox{\hyperlink{class_single_tone_voice_state}{Single\+Tone\+Voice\+State}} $\ast$voice\+State, \mbox{\hyperlink{struct_m_data}{MData}} cmd) override
+\item 
+void \mbox{\hyperlink{class_single_tone_a84e8152165971535e29348df9cd11879}{process\+Voice}} (\mbox{\hyperlink{class_single_tone_voice_state}{Single\+Tone\+Voice\+State}} $\ast$voice\+State, float $\ast$output\+Buffer, float $\ast$input\+Buffer, unsigned int n\+Buffer\+Frames, double stream\+Time, uint8\+\_\+t nvoices) override
+\item 
+void \mbox{\hyperlink{class_single_tone_a7a6a10ac4959ffc9d52e97c8c00e4d86}{draw}} (GFXcanvas1 $\ast$screen) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_single_tone_a7a6a10ac4959ffc9d52e97c8c00e4d86}\label{class_single_tone_a7a6a10ac4959ffc9d52e97c8c00e4d86}} 
+\index{SingleTone@{SingleTone}!draw@{draw}}
+\index{draw@{draw}!SingleTone@{SingleTone}}
+\doxysubsubsection{\texorpdfstring{draw()}{draw()}}
+{\footnotesize\ttfamily void Single\+Tone\+::draw (\begin{DoxyParamCaption}\item[{GFXcanvas1 $\ast$}]{screen }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Virtual draw method
+
+
+\begin{DoxyParams}{Parameters}
+{\em screen} & GFXcanvas1\\
+\hline
+\end{DoxyParams}
+Example of usage in child class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void} \mbox{\hyperlink{class_single_tone_a7a6a10ac4959ffc9d52e97c8c00e4d86}{draw}}(GFXcanvas1 * screen)\textcolor{keyword}{ override }\{}
+\DoxyCodeLine{  screen-\/>setCursor(0, 0);}
+\DoxyCodeLine{  screen-\/>setTextSize(1);}
+\DoxyCodeLine{  screen-\/>print(\textcolor{stringliteral}{"{}SAMPLE TEXT"{}});}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented from \mbox{\hyperlink{class_g_af0dc304f77853286afe764c1022fab55}{G}}.
+
+\mbox{\Hypertarget{class_single_tone_a84e8152165971535e29348df9cd11879}\label{class_single_tone_a84e8152165971535e29348df9cd11879}} 
+\index{SingleTone@{SingleTone}!processVoice@{processVoice}}
+\index{processVoice@{processVoice}!SingleTone@{SingleTone}}
+\doxysubsubsection{\texorpdfstring{processVoice()}{processVoice()}}
+{\footnotesize\ttfamily void Single\+Tone\+::process\+Voice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_single_tone_voice_state}{Single\+Tone\+Voice\+State}} $\ast$}]{voice\+State,  }\item[{float $\ast$}]{output\+Buffer,  }\item[{float $\ast$}]{input\+Buffer,  }\item[{unsigned int}]{n\+Buffer\+Frames,  }\item[{double}]{stream\+Time,  }\item[{uint8\+\_\+t}]{nvoices }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_poly_instrument}{Poly\+Instrument$<$ Single\+Tone\+Voice\+State $>$}}.
+
+\mbox{\Hypertarget{class_single_tone_ab4c0a762d615685436a75e6ba5b65bf5}\label{class_single_tone_ab4c0a762d615685436a75e6ba5b65bf5}} 
+\index{SingleTone@{SingleTone}!updateVoice@{updateVoice}}
+\index{updateVoice@{updateVoice}!SingleTone@{SingleTone}}
+\doxysubsubsection{\texorpdfstring{updateVoice()}{updateVoice()}}
+{\footnotesize\ttfamily void Single\+Tone\+::update\+Voice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_single_tone_voice_state}{Single\+Tone\+Voice\+State}} $\ast$}]{voice\+State,  }\item[{\mbox{\hyperlink{struct_m_data}{MData}}}]{cmd }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_poly_instrument}{Poly\+Instrument$<$ Single\+Tone\+Voice\+State $>$}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+instruments/\+Single\+Tone/Single\+Tone.\+h\item 
+instruments/\+Single\+Tone/Single\+Tone.\+cpp\end{DoxyCompactItemize}

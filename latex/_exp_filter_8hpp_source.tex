@@ -1,0 +1,66 @@
+\hypertarget{_exp_filter_8hpp_source}{}\doxysection{Exp\+Filter.\+hpp}
+\label{_exp_filter_8hpp_source}\index{common/ExpFilter.hpp@{common/ExpFilter.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#include "{}SampleDelay.hpp"{}}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#define \_filter\_depth 3}}
+\DoxyCodeLine{5 }
+\DoxyCodeLine{9 \textcolor{keyword}{class }ExpFilter \{}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{keyword}{public}:}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13     \textcolor{keywordtype}{float} freq = 4000;}
+\DoxyCodeLine{14     \textcolor{keywordtype}{float} sum = 0;}
+\DoxyCodeLine{15     \textcolor{keywordtype}{float} coeffIn = freq / 10000;}
+\DoxyCodeLine{16     \textcolor{keywordtype}{float} coeffDel = 1 -\/ coeffIn;}
+\DoxyCodeLine{17     \textcolor{keywordtype}{float} res = 0;}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19     OneSampleDelay* delayArray[\_filter\_depth];}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21     \textcolor{keywordtype}{float} delayCounter = 0;}
+\DoxyCodeLine{22     \textcolor{keywordtype}{float} cv = 0;}
+\DoxyCodeLine{23     \textcolor{keywordtype}{float} in = 0;}
+\DoxyCodeLine{24     \textcolor{keywordtype}{float} out = 0;}
+\DoxyCodeLine{25     \textcolor{keywordtype}{float} buf = 0;}
+\DoxyCodeLine{26     \textcolor{keywordtype}{float} lp = 0;}
+\DoxyCodeLine{27     \textcolor{keywordtype}{float} hp = 0;}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29   ExpFilter() \{}
+\DoxyCodeLine{30     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < \_filter\_depth; i++) \{}
+\DoxyCodeLine{31       delayArray[i] = \textcolor{keyword}{new} OneSampleDelay();}
+\DoxyCodeLine{32     \}}
+\DoxyCodeLine{33   \}}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35   \textcolor{keywordtype}{void} process () \{}
+\DoxyCodeLine{36     coeffIn = freq / 10000;}
+\DoxyCodeLine{37     \textcolor{keywordflow}{if} (coeffIn > 1) coeffIn = 0.999;}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{39     coeffDel = 1 -\/ coeffIn;}
+\DoxyCodeLine{40     out = 0;}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42     delayArray[0]-\/>in = in * coeffIn + delayArray[0]-\/>out * coeffDel -\/ delayArray[\_filter\_depth -\/ 1]-\/>out * res * coeffIn;}
+\DoxyCodeLine{43     out = delayArray[0]-\/>out;}
+\DoxyCodeLine{44     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 1; i < \_filter\_depth; i++) \{}
+\DoxyCodeLine{45       delayArray[i]-\/>in = out * coeffIn + delayArray[i]-\/>out * coeffDel;}
+\DoxyCodeLine{46       out = delayArray[i]-\/>out;}
+\DoxyCodeLine{47     \}}
+\DoxyCodeLine{48     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < \_filter\_depth; i++) \{}
+\DoxyCodeLine{49       delayArray[i]-\/>process();}
+\DoxyCodeLine{50     \}}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52     in = out;}
+\DoxyCodeLine{53     delayArray[0]-\/>in = in * coeffIn + delayArray[0]-\/>out * coeffDel -\/ delayArray[\_filter\_depth -\/ 1]-\/>out * res * coeffIn;}
+\DoxyCodeLine{54     out = delayArray[0]-\/>out;}
+\DoxyCodeLine{55     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 1; i < \_filter\_depth; i++) \{}
+\DoxyCodeLine{56       delayArray[i]-\/>in = out * coeffIn + delayArray[i]-\/>out * coeffDel;}
+\DoxyCodeLine{57       out = delayArray[i]-\/>out;}
+\DoxyCodeLine{58     \}}
+\DoxyCodeLine{59     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < \_filter\_depth; i++) \{}
+\DoxyCodeLine{60       delayArray[i]-\/>process();}
+\DoxyCodeLine{61     \}}
+\DoxyCodeLine{62   \}}
+\DoxyCodeLine{63 \};}
+
+\end{DoxyCode}

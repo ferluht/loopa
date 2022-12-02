@@ -2,6 +2,9 @@
 #include <atomic>
 #include <cstring>
 
+/**
+ * @private
+ */
 template <typename T, size_t S>
 struct DoubleRingBuffer {
 	std::atomic<size_t> start{0};

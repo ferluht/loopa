@@ -1,0 +1,57 @@
+\hypertarget{_v_c_o_8hpp_source}{}\doxysection{VCO.\+hpp}
+\label{_v_c_o_8hpp_source}\index{common/VCO.hpp@{common/VCO.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#pragma once}}
+\DoxyCodeLine{2 }
+\DoxyCodeLine{6 \textcolor{keyword}{class }VCO \{}
+\DoxyCodeLine{7 \textcolor{keyword}{public}:}
+\DoxyCodeLine{8 }
+\DoxyCodeLine{9   \textcolor{keywordtype}{float} freq = 261.63;}
+\DoxyCodeLine{10   \textcolor{keywordtype}{float} sample\_rate = 44100;}
+\DoxyCodeLine{11   \textcolor{keywordtype}{float} delta = M\_PI * 2 / (sample\_rate / freq);}
+\DoxyCodeLine{12   \textcolor{keywordtype}{float} phase = 0;}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14   \textcolor{keywordtype}{float} wave = 0;}
+\DoxyCodeLine{15   \textcolor{keywordtype}{float} amp = 1;}
+\DoxyCodeLine{16   \textcolor{keywordtype}{float} cv = 0;}
+\DoxyCodeLine{17   \textcolor{keywordtype}{float} fm = 0;}
+\DoxyCodeLine{18   \textcolor{keywordtype}{float} pw = 0.5;}
+\DoxyCodeLine{19   \textcolor{keywordtype}{float} value = 0;}
+\DoxyCodeLine{20   \textcolor{keywordtype}{float} type = 0;}
+\DoxyCodeLine{21   \textcolor{keywordtype}{float} mod = 0;}
+\DoxyCodeLine{22   \textcolor{keywordtype}{float} mod\_prev = 0;}
+\DoxyCodeLine{23   \textcolor{keywordtype}{float} phase\_inc = delta;}
+\DoxyCodeLine{24   \textcolor{keywordtype}{float} \_alpha = 0.01;}
+\DoxyCodeLine{25   \textcolor{keywordtype}{float} out = 0;}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28   VCO() \{}
+\DoxyCodeLine{29     }
+\DoxyCodeLine{30   \} }
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32   \textcolor{keywordtype}{void} update\_params() \{}
+\DoxyCodeLine{33     type = wave / 10;}
+\DoxyCodeLine{34     delta = M\_PI * 2 / (sample\_rate / freq);}
+\DoxyCodeLine{35   \}}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37   \textcolor{keywordtype}{void} process() \{}
+\DoxyCodeLine{38     update\_params();}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40     \textcolor{keywordflow}{if} (type >= 0) \{}
+\DoxyCodeLine{41       value = sin(phase) * (1 -\/ type) + (phase / M\_PI -\/ 1) * type;}
+\DoxyCodeLine{42     \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{43       value = sin(phase) * (1 + type) -\/ ((phase < M\_PI * pw * 2 ) * 2 -\/ 1) * type;}
+\DoxyCodeLine{44     \}}
+\DoxyCodeLine{45     }
+\DoxyCodeLine{46     mod = \_alpha * (cv + fm) + (1 -\/ \_alpha) * mod;}
+\DoxyCodeLine{47     \textcolor{keywordflow}{if} (mod != mod\_prev) \{ phase\_inc = delta * pow(2, mod); mod\_prev = mod; \}}
+\DoxyCodeLine{48     phase += phase\_inc;}
+\DoxyCodeLine{49     \textcolor{keywordflow}{if} (phase > M\_PI * 2) \{}
+\DoxyCodeLine{50       phase -\/= M\_PI * 2;}
+\DoxyCodeLine{51     \}}
+\DoxyCodeLine{52     out = value * amp;}
+\DoxyCodeLine{53   \}}
+\DoxyCodeLine{54 \};}
+
+\end{DoxyCode}

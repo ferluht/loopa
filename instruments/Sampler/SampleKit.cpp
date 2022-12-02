@@ -4,6 +4,16 @@
 
 #include "SampleKit.h"
 
+SampleKit::SampleKit() : Instrument("KIT") {
+    for (int i = 0; i < 128; i ++) notes[i] = nullptr;
+
+    addMIDIHandler({NOTEON_HEADER, NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
+        if (notes[cmd.data1])
+            return notes[cmd.data1]->midiIn(cmd);
+        return MIDISTATUS::DONE;
+    });
+}
+
 void SampleKit::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) {
     for (auto const& chain : activeChains) chain->process(outputBuffer, inputBuffer, nBufferFrames, streamTime);
 }

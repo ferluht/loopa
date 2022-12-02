@@ -1,0 +1,176 @@
+\hypertarget{class_m}{}\doxysection{M Class Reference}
+\label{class_m}\index{M@{M}}
+
+
+{\ttfamily \#include $<$M.\+h$>$}
+
+Inheritance diagram for M\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.989324cm]{class_m}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_m_af2037e5190cff1802d694edd919c9a90}{add\+MIDIHandler}} (uint8\+\_\+t header, std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$ handler)
+\item 
+void \mbox{\hyperlink{class_m_ae3aeb807434e8c4cbde4ab3467d91b41}{add\+MIDIHandler}} (std\+::vector$<$ uint8\+\_\+t $>$ headers, std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$ handler)
+\item 
+void \mbox{\hyperlink{class_m_a95a9942e85d7a52433474f682e048020}{add\+MIDIHandler}} (uint8\+\_\+t header, uint8\+\_\+t code\+\_\+start, uint8\+\_\+t code\+\_\+end, std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$ handler)
+\item 
+void \mbox{\hyperlink{class_m_a50b227a2ecc7070c5718bc4f6caf124b}{add\+MIDIHandler}} (std\+::vector$<$ uint8\+\_\+t $>$ headers, uint8\+\_\+t code\+\_\+start, uint8\+\_\+t code\+\_\+end, std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$ handler)
+\item 
+void \mbox{\hyperlink{class_m_acf137eabb66f2e3922e26188ed17c908}{add\+MIDIHandler}} (uint8\+\_\+t header\+\_\+start, uint8\+\_\+t header\+\_\+end, uint8\+\_\+t code\+\_\+start, uint8\+\_\+t code\+\_\+end, std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$ handler)
+\item 
+void \mbox{\hyperlink{class_m_ae7130e971f81e35458e46a9599aa3403}{add\+MIDIHandler}} (std\+::vector$<$ uint8\+\_\+t $>$ headers, std\+::vector$<$ uint8\+\_\+t $>$ codes, std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$ handler)
+\item 
+void \mbox{\hyperlink{class_m_ad65a426542615b93b2790022e720b16e}{add\+MIDIHandler}} (uint8\+\_\+t header, uint8\+\_\+t code, std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$ handler)
+\item 
+virtual MIDISTATUS \mbox{\hyperlink{class_m_a165f3e89d1329bdb7d738164ff5689cf}{midi\+In}} (\mbox{\hyperlink{struct_m_data}{MData}} \&cmd)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{class_m}{M}} stands for MIDI. The base class for all MIDI objects. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_m_ae3aeb807434e8c4cbde4ab3467d91b41}\label{class_m_ae3aeb807434e8c4cbde4ab3467d91b41}} 
+\index{M@{M}!addMIDIHandler@{addMIDIHandler}}
+\index{addMIDIHandler@{addMIDIHandler}!M@{M}}
+\doxysubsubsection{\texorpdfstring{addMIDIHandler()}{addMIDIHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily void M\+::add\+MIDIHandler (\begin{DoxyParamCaption}\item[{std\+::vector$<$ uint8\+\_\+t $>$}]{headers,  }\item[{std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$}]{handler }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add MIDI handler for set of headers
+
+
+\begin{DoxyParams}{Parameters}
+{\em headers} & set of midi headers \\
+\hline
+{\em handler} & callback to call when matching midi header is received \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_m_ae7130e971f81e35458e46a9599aa3403}\label{class_m_ae7130e971f81e35458e46a9599aa3403}} 
+\index{M@{M}!addMIDIHandler@{addMIDIHandler}}
+\index{addMIDIHandler@{addMIDIHandler}!M@{M}}
+\doxysubsubsection{\texorpdfstring{addMIDIHandler()}{addMIDIHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily void M\+::add\+MIDIHandler (\begin{DoxyParamCaption}\item[{std\+::vector$<$ uint8\+\_\+t $>$}]{headers,  }\item[{std\+::vector$<$ uint8\+\_\+t $>$}]{codes,  }\item[{std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$}]{handler }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add MIDI handler for set of headers and set of codes
+
+
+\begin{DoxyParams}{Parameters}
+{\em headers} & set of midi headers \\
+\hline
+{\em codes} & set of midi codes \\
+\hline
+{\em handler} & callback to call when matching midi header and code are received \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_m_a50b227a2ecc7070c5718bc4f6caf124b}\label{class_m_a50b227a2ecc7070c5718bc4f6caf124b}} 
+\index{M@{M}!addMIDIHandler@{addMIDIHandler}}
+\index{addMIDIHandler@{addMIDIHandler}!M@{M}}
+\doxysubsubsection{\texorpdfstring{addMIDIHandler()}{addMIDIHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily void M\+::add\+MIDIHandler (\begin{DoxyParamCaption}\item[{std\+::vector$<$ uint8\+\_\+t $>$}]{headers,  }\item[{uint8\+\_\+t}]{code\+\_\+start,  }\item[{uint8\+\_\+t}]{code\+\_\+end,  }\item[{std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$}]{handler }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add MIDI handler for set of headers and range of codes \mbox{[}code\+\_\+start .. code\+\_\+end\mbox{]}
+
+
+\begin{DoxyParams}{Parameters}
+{\em headers} & set of midi headers \\
+\hline
+{\em code\+\_\+start} & first midi code to include in handler \\
+\hline
+{\em code\+\_\+end} & last midi code to include in handler \\
+\hline
+{\em handler} & callback to call when matching midi header and code are received \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_m_af2037e5190cff1802d694edd919c9a90}\label{class_m_af2037e5190cff1802d694edd919c9a90}} 
+\index{M@{M}!addMIDIHandler@{addMIDIHandler}}
+\index{addMIDIHandler@{addMIDIHandler}!M@{M}}
+\doxysubsubsection{\texorpdfstring{addMIDIHandler()}{addMIDIHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily void M\+::add\+MIDIHandler (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{header,  }\item[{std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$}]{handler }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add MIDI handler for specific header
+
+
+\begin{DoxyParams}{Parameters}
+{\em header} & status (first) byte of midi command \\
+\hline
+{\em handler} & callback to call when matching midi header is received \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_m_ad65a426542615b93b2790022e720b16e}\label{class_m_ad65a426542615b93b2790022e720b16e}} 
+\index{M@{M}!addMIDIHandler@{addMIDIHandler}}
+\index{addMIDIHandler@{addMIDIHandler}!M@{M}}
+\doxysubsubsection{\texorpdfstring{addMIDIHandler()}{addMIDIHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily void M\+::add\+MIDIHandler (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{header,  }\item[{uint8\+\_\+t}]{code,  }\item[{std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$}]{handler }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add MIDI handler for just one header and one code
+
+
+\begin{DoxyParams}{Parameters}
+{\em header} & header \\
+\hline
+{\em code} & code \\
+\hline
+{\em handler} & callback to call when matching midi header and code are received \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_m_a95a9942e85d7a52433474f682e048020}\label{class_m_a95a9942e85d7a52433474f682e048020}} 
+\index{M@{M}!addMIDIHandler@{addMIDIHandler}}
+\index{addMIDIHandler@{addMIDIHandler}!M@{M}}
+\doxysubsubsection{\texorpdfstring{addMIDIHandler()}{addMIDIHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily void M\+::add\+MIDIHandler (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{header,  }\item[{uint8\+\_\+t}]{code\+\_\+start,  }\item[{uint8\+\_\+t}]{code\+\_\+end,  }\item[{std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$}]{handler }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add MIDI handler for set of headers
+
+
+\begin{DoxyParams}{Parameters}
+{\em headers} & set of midi headers \\
+\hline
+{\em handler} & callback to call when matching midi header is received \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_m_acf137eabb66f2e3922e26188ed17c908}\label{class_m_acf137eabb66f2e3922e26188ed17c908}} 
+\index{M@{M}!addMIDIHandler@{addMIDIHandler}}
+\index{addMIDIHandler@{addMIDIHandler}!M@{M}}
+\doxysubsubsection{\texorpdfstring{addMIDIHandler()}{addMIDIHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily void M\+::add\+MIDIHandler (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{header\+\_\+start,  }\item[{uint8\+\_\+t}]{header\+\_\+end,  }\item[{uint8\+\_\+t}]{code\+\_\+start,  }\item[{uint8\+\_\+t}]{code\+\_\+end,  }\item[{std\+::function$<$ MIDISTATUS(\mbox{\hyperlink{struct_m_data}{MData}} \&)$>$}]{handler }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add MIDI handler for range of headers \mbox{[}header\+\_\+start .. header\+\_\+end\mbox{]} and range of codes \mbox{[}code\+\_\+start .. code\+\_\+end\mbox{]}
+
+
+\begin{DoxyParams}{Parameters}
+{\em header\+\_\+start} & first midi header to include in handler \\
+\hline
+{\em header\+\_\+end} & last midi header to include in handler \\
+\hline
+{\em code\+\_\+start} & first midi code to include in handler \\
+\hline
+{\em code\+\_\+end} & last midi code to include in handler \\
+\hline
+{\em handler} & callback to call when matching midi header and code are received \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_m_a165f3e89d1329bdb7d738164ff5689cf}\label{class_m_a165f3e89d1329bdb7d738164ff5689cf}} 
+\index{M@{M}!midiIn@{midiIn}}
+\index{midiIn@{midiIn}!M@{M}}
+\doxysubsubsection{\texorpdfstring{midiIn()}{midiIn()}}
+{\footnotesize\ttfamily virtual MIDISTATUS M\+::midi\+In (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_m_data}{MData}} \&}]{cmd }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+MIDI receiver method. When received midi command calls matching callback if exists If no callback exists just returns MIDISTATUS\+::\+DONE 
+\begin{DoxyParams}{Parameters}
+{\em cmd} & midi command \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \mbox{\hyperlink{class_d_a_w_a9cc872796552800491c7a2e5079904ee}{DAW}}, and \mbox{\hyperlink{class_rack_a842952c85e86cc2efc0194523d12ab0b}{Rack}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/M.\+h\end{DoxyCompactItemize}

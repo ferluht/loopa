@@ -4,15 +4,16 @@
 
 #pragma once
 
+#include <Instrument.h>
 #include "SimpleInstrument/SimpleInstrument.h"
 #include "SingleTone/SingleTone.h"
 #include "Sampler/Sampler.h"
 #include "Sampler/SampleKit.h"
 
-class DummyInstrument : public AMG {
+class DummyInstrument : public Instrument {
 
 public:
-    DummyInstrument() : AMG("EMPTY") {
+    DummyInstrument() : Instrument("EMPTY") {
 
     }
 

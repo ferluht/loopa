@@ -1,5 +1,8 @@
 #pragma once
 
+/**
+ * @private
+ */
 class SampleAndHold {
 public:
 

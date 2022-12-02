@@ -14,6 +14,7 @@
 
 #define HISTORY_SIZE (1<<21)
 
+/// @private
 class Delay {
 
     DoubleRingBuffer<float, HISTORY_SIZE> historyBuffer;

@@ -3,6 +3,9 @@
 
 #define _filter_depth 3
 
+/**
+ * @private
+ */
 class ExpFilter {
 
 public:

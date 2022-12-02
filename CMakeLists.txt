@@ -71,7 +71,7 @@ add_executable(rpidaw
         instruments/Sampler/Sampler.cpp
         instruments/Sampler/SampleKit.cpp
         3rdparty/Adafruit-GFX-offscreen/Adafruit_GFX.cpp
-        Gui.cpp)
+        Gui.cpp core/Effect.h)
 
 set(CMAKE_CXX_FLAGS "-O3 -Wno-cpp") # -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wall -Wextra")
 #target_compile_options(rpidaw PRIVATE -Ofast)

@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <AMG.h>
+#include <Effect.h>
 
-class Scale : public AMG {
+class Scale : public MIDIEffect {
 
     std::vector<std::pair<const char *, std::vector<int>>> scales = {
             {"MIXOLYDIAN", {0, 2, 4, 5, 7, 9, 10}},
@@ -19,17 +19,17 @@ class Scale : public AMG {
     std::vector<std::pair<const char *, std::vector<int>>>::iterator selected_scale;
 
 public:
-    Scale() : AMG("SCALE") {
+    Scale() : MIDIEffect("SCALE") {
         selected_scale = scales.begin();
 
-        addHandler({NOTEON_HEADER, NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler({NOTEON_HEADER, NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
             std::vector<int> * scale = &selected_scale->second;
             cmd.data1 = (*scale)[(cmd.data1 - 36) % scale->size()] + (int)((cmd.data1 - 36) / scale->size()) * 12;
             return MIDISTATUS::DONE;
         });
 
-        addHandler(CC_HEADER, CC_E1,[this](MData &cmd) -> MIDISTATUS {
-            if (selected_scale + 1 != scales.end()) selected_scale ++;
+        addMIDIHandler(CC_HEADER, CC_E1, [this](MData &cmd) -> MIDISTATUS {
+            if (selected_scale + 1 != scales.end()) selected_scale++;
             else selected_scale = scales.begin();
             return MIDISTATUS::DONE;
         });

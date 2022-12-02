@@ -12,10 +12,12 @@
  #include <cstdint>
 // #include "../Utilities.hpp"
 
+/// @private
 inline float linterp(float a, float b, float f) {
     return a + f * (b - a);
 }
 
+/// @private
 template<typename T = float>
 class InterpDelay2 {
 public:
