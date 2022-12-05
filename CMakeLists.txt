@@ -23,7 +23,6 @@ include_directories(core)
 include_directories(effects_audio)
 include_directories(effects_midi)
 include_directories(instruments)
-include_directories(ui)
 include_directories(utils)
 include_directories(3rdparty)
 include_directories(3rdparty/nanogui/include)
@@ -65,13 +64,13 @@ add_executable(rpidaw
         instruments/SingleTone/SingleTone.cpp
 #        3rdparty/nanovg/src/nanovg.c
         effects_midi/Scale.cpp
-        ui/Rack.cpp
-        ui/TapeRack.cpp
+        core/Rack.cpp
         utils/WavFile.cpp
         instruments/Sampler/Sampler.cpp
         instruments/Sampler/SampleKit.cpp
         3rdparty/Adafruit-GFX-offscreen/Adafruit_GFX.cpp
-        Gui.cpp core/Effect.h)
+        Gui.cpp
+        effects_audio/LoopMatrix/LoopMatrix.cpp)
 
 set(CMAKE_CXX_FLAGS "-O3 -Wno-cpp") # -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wall -Wextra")
 #target_compile_options(rpidaw PRIVATE -Ofast)

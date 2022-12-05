@@ -5,7 +5,7 @@
 #include "SingleTone.h"
 
 void SingleTone::updateVoice(SingleToneVoiceState * voiceState, MData cmd) {
-    if ((cmd.status == NOTEON_HEADER) && (cmd.data2 != 0)) {
+    if ((cmd.status == MIDI::GENERAL::NOTEON_HEADER) && (cmd.data2 != 0)) {
         if (!voiceState->isActive()) {
             voiceState->glide = 0;
             voiceState->glide_inc = 0;

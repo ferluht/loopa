@@ -7,7 +7,7 @@
 SampleKit::SampleKit() : Instrument("KIT") {
     for (int i = 0; i < 128; i ++) notes[i] = nullptr;
 
-    addMIDIHandler({NOTEON_HEADER, NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
+    addMIDIHandler({MIDI::GENERAL::NOTEON_HEADER, MIDI::GENERAL::NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
         if (notes[cmd.data1])
             return notes[cmd.data1]->midiIn(cmd);
         return MIDISTATUS::DONE;

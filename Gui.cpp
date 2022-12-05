@@ -42,16 +42,16 @@ public:
 //        std::cout << key << " " << action << std::endl;
 
         if (65 <= key && key <= 90) {
-            cmd.status = action ? NOTEON_HEADER : NOTEOFF_HEADER;
+            cmd.status = action ? MIDI::GENERAL::NOTEON_HEADER : MIDI::GENERAL::NOTEOFF_HEADER;
             cmd.data1 = key;
             cmd.data2 = action ? 100 : 0;
             mdaw->midiIn(cmd);
         } else if (key >= 262 && key <= 265) {
-            cmd.status = CC_HEADER;
+            cmd.status = MIDI::GENERAL::CC_HEADER;
             cmd.data1 = S2;
             cmd.data2 = 127;
             mdaw->midiIn(cmd);
-            cmd.status = CC_HEADER;
+            cmd.status = MIDI::GENERAL::CC_HEADER;
             cmd.data2 = action ? 100 : 0;
             switch (key) {
                 case 262:
@@ -70,22 +70,22 @@ public:
                     break;
             }
             mdaw->midiIn(cmd);
-            cmd.status = CC_HEADER;
+            cmd.status = MIDI::GENERAL::CC_HEADER;
             cmd.data1 = S2;
             cmd.data2 = 0;
             mdaw->midiIn(cmd);
         } else if (key >= '1' && key <= '4') {
-            cmd.status = CC_HEADER;
+            cmd.status = MIDI::GENERAL::CC_HEADER;
             cmd.data1 = P1 + key - '1';
             cmd.data2 = action ? 127 : 0;
             mdaw->midiIn(cmd);
         } else if (key == 341) {
-            cmd.status = CC_HEADER;
+            cmd.status = MIDI::GENERAL::CC_HEADER;
             cmd.data1 = S1;
             cmd.data2 = action ? 127 : 0;
             mdaw->midiIn(cmd);
         } else if (key == 340) {
-            cmd.status = CC_HEADER;
+            cmd.status = MIDI::GENERAL::CC_HEADER;
             cmd.data1 = S2;
             cmd.data2 = action ? 127 : 0;
             mdaw->midiIn(cmd);
@@ -338,9 +338,9 @@ void scan_buttons() {
         if (uartbuffer[uartit] == '\n') {
             MData cmd;
             switch (uartbuffer[0]) {
-                case CC_HEADER:
-                case NOTEON_HEADER:
-                case NOTEOFF_HEADER:
+                case MIDI::GENERAL::CC_HEADER:
+                case MIDI::GENERAL::NOTEON_HEADER:
+                case MIDI::GENERAL::NOTEOFF_HEADER:
                     cmd.status = uartbuffer[0];
                     cmd.data1 = uartbuffer[1];
                     cmd.data2 = uartbuffer[2];

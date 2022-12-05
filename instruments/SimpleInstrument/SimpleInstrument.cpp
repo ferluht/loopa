@@ -6,7 +6,7 @@
 #include "SimpleInstrument.h"
 
 void SimpleInstrument::updateVoice(SimpleInstrumentVoiceState * voiceState, MData cmd) {
-    if (((cmd.status & 0xF0) == NOTEON_HEADER) && (cmd.data2 != 0)) {
+    if (((cmd.status & 0xF0) == MIDI::GENERAL::NOTEON_HEADER) && (cmd.data2 != 0)) {
         voiceState->note = cmd.data1;
         voiceState->volume = (float)cmd.data2/127.f;
         voiceState->phase_inc = getPhaseIncrement(cmd.data1);

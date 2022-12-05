@@ -9,7 +9,7 @@ Plateau::Plateau() : AudioEffect("PLATEAU") {
     dattorro->size = 0.95;
     dattorro->decay = 0.9;
 
-    addMIDIHandler(CC_HEADER, CC_E1, [this](MData &cmd) -> MIDISTATUS {
+    addMIDIHandler(MIDI::GENERAL::CC_HEADER, CC_E1, [this](MData &cmd) -> MIDISTATUS {
         dry = (float) cmd.data2 / 127.0;
         return MIDISTATUS::DONE;
     });

@@ -69,12 +69,12 @@ public:
         pitch = 0;
         for (int i = 0; i < num_voices; i++) voices.push_back(new TVoiceState());
 
-        addMIDIHandler({NOTEON_HEADER, NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler({MIDI::GENERAL::NOTEON_HEADER, MIDI::GENERAL::NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
             keyPressed(cmd);
             return MIDISTATUS::DONE;
         });
 
-        addMIDIHandler(PITCHWHEEL_HEADER, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler(MIDI::GENERAL::PITCHWHEEL_HEADER, [this](MData &cmd) -> MIDISTATUS {
             pitch = (cmd.data1 + cmd.data2*128.0f) / (float)0xFFFF * pitch_distance;
             return MIDISTATUS::DONE;
         });

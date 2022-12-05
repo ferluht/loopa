@@ -4,27 +4,36 @@
 
 #include "Tape.h"
 
-Tape::Tape() : AudioEffect("TAPE") {
+Tape::Tape() : Tape(nullptr){}
+
+Tape::Tape(Sync * sync) : AudioEffect("TAPE") {
+    if (sync) this->sync = sync;
+    else this->sync = new Sync();
+
     audio.reserve(max_loop_size);
 
-    addMIDIHandler(CC_HEADER, MIDICC::TAPE_TRIG, [this](MData &cmd) -> MIDISTATUS {
+    sync->attachSyncCallback(this, [this](){ trig(); });
+
+    addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::TAPE::TRIG, [this](MData &cmd) -> MIDISTATUS {
         if (cmd.data2 > 0) return trig();
         return MIDISTATUS::DONE;
     });
 
-    addMIDIHandler(CC_HEADER, MIDICC::TAPE_CLEAR, [this](MData &cmd) -> MIDISTATUS {
+    addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::TAPE::CLEAR, [this](MData &cmd) -> MIDISTATUS {
         if (cmd.data2 > 0) return clear();
         return MIDISTATUS::DONE;
     });
 
-    addMIDIHandler(CC_HEADER, MIDICC::TAPE_DOUBLE, [this](MData &cmd) -> MIDISTATUS {
+    addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::TAPE::DOUBLE, [this](MData &cmd) -> MIDISTATUS {
         if (cmd.data2 > 0) return double_loop();
         return MIDISTATUS::DONE;
     });
 
-    addMIDIHandler(CC_HEADER, MIDICC::TAPE_STOP, [this](MData &cmd) -> MIDISTATUS {
-        looper_state = STOP;
-        position = 0;
+    addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::TAPE::STOP, [this](MData &cmd) -> MIDISTATUS {
+//        looper_state = STOP;
+        if (cmd.data2 > 0)
+            level = std::abs(level - 1.0);
+//        position = 0;
         return MIDISTATUS::DONE;
     });
 
@@ -34,10 +43,12 @@ Tape::Tape() : AudioEffect("TAPE") {
 MIDISTATUS Tape::trig() {
     switch (looper_state) {
         case STOP:
+            if (sync->wait(this)) break;
             if (audio.size() > 0) looper_state = PLAY;
             else looper_state = REC;
             break;
         case REC:
+            if (sync->wait(this)) break;
             looper_state = OVERDUB;
             break;
         case OVERDUB:
@@ -55,6 +66,7 @@ MIDISTATUS Tape::trig() {
 MIDISTATUS Tape::clear() {
     looper_state = STOP;
     audio.clear();
+    sync->inactivate(this);
     position = 0;
     avg = 0;
     avg_env = 0;
@@ -79,39 +91,47 @@ MIDISTATUS Tape::double_loop() {
     return MIDISTATUS::WAITING;
 }
 
-void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) {
-
-    float envl, envr;
-
-    for (unsigned int i = 0; i < 2*nBufferFrames; i += 2) {
-        switch (looper_state) {
-            case STOP:
-                outputBuffer[i + 0] = inputBuffer[i + 0];
-                outputBuffer[i + 1] = inputBuffer[i + 1];
-                break;
-            case REC:
-                audio.push_back(inputBuffer[i + 0]);
-                audio.push_back(inputBuffer[i + 1]);
-                outputBuffer[i + 0] = inputBuffer[i + 0];
-                outputBuffer[i + 1] = inputBuffer[i + 1];
-                break;
-            case OVERDUB:
-                audio[position+0] = soft_clip(audio[position+0] + inputBuffer[i + 0]);
-                audio[position+1] = soft_clip(audio[position+1] + inputBuffer[i + 1]);
-                outputBuffer[i + 0] = audio[position+0];
-                outputBuffer[i + 1] = audio[position+1];
-                position = (position + 2) % audio.size();
-                break;
-            case PLAY:
-                if (audio.empty()) break;
-                outputBuffer[i + 0] = soft_clip(audio[position+0] + inputBuffer[i + 0]);
-                outputBuffer[i + 1] = soft_clip(audio[position+1] + inputBuffer[i + 1]);
-                position = (position + 2) % audio.size();
-                break;
-            default:
-                break;
-        }
+MIDISTATUS Tape::copy(Tape * to) {
+    if (doubling_progress == 0)
+        doubling_size = audio.size();
+    auto beg = audio.begin() + doubling_progress;
+    unsigned int step_size = std::min(doubling_size - doubling_progress, max_doubling_stepsize);
+    auto end = beg + step_size;
+    std::copy(beg, end, std::back_inserter(to->audio));
+    doubling_progress += step_size;
+    if (doubling_progress == doubling_size) {
+        doubling_progress = 0;
+        return MIDISTATUS::DONE;
     }
+    return MIDISTATUS::WAITING;
+}
+
+void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) {
+    unsigned long old_position = position;
+    switch (looper_state) {
+        case STOP:
+            std::copy(inputBuffer, inputBuffer + nBufferFrames * 2, outputBuffer);
+            break;
+        case REC:
+            std::copy(inputBuffer, inputBuffer + nBufferFrames * 2, std::back_inserter(audio));
+            std::copy(inputBuffer, inputBuffer + nBufferFrames * 2, outputBuffer);
+            break;
+        case OVERDUB:
+            for (unsigned int i = 0; i < 2*nBufferFrames; i ++) {
+                audio[position] = soft_clip(audio[position] + inputBuffer[i]);
+                outputBuffer[i] = audio[position] * level;
+                position = (position + 1) % audio.size();
+            }
+            break;
+        case PLAY:
+            if (audio.empty()) break;
+            for (unsigned int i = 0; i < 2*nBufferFrames; i ++) {
+                outputBuffer[i] = soft_clip(audio[position] + inputBuffer[i]) * level;
+                position = (position + 1) % audio.size();
+            }
+            break;
+    }
+    if (position < old_position) sync->send(this);
 }
 
 void Tape::draw(GFXcanvas1 * screen) {

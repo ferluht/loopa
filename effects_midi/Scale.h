@@ -22,13 +22,13 @@ public:
     Scale() : MIDIEffect("SCALE") {
         selected_scale = scales.begin();
 
-        addMIDIHandler({NOTEON_HEADER, NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler({MIDI::GENERAL::NOTEON_HEADER, MIDI::GENERAL::NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
             std::vector<int> * scale = &selected_scale->second;
             cmd.data1 = (*scale)[(cmd.data1 - 36) % scale->size()] + (int)((cmd.data1 - 36) / scale->size()) * 12;
             return MIDISTATUS::DONE;
         });
 
-        addMIDIHandler(CC_HEADER, CC_E1, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler(MIDI::GENERAL::CC_HEADER, CC_E1, [this](MData &cmd) -> MIDISTATUS {
             if (selected_scale + 1 != scales.end()) selected_scale++;
             else selected_scale = scales.begin();
             return MIDISTATUS::DONE;

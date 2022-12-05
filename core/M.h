@@ -11,28 +11,8 @@
 #include <list>
 #include <string>
 #include <map>
+#include <functional>
 #include <algorithm>
-
-#define NOTEOFF_HEADER 128
-#define NOTEON_HEADER 144
-#define POLYPRESSURE_HEADER 160
-#define CC_HEADER 176
-#define PITCHWHEEL_HEADER 224
-#define DAW_CTRL_HEADER 100
-
-
-#define CC_MODWHEEL 1
-#define CC_BREATH_CONTROLLER 2
-#define CC_AFTERTOUCH 3
-#define CC_FOOT_CONTROLLER 4
-#define CC_PORTAMENTO_TIME 5
-#define CC_DATA_ENTRY 6
-#define CC_MAIN_VOLUME 7
-#define CC_DAMPER_PEDAL 64
-#define CC_PORTAMENTO 65
-#define CC_SOSTENUTO 66
-#define CC_SOFT_PEDAL 67
-#define CC_CHORUS 93
 
 #define CC_E1 105
 #define CC_E2 106
@@ -42,22 +22,50 @@ enum MIDISTATUS {
     DONE
 };
 
-enum MIDICC {
-    NONE,
-    DAW_ = 40,
-    DAW_ALT1,
-    DAW_ALT2,
-    DAW_LEFT,
-    DAW_RIGHT,
-    DAW_UP,
-    DAW_DOWN,
-    TAPE = 50,
-    TAPE_TRIG,
-    TAPE_CLEAR,
-    TAPE_DOUBLE,
-    TAPE_STOP,
-    TAPE_END
-};
+namespace MIDI {
+
+    namespace GENERAL {
+        const uint8_t NOTEOFF_HEADER = 128;
+        const uint8_t NOTEON_HEADER = 144;
+        const uint8_t POLYPRESSURE_HEADER = 160;
+        const uint8_t CC_HEADER = 176;
+        const uint8_t PITCHWHEEL_HEADER = 224;
+    }
+
+    namespace UI {
+
+        namespace DAW {
+            enum {
+                START = 0,
+                LEFT,
+                RIGHT,
+                UP,
+                DOWN,
+                END = 10
+            };
+        }
+
+        namespace TAPE {
+            enum {
+                START = 10,
+                TRIG,
+                CLEAR,
+                DOUBLE,
+                STOP,
+                END = 20
+            };
+        }
+
+        namespace LOOPMATRIX {
+            enum {
+                START = 20,
+                COPY,
+                END = 30
+            };
+        }
+    }
+
+}
 
 struct MData {
     double beat;
@@ -299,7 +307,7 @@ public:
     }
 
     /**
-     * Add mapping of control sequence of knobs to virtual midi command
+     * Add mapping of control sequence of knobs to virtual midi command (preserving last byte of midi command)
      *
      * @param ctrl_seq sequence of hardware knob names which triggers midi command
      * @param mheader first byte of assigned midi command

@@ -10,6 +10,7 @@
 #include "Limiter/SoftClipper.h"
 #include "Plateau/Plateau.h"
 #include "Tape/Tape.h"
+#include "LoopMatrix/LoopMatrix.h"
 
 class DummyAudioFX : public AudioEffect {
 

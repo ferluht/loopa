@@ -4,11 +4,59 @@
 
 #pragma once
 
-#include <AudioEffects.h>
 #include <vector>
+#include <unordered_map>
 #include <cmath>
 #include <iostream>
+#include <Effect.h>
 #include <Utils.hpp>
+
+class Sync {
+    bool sync;
+    std::unordered_map<AMG *, bool> active_devices;
+    std::unordered_map<AMG *, std::function<void(void)>> callbacks;
+    
+public:
+
+    Sync(){
+        sync = false;
+    }
+
+    inline void attachSyncCallback(AMG * dev, std::function<void(void)> callback) { callbacks[dev] = callback; }
+    inline void inactivate(AMG * dev) { active_devices.erase(dev); }
+    inline void send(AMG * dev) {
+        active_devices[dev] = false;
+        sync = true;
+    }
+
+    inline bool wait(AMG * dev) {
+        if (!active_devices.empty()){
+            if (sync)
+                active_devices[dev] = false;
+            else {
+                active_devices[dev] = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    inline bool isWaiting(AMG * dev) {
+        auto adev = active_devices.find(dev);
+        if (adev != active_devices.end() && adev->second)
+            return true;
+        return false;
+    }
+
+    inline void process() {
+        for (auto it = callbacks.begin(); it != callbacks.end(); it ++) {
+            auto dev = active_devices.find(it->first);
+            if (dev != active_devices.end() && dev->second && sync)
+                it->second();
+        }
+        sync = false;
+    }
+};
 
 class Tape : public AudioEffect {
 
@@ -23,9 +71,9 @@ class Tape : public AudioEffect {
 
     int looper_state = STOP;
 
-    bool waitingforsync = false;
-
     unsigned long position = 0;
+
+    float level = 1;
 
     std::vector<float> audio;
 
@@ -34,6 +82,8 @@ class Tape : public AudioEffect {
     int tick_counter = 0;
 
     bool monitoring = true;
+
+    Sync * sync;
 
 public:
 
@@ -47,10 +97,12 @@ public:
     static const float looper_ratio;
 
     Tape();
+    Tape(Sync * sync);
 
     MIDISTATUS trig();
     MIDISTATUS clear();
     MIDISTATUS double_loop();
+    MIDISTATUS copy(Tape * to);
 
 //    inline float envelope(float sample, float w, float w_env) {
 //        avg = w * sample + (1 - w) * avg;
