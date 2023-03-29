@@ -37,7 +37,7 @@ public:
     ADSR() : ADSR(10) {}
 
     ADSR(float clockdiv_) {
-        set(0.2, 1, 0.8, 30);
+        set(0.02, 1, 0.8, 30);
         clockdiv = clockdiv_;
         reset();
     }

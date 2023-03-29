@@ -26,7 +26,13 @@ class SimpleInstrument : public PolyInstrument<SimpleInstrumentVoiceState> {
 public:
 
     SimpleInstrument() : PolyInstrument<SimpleInstrumentVoiceState>("SIMP") {
-
+//        addMIDIHandler(MIDI::GENERAL::CC_HEADER,
+//                       CC_E1,
+//                       [this](MData &cmd) -> MIDISTATUS {
+//                            for (auto it = voices)
+//                           cmd.status = MIDI::GENERAL::CC_HEADER;
+//                           return tapes[focus_tape]->midiIn(cmd);
+//                       });
     }
 
     void updateVoice(SimpleInstrumentVoiceState * voiceState, MData cmd) override;

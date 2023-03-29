@@ -14,12 +14,10 @@ class SampleKit : public Instrument {
 
 public:
 
-    SampleKit();
+    SampleKit(const char * name);
 
     void addSample(const char * sample_name_, const char note);
 
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, double streamTime) override;
-
-    void draw(GFXcanvas1 * screen) override;
 };

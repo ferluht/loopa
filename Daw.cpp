@@ -6,6 +6,24 @@
 #include <Adafruit-GFX-offscreen/Fonts/Picopixel.h>
 #include <cmath>
 
+#include <string>
+#include <iostream>
+#include <dirent.h>
+#include <sys/types.h>
+
+std::vector<std::string> list_dir(const char *path) {
+    std::vector<std::string> ret;
+    struct dirent *entry;
+    DIR *dir = opendir(path);
+    if (dir == nullptr) return ret;
+
+    while ((entry = readdir(dir)) != nullptr)
+        ret.emplace_back(entry->d_name);
+
+    closedir(dir);
+    return ret;
+}
+
 MIDISTATUS DAW::midiIn(MData& cmd) {
     if (dawMidiStatus != MIDISTATUS::DONE)
         return MIDISTATUS::DONE;
@@ -66,6 +84,8 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
 void DAW::draw(GFXcanvas1 * screen) {
     screen->drawFastVLine(96, 0, 32, 1);
     screen->drawFastHLine(0, 8, 128, 1);
+
+//    screen->drawFastVLine(2, tracks->get_focus_index() * 4, 4, 1);
 
     screen->setFont(&Picopixel);
     screen->setTextSize(1);
@@ -164,16 +184,43 @@ Rack *DAW::spawnInstrumentRack() {
     Rack * instrument = new Rack("ENGINE", Rack::SELECTIVE);
     instrument->add(new DummyInstrument());
     instrument->add(new SingleTone());
-    instrument->add(new Sampler("../res/samples/Kick/Kick 909 1.wav"));
     instrument->add(new SimpleInstrument());
 
-    auto kit = new SampleKit();
-    kit->addSample("../res/samples/Kick/Kick 909 1.wav", 60);
-    kit->addSample("../res/samples/Kick/Kick 70sDnB 1.wav", 61);
-    kit->addSample("../res/samples/Snare/Snare 808 1.wav", 62);
-    kit->addSample("../res/samples/Snare/Snare 70sDnB 1.wav", 63);
-    kit->addSample("../res/samples/HHClosed/ClosedHH 808.wav", 64);
-    instrument->add(kit);
+    std::string base_path = "../res/samples";
+    auto dirs = list_dir(base_path.c_str());
+    for (auto & dir : dirs) {
+        std::string samplepack_path = base_path.append("/") + dir;
+        auto files = list_dir(samplepack_path.c_str());
+        int nfiles = 0;
+        for (auto & f : files)
+            if (f.find(".wav") != std::string::npos) nfiles ++;
+        if (nfiles > 1) {
+            auto kit = new SampleKit(dir.c_str());
+            bool valid = false;
+            for (auto & f : files) {
+                if (f.find(".wav") == std::string::npos) continue;
+                std::string notenum = f.substr(f.find("_") + 1, std::string::npos);
+                notenum = notenum.substr(0, notenum.find("."));
+                int8_t note = std::stoi(notenum);
+                std::string sample_path = samplepack_path.append("/") + f;
+                kit->addSample(sample_path.c_str(), note);
+                valid = true;
+            }
+            if (valid) instrument->add(kit);
+        } else if (nfiles == 1) {
+            for (auto & f : files) {
+                if (f.find(".wav") == std::string::npos) continue;
+                std::string notenum = f.substr(f.find("_") + 1, std::string::npos);
+                notenum = notenum.substr(0, notenum.find("."));
+                int8_t note = std::stoi(notenum);
+                std::string sample_path = samplepack_path.append("/") + f;
+                auto sampler = new Sampler(dir.c_str(), sample_path.c_str(), note);
+                instrument->add(sampler);
+                break;
+            }
+        }
+    }
+
     return instrument;
 }
 

@@ -34,6 +34,12 @@ public:
     Instrument(const char * name) : AMG(name) {
 
     }
+
+    void draw(GFXcanvas1 * screen) override {
+        screen->setCursor(4, 16);
+        screen->setTextSize(1);
+        screen->print(getName());
+    }
 };
 
 template <class TVoiceState>
@@ -103,7 +109,8 @@ public:
     virtual void updateVoice(TVoiceState * voiceState, MData cmd) {};
 
     virtual void processVoice(TVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
-                              unsigned int nBufferFrames, double streamTime, uint8_t nvoices) {}
+                              unsigned int nBufferFrames, double streamTime, uint8_t nvoices) {};
+
 };
 
 template <class TVoiceState>

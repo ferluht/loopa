@@ -38,7 +38,7 @@ class Sampler : public PolyInstrument<SamplerState> {
 
 public:
 
-    Sampler(const char * sample_name_);
+    Sampler(const char * name, const char * sample_name_, int8_t note);
 
     static float InterpolateCubic(float x0, float x1, float x2, float x3, float t);
     static float InterpolateHermite4pt3oX(float x0, float x1, float x2, float x3, float t);
@@ -49,7 +49,5 @@ public:
 
     void processVoice(SamplerState * voiceState, float *outputBuffer, float * inputBuffer,
                       unsigned int nBufferFrames, double streamTime, uint8_t nvoices) override ;
-
-    void draw(GFXcanvas1 * screen) override;
 
 };

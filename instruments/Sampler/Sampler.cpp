@@ -4,8 +4,10 @@
 
 #include "Sampler.h"
 
-Sampler::Sampler(const char * sample_name_) : PolyInstrument<SamplerState>("SAMPLR") {
+Sampler::Sampler(const char * name, const char * sample_name_, int8_t note) : PolyInstrument<SamplerState>(name) {
     sample_name = sample_name_;
+
+    base_note = note;
 
     const_pitch = false;
 
@@ -113,10 +115,4 @@ void Sampler::processVoice(SamplerState *voiceState, float *outputBuffer, float 
 //            sample.printSummary();
         }
     }
-}
-
-void Sampler::draw(GFXcanvas1 * screen) {
-    screen->setCursor(4, 16);
-    screen->setTextSize(1);
-    screen->print("909 KICK");
 }
