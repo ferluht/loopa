@@ -30,9 +30,3 @@ void SimpleInstrument::processVoice(SimpleInstrumentVoiceState * voiceState, flo
         if (voiceState->adsr.end()) voiceState->disable();
     }
 }
-
-void SimpleInstrument::draw(GFXcanvas1 * screen) {
-    screen->setCursor(4, 16);
-    screen->setTextSize(1);
-    screen->print("A:10 | D:13 | S:0.8 | R:1.2");
-}

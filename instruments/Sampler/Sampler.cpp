@@ -21,6 +21,11 @@ Sampler::Sampler(const char * name, const char * sample_name_, int8_t note) : Po
 
     base_frequency = SAMPLERATE / 2 / M_PI;
 
+    addParameter("PITCH");
+    addParameter("VOICS");
+    addParameter("FILTR");
+    addParameter("DECAY");
+
 //    trig = new GUI::TapButton("trig", [this] (bool state) {triggered = true;});
 //    trig->GPlace({0.75, 0.75});
 //    trig->GSetHeight(0.2);
