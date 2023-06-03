@@ -10,7 +10,9 @@ Plateau::Plateau() : AudioEffect("PLATEAU") {
     dattorro->decay = 0.9;
 
     addMIDIHandler(MIDI::GENERAL::CC_HEADER, CC_E1, [this](MData &cmd) -> MIDISTATUS {
-        dry = (float) cmd.data2 / 127.0;
+        dry += (float) (cmd.data2 - 64) / 127.0;
+        if (dry > 1) dry = 1;
+        if (dry < 0) dry = 0;
         return MIDISTATUS::DONE;
     });
 }
@@ -29,8 +31,7 @@ void Plateau::process(float *outputBuffer, float * inputBuffer,
 }
 
 void Plateau::draw(GFXcanvas1 * screen) {
-    screen->setCursor(4, 16);
-    screen->setTextSize(1);
+    screen->setCursor(4, 17);
     char output[50];
     sprintf(output, "SZ:0.95 | DC:0.9 | D/W:%.2f", dry);
     screen->print(output);

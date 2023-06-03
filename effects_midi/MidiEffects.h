@@ -15,8 +15,6 @@ public:
     }
 
     void draw(GFXcanvas1 * screen) override {
-        screen->setCursor(4, 16);
-        screen->setTextSize(1);
         screen->print("NO MIDI FX");
     }
 };

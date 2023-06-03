@@ -41,6 +41,9 @@ namespace MIDI {
                 RIGHT,
                 UP,
                 DOWN,
+                UPUP,
+                DOWNDOWN,
+                SAVE,
                 END = 10
             };
         }
@@ -61,6 +64,15 @@ namespace MIDI {
                 START = 20,
                 COPY,
                 END = 30
+            };
+        }
+
+        namespace SCREEN {
+            enum {
+                START = 30,
+                LOOP_SCREEN,
+                ALT_PARAMS,
+                END = 40
             };
         }
     }

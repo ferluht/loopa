@@ -33,13 +33,16 @@ public:
 //                           cmd.status = MIDI::GENERAL::CC_HEADER;
 //                           return tapes[focus_tape]->midiIn(cmd);
 //                       });
+
+        addParameter("ATT");
+        addParameter("DEC");
+        addParameter("SUS");
+        addParameter("REL");
     }
 
     void updateVoice(SimpleInstrumentVoiceState * voiceState, MData cmd) override;
 
     void processVoice(SimpleInstrumentVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
         unsigned int nBufferFrames, double streamTime, uint8_t nvoices) override;
-
-    void draw(GFXcanvas1 * screen) override;
 };
 

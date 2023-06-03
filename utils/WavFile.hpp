@@ -95,7 +95,7 @@ public:
     /** Set the audio buffer for this AudioFile by copying samples from another buffer.
      * @Returns true if the buffer was copied successfully.
      */
-    bool setAudioBuffer (AudioBuffer& newBuffer);
+    bool setAudioBuffer (std::vector<float>& newBuffer, int numChannels);
 
     /** Sets the audio buffer to a given number of channels and number of samples per channel. This will try to preserve
      * the existing audio, adding zeros to any new channels or new samples in a given channel.
@@ -127,6 +127,16 @@ public:
     int16_t sampleToSixteenBitInt (T sample);
 
 private:
+
+    const int sabchunksize = 500;
+    int copied_samples = 0;
+
+    std::vector<uint8_t> fileData;
+    int prepared_samples = 0;
+    int written_bytes = 0;
+    const int pchunksize = 500;
+    const int wchunksize = 200;
+    std::ofstream * outputFile;
 
     //=============================================================
     enum class Endianness

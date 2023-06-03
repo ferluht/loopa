@@ -42,6 +42,4 @@ public:
 
     void processVoice(SingleToneVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
                       unsigned int nBufferFrames, double streamTime, uint8_t nvoices) override;
-
-    void draw(GFXcanvas1 * screen) override;
 };

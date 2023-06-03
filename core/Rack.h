@@ -43,6 +43,7 @@ public:
     void set_focus_by_index(int i);
     AMG * get_focus();
     int get_focus_index();
+    inline AMG * get_item(int i) { return items[i % items.size()].first; }
 
 private:
 

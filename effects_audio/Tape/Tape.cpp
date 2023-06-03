@@ -174,3 +174,27 @@ float Tape::getPosition() {
 int Tape::getState() {
     return looper_state;
 }
+
+bool Tape::save(std::string path) {
+    if (audio.empty()) return true;
+    switch (savingprogress) {
+        case 0:
+            wf.setBitDepth(16);
+            wf.setNumChannels(2);
+            wf.setSampleRate(SAMPLERATE);
+            savingprogress = 1;
+            break;
+        case 1:
+            if (wf.setAudioBuffer(audio, 2))
+                savingprogress = 2;
+            break;
+        case 2:
+            if (wf.save(path))
+                savingprogress = 3;
+            break;
+        case 3:
+            savingprogress = 0;
+            return true;
+    }
+    return false;
+}

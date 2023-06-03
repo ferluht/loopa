@@ -7,11 +7,20 @@
 
 #include <Effect.h>
 #include <Tape/Tape.h>
+#include <iostream>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 template <uint8_t m, uint8_t n>
 class LoopMatrix : public AudioEffect {
 
     Tape * tapes[m*n];
+    bool saved[m*n];
+    int saveiterations = 0;
+    std::string savedir;
     int focus_tape;
     Tape * copy_from;
     Sync * sync;
@@ -25,7 +34,10 @@ public:
         sync = new Sync();
 
         for (int i = 0; i < m*n; i ++)
-                tapes[i] = new Tape(sync);
+            tapes[i] = new Tape(sync);
+
+        for (int i = 0; i < m * n; i++)
+            saved[i] = false;
 
         addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::GENERAL::CC_HEADER + m * n,
                        MIDI::UI::TAPE::START, MIDI::UI::TAPE::STOP,
@@ -104,6 +116,36 @@ public:
             }
         }
         draw_counter = (draw_counter + 1) % 10;
+    }
+
+    bool save() {
+        bool ret = true;
+
+        if (saveiterations == 0) {
+            auto t = std::time(nullptr);
+            auto tm = *std::localtime(&t);
+
+            std::ostringstream oss;
+            oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+            auto timestr = oss.str();
+
+            if (saveiterations == 0)
+                savedir = "../res/saved/" + timestr;
+
+            mkdir(savedir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        }
+
+        for (int i = 0; i < m * n; i++) {
+            if (!saved[i]) saved[i] = tapes[i]->save(savedir + "/" + std::to_string(i) + ".wav");
+            ret = ret && saved[i];
+        }
+        if (ret) for (int i = 0; i < m * n; i++)
+            saved[i] = false;
+
+        if (ret) saveiterations = 0;
+        else saveiterations ++;
+
+        return ret;
     }
 };
 

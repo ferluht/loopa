@@ -127,34 +127,37 @@ void WavFile<T>::printSummary() const
 
 //=============================================================
 template <class T>
-bool WavFile<T>::setAudioBuffer (AudioBuffer& newBuffer)
+bool WavFile<T>::setAudioBuffer (std::vector<float>& newBuffer, int numChannels)
 {
-    int numChannels = (int)newBuffer.size();
+    int numSamples = (int) newBuffer.size() / numChannels;
 
-    if (numChannels <= 0)
-    {
-        assert (false && "The buffer your are trying to use has no channels");
-        return false;
-    }
-
-    int numSamples = (int)newBuffer[0].size();
-
-    // set the number of channels
-    samples.resize (newBuffer.size());
-
-    for (int k = 0; k < getNumChannels(); k++)
-    {
-        assert (newBuffer[k].size() == numSamples);
-
-        samples[k].resize (numSamples);
-
-        for (int i = 0; i < numSamples; i++)
-        {
-            samples[k][i] = newBuffer[k][i];
+    if (copied_samples == 0) {
+        if (numChannels <= 0) {
+            assert (false && "The buffer your are trying to use has no channels");
+            return false;
         }
+
+        // set the number of channels
+        samples.resize(numChannels);
+
+        for (int k = 0; k < numChannels; k++)
+            samples[k].resize(numSamples);
     }
 
-    return true;
+    int i;
+    for (i = copied_samples; (i - copied_samples < sabchunksize) && (i < numSamples); i ++)
+        for (int k = 0; k < numChannels; k++) {
+            samples[k][i] = newBuffer[i * numChannels + k];
+        }
+
+    copied_samples = i;
+
+    if (copied_samples == numSamples) {
+        copied_samples = 0;
+        return true;
+    }
+
+    return false;
 }
 
 //=============================================================
@@ -540,86 +543,114 @@ bool WavFile<T>::save (std::string filePath, WavFileFormat format)
 template <class T>
 bool WavFile<T>::saveToWaveFile (std::string filePath)
 {
-    std::vector<uint8_t> fileData;
-
     int32_t dataChunkSize = getNumSamplesPerChannel() * (getNumChannels() * bitDepth / 8);
-
-    // -----------------------------------------------------------
-    // HEADER CHUNK
-    addStringToFileData (fileData, "RIFF");
-
-    // The file size in bytes is the header chunk size (4, not counting RIFF and WAVE) + the format
-    // chunk size (24) + the metadata part of the data chunk plus the actual data chunk size
     int32_t fileSizeInBytes = 4 + 24 + 8 + dataChunkSize;
-    addInt32ToFileData (fileData, fileSizeInBytes);
 
-    addStringToFileData (fileData, "WAVE");
+    if (prepared_samples == 0 && written_bytes == 0) {
+        fileData.clear();
 
-    // -----------------------------------------------------------
-    // FORMAT CHUNK
-    addStringToFileData (fileData, "fmt ");
-    addInt32ToFileData (fileData, 16); // format chunk size (16 for PCM)
-    addInt16ToFileData (fileData, 1); // audio format = 1
-    addInt16ToFileData (fileData, (int16_t)getNumChannels()); // num channels
-    addInt32ToFileData (fileData, (int32_t)sampleRate); // sample rate
+        // -----------------------------------------------------------
+        // HEADER CHUNK
+        addStringToFileData (fileData, "RIFF");
 
-    int32_t numBytesPerSecond = (int32_t) ((getNumChannels() * sampleRate * bitDepth) / 8);
-    addInt32ToFileData (fileData, numBytesPerSecond);
+        // The file size in bytes is the header chunk size (4, not counting RIFF and WAVE) + the format
+        // chunk size (24) + the metadata part of the data chunk plus the actual data chunk size
+        addInt32ToFileData (fileData, fileSizeInBytes);
 
-    int16_t numBytesPerBlock = getNumChannels() * (bitDepth / 8);
-    addInt16ToFileData (fileData, numBytesPerBlock);
+        addStringToFileData (fileData, "WAVE");
 
-    addInt16ToFileData (fileData, (int16_t)bitDepth);
+        // -----------------------------------------------------------
+        // FORMAT CHUNK
+        addStringToFileData (fileData, "fmt ");
+        addInt32ToFileData (fileData, 16); // format chunk size (16 for PCM)
+        addInt16ToFileData (fileData, 1); // audio format = 1
+        addInt16ToFileData (fileData, (int16_t)getNumChannels()); // num channels
+        addInt32ToFileData (fileData, (int32_t)sampleRate); // sample rate
 
-    // -----------------------------------------------------------
-    // DATA CHUNK
-    addStringToFileData (fileData, "data");
-    addInt32ToFileData (fileData, dataChunkSize);
+        int32_t numBytesPerSecond = (int32_t) ((getNumChannels() * sampleRate * bitDepth) / 8);
+        addInt32ToFileData (fileData, numBytesPerSecond);
 
-    for (int i = 0; i < getNumSamplesPerChannel(); i++)
-    {
-        for (int channel = 0; channel < getNumChannels(); channel++)
-        {
-            if (bitDepth == 8)
-            {
-                uint8_t byte = sampleToSingleByte (samples[channel][i]);
-                fileData.push_back (byte);
-            }
-            else if (bitDepth == 16)
-            {
-                int16_t sampleAsInt = sampleToSixteenBitInt (samples[channel][i]);
-                addInt16ToFileData (fileData, sampleAsInt);
-            }
-            else if (bitDepth == 24)
-            {
-                int32_t sampleAsIntAgain = (int32_t) (samples[channel][i] * (T)8388608.);
+        int16_t numBytesPerBlock = getNumChannels() * (bitDepth / 8);
+        addInt16ToFileData (fileData, numBytesPerBlock);
 
-                uint8_t bytes[3];
-                bytes[2] = (uint8_t) (sampleAsIntAgain >> 16) & 0xFF;
-                bytes[1] = (uint8_t) (sampleAsIntAgain >>  8) & 0xFF;
-                bytes[0] = (uint8_t) sampleAsIntAgain & 0xFF;
+        addInt16ToFileData (fileData, (int16_t)bitDepth);
 
-                fileData.push_back (bytes[0]);
-                fileData.push_back (bytes[1]);
-                fileData.push_back (bytes[2]);
-            }
-            else
-            {
-                assert (false && "Trying to write a file with unsupported bit depth");
-                return false;
+        // -----------------------------------------------------------
+        // DATA CHUNK
+        addStringToFileData (fileData, "data");
+        addInt32ToFileData (fileData, dataChunkSize);
+    }
+
+    if (prepared_samples < getNumSamplesPerChannel()) {
+
+        int i;
+        for (i = prepared_samples; ((i - prepared_samples) < pchunksize) && (i < getNumSamplesPerChannel()); i++) {
+            for (int channel = 0; channel < getNumChannels(); channel++) {
+                if (bitDepth == 8) {
+                    uint8_t byte = sampleToSingleByte(samples[channel][i]);
+                    fileData.push_back(byte);
+                } else if (bitDepth == 16) {
+                    int16_t sampleAsInt = sampleToSixteenBitInt(samples[channel][i]);
+                    addInt16ToFileData(fileData, sampleAsInt);
+                } else if (bitDepth == 24) {
+                    int32_t sampleAsIntAgain = (int32_t) (samples[channel][i] * (T) 8388608.);
+
+                    uint8_t bytes[3];
+                    bytes[2] = (uint8_t) (sampleAsIntAgain >> 16) & 0xFF;
+                    bytes[1] = (uint8_t) (sampleAsIntAgain >> 8) & 0xFF;
+                    bytes[0] = (uint8_t) sampleAsIntAgain & 0xFF;
+
+                    fileData.push_back(bytes[0]);
+                    fileData.push_back(bytes[1]);
+                    fileData.push_back(bytes[2]);
+                } else {
+                    assert (false && "Trying to write a file with unsupported bit depth");
+                    prepared_samples = 0;
+                    written_bytes = 0;
+                    return false;
+                }
             }
         }
+
+        prepared_samples = i;
+
+        if (prepared_samples < getNumSamplesPerChannel())
+            return false;
     }
 
-    // check that the various sizes we put in the metadata are correct
-    if (fileSizeInBytes != (fileData.size() - 8) || dataChunkSize != (getNumSamplesPerChannel() * getNumChannels() * (bitDepth / 8)))
+    if (written_bytes == 0) {
+        // check that the various sizes we put in the metadata are correct
+        if (fileSizeInBytes != (fileData.size() - 8) ||
+            dataChunkSize != (getNumSamplesPerChannel() * getNumChannels() * (bitDepth / 8))) {
+            std::cout << "ERROR: couldn't save file to " << filePath << std::endl;
+            prepared_samples = 0;
+            written_bytes = 0;
+            return false;
+        }
+
+        outputFile = new std::ofstream(filePath, std::ios::binary);
+    }
+
+    if (outputFile->is_open())
     {
-        std::cout << "ERROR: couldn't save file to " << filePath << std::endl;
-        return false;
+        int i;
+        for (i = written_bytes; (i - written_bytes < wchunksize) && (i < fileData.size()); i++)
+        {
+            char value = (char) fileData[i];
+            outputFile->write (&value, sizeof (char));
+        }
+
+        written_bytes = i;
+
+        if (written_bytes < fileData.size())
+            return false;
+
+        outputFile->close();
     }
 
-    // try to write the file
-    return writeDataToFile (fileData, filePath);
+    prepared_samples = 0;
+    written_bytes = 0;
+    return true;
 }
 
 //=============================================================
@@ -710,20 +741,18 @@ bool WavFile<T>::saveToAiffFile (std::string filePath)
 template <class T>
 bool WavFile<T>::writeDataToFile (std::vector<uint8_t>& fileData, std::string filePath)
 {
-    std::ofstream outputFile (filePath, std::ios::binary);
-
-    if (outputFile.is_open())
-    {
-        for (int i = 0; i < fileData.size(); i++)
-        {
-            char value = (char) fileData[i];
-            outputFile.write (&value, sizeof (char));
-        }
-
-        outputFile.close();
-
-        return true;
-    }
+//    if (outputFile.is_open())
+//    {
+//        for (int i = 0; i < fileData.size(); i++)
+//        {
+//            char value = (char) fileData[i];
+//            outputFile.write (&value, sizeof (char));
+//        }
+//
+//        outputFile.close();
+//
+//        return true;
+//    }
 
     return false;
 }

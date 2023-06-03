@@ -9,6 +9,7 @@
 #include <cmath>
 #include <iostream>
 #include <Effect.h>
+#include <WavFile.hpp>
 #include <Utils.hpp>
 
 class Sync {
@@ -85,6 +86,9 @@ class Tape : public AudioEffect {
 
     Sync * sync;
 
+    WavFile<float> wf;
+    int savingprogress = 0;
+
 public:
 
     enum TAPE_STATE {
@@ -110,6 +114,8 @@ public:
 //        avg_env = w_env * i + (1 - w_env) * avg_env;
 //        return avg_env;
 //    }
+
+    bool save(std::string path);
 
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, double streamTime) override;
