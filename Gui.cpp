@@ -89,6 +89,31 @@ public:
             cmd.data1 = S2;
             cmd.data2 = action ? 127 : 0;
             mdaw->midiIn(cmd);
+        } else if (key == 96) {
+            cmd.status = MIDI::GENERAL::CC_HEADER;
+            cmd.data1 = K5;
+            cmd.data2 = action ? 127 : 0;
+            mdaw->midiIn(cmd);
+        } else if (key == 258) {
+            cmd.status = MIDI::GENERAL::CC_HEADER;
+            cmd.data1 = K6;
+            cmd.data2 = action ? 127 : 0;
+            mdaw->midiIn(cmd);
+        } else if (key == '-') {
+            cmd.status = MIDI::GENERAL::CC_HEADER;
+            cmd.data1 = CC_E1;
+            cmd.data2 = action ? 65 : 64;
+            mdaw->midiIn(cmd);
+        } else if (key == '=') {
+            cmd.status = MIDI::GENERAL::CC_HEADER;
+            cmd.data1 = CC_E2;
+            cmd.data2 = action ? 65 : 64;
+            mdaw->midiIn(cmd);
+        } else if (key == 92) {
+            cmd.status = MIDI::GENERAL::CC_HEADER;
+            cmd.data1 = K7;
+            cmd.data2 = action ? 127 : 0;
+            mdaw->midiIn(cmd);
         } else {
             return true;
         }

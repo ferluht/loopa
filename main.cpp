@@ -55,7 +55,7 @@ bool checkMidi(RtMidiIn * midiin) {
         unsigned int nPorts = midiin->getPortCount();
         if (nPorts < 2) return false;
         try {
-            midiin->openPort(1);
+            midiin->openPort(2);
             std::cout << "midi port opened" << std::endl;
         } catch (RtMidiError &error) {
             error.printMessage();

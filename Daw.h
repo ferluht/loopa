@@ -17,12 +17,28 @@
 
 class DAW : public AMG{
 
+    enum FSCREEN {
+        MAIN,
+        LOOP,
+        MIX
+    };
+
+    std::chrono::time_point<std::chrono::steady_clock> screenchange_time;
+    int previous_screen;
+    int current_screen;
+    bool screen_toggle = false;
+
+    Rack * master_effects;
+
 public:
 
     DAW(GFXcanvas1 * screen_) : DAW(3, 4, screen_) {};
 
     DAW (int n_tracks, int n_tapes, GFXcanvas1 * screen_) : AMG("DAW") {
         screen = screen_;
+
+        master_effects = new Rack("AUDIO FX", Rack::SEQUENTIAL);
+        master_effects->add(new Plateau());
 
         midiMap = new MIDIMap();
         midiMap->addHardwareControl("CTRL", MIDI::GENERAL::CC_HEADER, 100);
@@ -38,13 +54,21 @@ public:
         midiMap->addHardwareControl("K2", MIDI::GENERAL::CC_HEADER, 61);
         midiMap->addHardwareControl("K3", MIDI::GENERAL::CC_HEADER, 62);
         midiMap->addHardwareControl("K4", MIDI::GENERAL::CC_HEADER, 63);
-        midiMap->addHardwareControl("K5", MIDI::GENERAL::CC_HEADER, 64);
-        midiMap->addHardwareControl("K6", MIDI::GENERAL::CC_HEADER, 65);
+
+        midiMap->addHardwareControl("ALT", MIDI::GENERAL::CC_HEADER, 64);
+        midiMap->addHardwareControl("LOOP", MIDI::GENERAL::CC_HEADER, 65);
+//        midiMap->addHardwareControl("SAVE", MIDI::GENERAL::CC_HEADER, 66);
 
         midiMap->addMapping({"SHIFT", "K1"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::LEFT);
         midiMap->addMapping({"SHIFT", "K2"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::DOWN);
+        midiMap->addMapping({"SHIFT", "CTRL", "K2"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::DOWNDOWN);
         midiMap->addMapping({"SHIFT", "K3"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::RIGHT);
-        midiMap->addMapping({"SHIFT", "K4"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::UP);
+        midiMap->addMapping({"SHIFT", "K4"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::SAVE);
+        midiMap->addMapping({"SHIFT", "CTRL", "K4"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::UPUP);
+
+        midiMap->addMapping({"ALT"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::ALT_PARAMS);
+        midiMap->addMapping({"LOOP"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::LOOP_SCREEN);
+//        midiMap->addMapping({"SAVE"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::SAVE);
 
         for (int i = 0; i < n_tapes; i ++) {
             auto kn = "P" + std::to_string(i);
@@ -56,32 +80,140 @@ public:
         }
 
         addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::LEFT, [this](MData &cmd) -> MIDISTATUS {
-            if (cmd.data2 > 0)
-                this->focus_rack = this->focus_rack->dive_out();
+            if (cmd.data2 > 0) {
+                switch (focus_rack_depth) {
+                    case 1:
+                        this->focus_rack = (Rack *) this->focus_rack->dive_out()->get_item(1);
+                        focus_rack_depth = 0;
+                        break;
+                    case 2:
+                        this->focus_rack = (Rack *) this->focus_rack->dive_out()->get_item(0);
+                        focus_rack_depth = 1;
+                        break;
+                    default:
+                        break;
+                }
+            }
             return MIDISTATUS::DONE;
         });
 
         addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::DOWN, [this](MData &cmd) -> MIDISTATUS {
-            if (cmd.data2 > 0)
-                this->focus_rack = this->focus_rack->dive_next();
+            if (cmd.data2 > 0) {
+                switch (focus_rack_depth) {
+                    case 0:
+                        tracks->dive_next();
+                        this->focus_rack = (Rack *)(((Rack *) tracks->get_focus())->get_item(1));
+                        break;
+                    case 1:
+                    case 2:
+                        this->focus_rack = (Rack*) this->focus_rack->dive_next();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return MIDISTATUS::DONE;
+        });
+
+        addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::DOWNDOWN, [this](MData &cmd) -> MIDISTATUS {
+            if (cmd.data2 > 0) {
+                switch (focus_rack_depth) {
+                    case 0:
+                        ((Rack *)(((Rack *) tracks->get_focus())->get_item(1)))->dive_prev();
+                        this->focus_rack = (Rack *)(((Rack *) tracks->get_focus())->get_item(1));
+                        break;
+                    default:
+                        break;
+                }
+            }
             return MIDISTATUS::DONE;
         });
 
         addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::RIGHT, [this](MData &cmd) -> MIDISTATUS {
-            if (cmd.data2 > 0)
-                this->focus_rack = this->focus_rack->dive_in();
+            if (cmd.data2 > 0) {
+                switch (focus_rack_depth) {
+                    case 0:
+                        this->focus_rack = (Rack*) this->focus_rack->dive_out()->get_item(0);
+                        focus_rack_depth = 1;
+                        break;
+                    case 1:
+                        this->focus_rack = (Rack*) this->focus_rack->dive_out()->get_item(2);
+                        focus_rack_depth = 2;
+                        break;
+                    default:
+                        break;
+                }
+            }
             return MIDISTATUS::DONE;
         });
 
         addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::UP, [this](MData &cmd) -> MIDISTATUS {
-            if (cmd.data2 > 0)
-                this->focus_rack = this->focus_rack->dive_prev();
+            if (cmd.data2 > 0) {
+                switch (focus_rack_depth) {
+                    case 0:
+                        tracks->dive_prev();
+                        this->focus_rack = (Rack *)(((Rack *) tracks->get_focus())->get_item(1));
+                        break;
+                    case 1:
+                    case 2:
+                        this->focus_rack = (Rack*) this->focus_rack->dive_prev();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return MIDISTATUS::DONE;
+        });
+
+        addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::UPUP, [this](MData &cmd) -> MIDISTATUS {
+            if (cmd.data2 > 0) {
+                switch (focus_rack_depth) {
+                    case 0:
+                        ((Rack *)(((Rack *) tracks->get_focus())->get_item(1)))->dive_next();
+                        this->focus_rack = (Rack *)(((Rack *) tracks->get_focus())->get_item(1));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return MIDISTATUS::DONE;
+        });
+
+        addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::LOOP_SCREEN, [this](MData &cmd) -> MIDISTATUS {
+            if (cmd.data2 > 0) {
+                if (!screen_toggle) {
+                    previous_screen = current_screen;
+                    if (current_screen != FSCREEN::LOOP) {
+                        current_screen = FSCREEN::LOOP;
+                    } else {
+                        current_screen = FSCREEN::MAIN;
+                    }
+                    screenchange_time = std::chrono::steady_clock::now();
+                }
+                screen_toggle = true;
+            } else {
+                auto timedelta = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - screenchange_time).count();
+                if (timedelta > 300) {
+                    current_screen = previous_screen;
+                }
+                screen_toggle = false;
+            }
             return MIDISTATUS::DONE;
         });
 
         tracks = spawnTracksRack(n_tracks);
         tapes = new LoopMatrix<2,2>();
-        focus_rack = tracks;
+
+        tapes->addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::SAVE, [this](MData &cmd) -> MIDISTATUS {
+            if (cmd.data2 > 0) {
+                if (tapes->save()) return MIDISTATUS::DONE;
+                else return MIDISTATUS::WAITING;
+            }
+            return MIDISTATUS::DONE;
+        });
+
+        focus_rack = (Rack*)((Rack*)tracks->get_focus())->get_item(1);
+        focus_rack_depth = 0;
 
         dawMidiStatus = MIDISTATUS::DONE;
     }
@@ -94,6 +226,10 @@ public:
     void draw(GFXcanvas1 * screen) override;
 
 private:
+
+//    void drawMixScreen(GFXcanvas1 * screen);
+    void drawMainScreen(GFXcanvas1 * screen);
+    void drawLoopScreen(GFXcanvas1 * screen);
 
     GFXcanvas1 * screen;
 
@@ -111,6 +247,7 @@ private:
     Rack * tracks;
     LoopMatrix<2,2> * tapes;
     Rack * focus_rack;
+    int focus_rack_depth = 0;
 
     MIDISTATUS dawMidiStatus;
 
