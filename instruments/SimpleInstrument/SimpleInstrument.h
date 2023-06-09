@@ -23,22 +23,12 @@ public:
 };
 
 class SimpleInstrument : public PolyInstrument<SimpleInstrumentVoiceState> {
+
+    Parameter * Ap, * Dp, * Sp, * Rp;
+
 public:
 
-    SimpleInstrument() : PolyInstrument<SimpleInstrumentVoiceState>("SIMP") {
-//        addMIDIHandler(MIDI::GENERAL::CC_HEADER,
-//                       CC_E1,
-//                       [this](MData &cmd) -> MIDISTATUS {
-//                            for (auto it = voices)
-//                           cmd.status = MIDI::GENERAL::CC_HEADER;
-//                           return tapes[focus_tape]->midiIn(cmd);
-//                       });
-
-        addParameter("ATT");
-        addParameter("DEC");
-        addParameter("SUS");
-        addParameter("REL");
-    }
+    SimpleInstrument();
 
     void updateVoice(SimpleInstrumentVoiceState * voiceState, MData cmd) override;
 

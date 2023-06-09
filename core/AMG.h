@@ -28,3 +28,27 @@ public:
         return name;
     }
 };
+
+class Parameter {
+
+public:
+
+    Parameter() {
+        value = 0;
+    }
+
+    void set(uint8_t v) {
+        value = (float)v / 128.0;
+    }
+
+    void update(uint8_t v) {
+        float inc = (float)(v - 64) / 128.0;
+        value += inc;
+        if (value > 1) value = 1;
+        if (value < 0) value = 0;
+    }
+
+    std::string name;
+    bool enabled;
+    float value;
+};

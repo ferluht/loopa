@@ -19,12 +19,12 @@ Sampler::Sampler(const char * name, const char * sample_name_, int8_t note) : Po
 //    GAttach(pitch);
 //    MConnect(pitch);
 
-    base_frequency = SAMPLERATE / 2 / M_PI;
+    base_frequency = sample.getSampleRate() / 2 / M_PI;
 
     addParameter("PITCH");
-    addParameter("VOICS");
+    voices = addParameter("VOICS", 0.4);
     addParameter("FILTR");
-    addParameter("DECAY");
+    decay = addParameter("DECAY", 0.375);
 
 //    trig = new GUI::TapButton("trig", [this] (bool state) {triggered = true;});
 //    trig->GPlace({0.75, 0.75});
@@ -51,11 +51,15 @@ void Sampler::updateVoice(SamplerState *state, MData md) {
             state->transient = true;
             state->alpha = 0.001;
         }
+        state->adsr.set(0.01, 0.1, 1.0, decay->value * 40);
+        state->adsr.gateOn();
         state->time = 0;
         state->enable();
+
+//        set_voices((int)(voices->value * 5) + 1);
 //        std::cout << "note" << std::endl;
     }else{
-
+        state->adsr.gateOff();
     }
 }
 
@@ -85,6 +89,8 @@ void Sampler::processVoice(SamplerState *voiceState, float *outputBuffer, float 
         if (!voiceState->isActive()) continue;
         if (voiceState->time + 4 < sample.getNumSamplesPerChannel()) {
 
+            voiceState->adsr.process();
+
             float x = InterpolateHermite4pt3oX(
                     sample.samples[0][(int) voiceState->time],
                     sample.samples[0][((int) voiceState->time) + 1],
@@ -109,15 +115,18 @@ void Sampler::processVoice(SamplerState *voiceState, float *outputBuffer, float 
                 voiceState->transient = false;
             }
 
-            outputBuffer[i + 0] += voiceState->out * instrument_volume;
-            outputBuffer[i + 1] += voiceState->out * instrument_volume;
+            outputBuffer[i + 0] += voiceState->out * instrument_volume * voiceState->adsr.get();
+            outputBuffer[i + 1] += voiceState->out * instrument_volume * voiceState->adsr.get();
+
+            if (voiceState->adsr.end()) voiceState->disable();
+
+
 //            std::cout << voiceState->out << std::endl;
+
             voiceState->time += getPhaseIncrement(voiceState->note);// + *pitch);
 
         } else {
             voiceState->disable();
-//            std::cout << "note off" << std::endl;
-//            sample.printSummary();
         }
     }
 }

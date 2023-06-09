@@ -39,7 +39,25 @@ MIDISTATUS DAW::midiIn(MData& cmd) {
 
 void DAW::process(float *outputBuffer, float *inputBuffer,
              unsigned int nBufferFrames, double streamTime) {
+    float inbuf[BUF_SIZE * 2];
     float buf[BUF_SIZE * 2];
+
+    if (strcmp(((Rack*)((Rack*)tracks->get_focus())->get_item(1))->get_focus()->getName(), "MICIN") == 0) {
+        int k = 0;
+        for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
+            inbuf[i + 0] = inputBuffer[k];
+            inbuf[i + 1] = inputBuffer[k];
+            k ++;
+        }
+    } else {
+        float j = -1;
+        for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
+            inbuf[i + 0] = 0.0001f * j;
+            inbuf[i + 1] = 0.0001f * j;
+            j *= -1;
+        }
+    }
+
     float j = -1;
     for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
         buf[i + 0] = 0.0001f * j;
@@ -54,28 +72,51 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
         midiMap->midiIn(cmd);
         M::midiIn(cmd);
 
-        bool tracks_done;
-        if (cmd.status == MIDI::GENERAL::CC_HEADER) {
-            tracks_done = focus_rack->midiIn(cmd) == MIDISTATUS::DONE;
-        } else {
-            tracks_done = tracks->midiIn(cmd) == MIDISTATUS::DONE;
-        }
-        bool tapes_done = tapes->midiIn(cmd) == MIDISTATUS::DONE;
+        if (current_screen == DAW::FSCREEN::MAIN) {
+            bool tracks_done = false;
+            if (cmd.status == MIDI::GENERAL::CC_HEADER) {
+                tracks_done = focus_rack->midiIn(cmd) == MIDISTATUS::DONE;
+            } else {
+                if (dynamic_cast<SampleKit*>(((Rack*)((Rack*)tracks->get_focus())->get_item(1))->get_focus()) == nullptr) {
+                    master_fx->get_item(0)->midiIn(cmd);
+                }
+                tracks_done = tracks->midiIn(cmd) == MIDISTATUS::DONE;
+            }
 
-        if (tracks_done && tapes_done) {
-            midiLock.lock();
-            midiQueue.pop_front();
-            midiLock.unlock();
-        } else {
-            ms = MIDISTATUS::WAITING;
+            bool tapes_done = tapes->midiIn(cmd) == MIDISTATUS::DONE;
+
+            if (tracks_done && tapes_done) {
+                midiLock.lock();
+                midiQueue.pop_front();
+                midiLock.unlock();
+            } else {
+                ms = MIDISTATUS::WAITING;
+            }
+        } else if (current_screen == DAW::FSCREEN::LOOP) {
+            bool tracks_done = true;
+            if (cmd.status != MIDI::GENERAL::CC_HEADER) {
+                if (dynamic_cast<SampleKit*>(((Rack*)((Rack*)tracks->get_focus())->get_item(1))->get_focus()) == nullptr) {
+                    master_fx->get_item(0)->midiIn(cmd);
+                }
+                tracks_done = tracks->midiIn(cmd) == MIDISTATUS::DONE;
+            }
+
+            bool fx_done = master_fx->get_focus()->midiIn(cmd) == MIDISTATUS::DONE;
+
+            if (fx_done && tracks_done) {
+                midiLock.lock();
+                midiQueue.pop_front();
+                midiLock.unlock();
+            } else {
+                ms = MIDISTATUS::WAITING;
+            }
         }
     }
 
     dawMidiStatus = ms;
 
-    tracks->process(buf, buf, nBufferFrames, 0);
+    tracks->process(buf, inbuf, nBufferFrames, 0);
     tapes->process(buf, buf, nBufferFrames, 0);
-    master_effects->process(buf, buf, nBufferFrames, 0);
 
     for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
         buf[i + 0] *= 0.5;
@@ -98,14 +139,6 @@ void DAW::drawMainScreen(GFXcanvas1 *screen) {
     screen->setFont(&Picopixel);
     screen->setTextSize(1);
 
-//    screen->setCursor(54, 6);
-//    screen->setTextSize(1);
-//    screen->print("M");
-//
-//    screen->setCursor(71, 6);
-//    screen->setTextSize(1);
-//    screen->print("A");
-
     int16_t s = 81;
 
     for (int i = 0; i < 14; i ++)
@@ -119,13 +152,6 @@ void DAW::drawMainScreen(GFXcanvas1 *screen) {
     screen->drawFastHLine(s+6, 2, 3, 1);
     screen->drawFastVLine(s+8, 3, 3, 1);
     screen->drawFastHLine(s+8, 6, 3, 1);
-
-//    screen->drawPixel(s-1, 4, 1);
-//    screen->drawPixel(s+1, 5, 1);
-//    screen->drawPixel(s+2, 4, 1);
-//    screen->drawPixel(s+1, 3, 1);
-
-//    screen->drawCircle(72, 4, 2, 1);
 
     auto selected_track = (Rack *) (tracks->get_focus());
     screen->setCursor(4, 6);
@@ -141,19 +167,7 @@ void DAW::drawMainScreen(GFXcanvas1 *screen) {
     auto instr_name = selected_instrument_rack->get_focus()->getName();
     screen->print(instr_name);
 
-
-    auto selected_stage = (Rack *) (selected_track->get_focus());
-//    screen->setCursor(34, 6);
-//    screen->setTextSize(1);
-//    screen->print(selected_stage->getName());
-
-    auto selected_fx = (Rack *) (selected_stage->get_focus());
-//    screen->setCursor(66, 6);
-//    screen->setTextSize(1);
-//    screen->print(selected_fx->getName());
-
     focus_rack->draw(screen);
-//    std::cout << selected_track->getName() << " " << selected_stage->getName() << "\n";
 
     if (focus_rack == selected_track->get_item(1)) {
         screen->drawFastHLine(0, 9, 60, 1);
@@ -162,9 +176,7 @@ void DAW::drawMainScreen(GFXcanvas1 *screen) {
     } else {
         screen->drawFastHLine(78, 9, 18, 1);
     }
-}
 
-void DAW::drawLoopScreen(GFXcanvas1 *screen) {
     screen->setCursor(103, 6);
     screen->setTextSize(1);
     screen->print("TAPES");
@@ -182,19 +194,51 @@ void DAW::drawLoopScreen(GFXcanvas1 *screen) {
     }
 }
 
+void DAW::drawLoopScreen(GFXcanvas1 *screen) {
+    screen->drawFastVLine(18, 2, 5, 1);
+    screen->drawFastVLine(36, 2, 5, 1);
+    screen->drawFastHLine(0, 8, 128, 1);
+
+    int16_t s = 21;
+
+    for (int i = 0; i < 14; i ++)
+        screen->drawPixel(s+i, 4 + 2 * sin(((float)i / 14) * 2 * M_PI), 1);
+
+    s = 4;
+    screen->drawFastHLine(s-1, 2, 5, 1);
+    screen->drawFastHLine(s+3, 6, 4, 1);
+    screen->drawFastVLine(s+3, 3, 3, 1);
+    screen->drawFastVLine(s+6, 3, 3, 1);
+    screen->drawFastHLine(s+6, 2, 3, 1);
+    screen->drawFastVLine(s+8, 3, 3, 1);
+    screen->drawFastHLine(s+8, 6, 3, 1);
+
+    if (master_fx->get_focus() == master_fx->get_item(0)) {
+        screen->drawFastHLine(0, 9, 18, 1);
+    } else if (master_fx->get_focus() == master_fx->get_item(1)) {
+        screen->setCursor(103, 6);
+        screen->setTextSize(1);
+        screen->print("TAPES");
+
+        screen->drawFastVLine(96, 0, 32, 1);
+
+        screen->drawFastHLine(18, 9, 18, 1);
+    }
+
+    master_fx->get_focus()->draw(screen);
+}
+
 void DAW::draw(GFXcanvas1 * screen) {
-    drawMainScreen(screen);
-    drawLoopScreen(screen);
-//    switch (current_screen) {
-//        case (FSCREEN::LOOP):
-//            drawLoopScreen(screen);
-//            break;
-//        case (FSCREEN::MAIN):
-//            drawMainScreen(screen);
-//            break;
-//        default:
-//            break;
-//    }
+    switch (current_screen) {
+        case (FSCREEN::LOOP):
+            drawLoopScreen(screen);
+            break;
+        case (FSCREEN::MAIN):
+            drawMainScreen(screen);
+            break;
+        default:
+            break;
+    }
 }
 
 Rack *DAW::spawnTracksRack(int n) {
@@ -235,12 +279,13 @@ Rack *DAW::spawnSingleTrack(const char * name, int i, int j, int k) {
 
 Rack *DAW::spawnMidiRack() {
     Rack * midirack = new Rack("MIDI FX",Rack::SELECTIVE);
-    midirack->add(new Scale());
+    midirack->add(new DummyMidiFX());
     return midirack;
 }
 
 Rack *DAW::spawnInstrumentRack() {
     Rack * instrument = new Rack("ENGINE", Rack::SELECTIVE);
+    instrument->add(new MicInput());
     instrument->add(new SingleTone());
     instrument->add(new SimpleInstrument());
 

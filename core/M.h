@@ -63,6 +63,8 @@ namespace MIDI {
             enum {
                 START = 20,
                 COPY,
+                COPY_SCENE,
+                SELECT_SCENE,
                 END = 30
             };
         }

@@ -29,34 +29,10 @@ public:
     template <class VoiceState> friend class PolyInstrument;
 };
 
-class InstrumentParameter {
-
-public:
-
-    InstrumentParameter() {
-
-    }
-
-    void set(uint8_t v) {
-        value = (float)v / 128.0;
-    }
-
-    void update(uint8_t v) {
-        float inc = (float)(v - 64) / 128.0;
-        value += inc;
-        if (value > 1) value = 1;
-        if (value < 0) value = 0;
-    }
-
-    std::string name;
-    bool enabled;
-    float value;
-};
-
 class Instrument : public AMG {
 
     bool altparams;
-    std::vector<InstrumentParameter> inputparams;
+    std::vector<Parameter> inputparams;
 
 public:
 
@@ -95,18 +71,24 @@ public:
 //        screen->print("par1");
     }
 
-    void addParameter(std::string name) {
+    Parameter * addParameter(std::string name) {
+        return addParameter(name, 0);
+    }
+
+
+    Parameter * addParameter(std::string name, float default_value) {
         inputparams.emplace_back();
         inputparams.back().name = name;
         inputparams.back().enabled = true;
-        inputparams.back().value = 0;
+        inputparams.back().value = default_value;
+        return &inputparams.back();
     }
 };
 
 template <class TVoiceState>
 class PolyInstrument : public Instrument {
 
-    unsigned int num_voices = 4;
+    unsigned int num_voices = 6;
     std::list<TVoiceState *> voices;
 
     std::mutex keyPressedLock;

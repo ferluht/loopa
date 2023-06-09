@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <chrono>
 #include <mutex>
+#include <LoopMatrix/LoopMatrix.h>
 
 #define SLEEP( milliseconds ) usleep( (unsigned long) (milliseconds * 1000.0) )
 
@@ -28,7 +29,7 @@ class DAW : public AMG{
     int current_screen;
     bool screen_toggle = false;
 
-    Rack * master_effects;
+    Rack * master_fx;
 
 public:
 
@@ -36,9 +37,6 @@ public:
 
     DAW (int n_tracks, int n_tapes, GFXcanvas1 * screen_) : AMG("DAW") {
         screen = screen_;
-
-        master_effects = new Rack("AUDIO FX", Rack::SEQUENTIAL);
-        master_effects->add(new Plateau());
 
         midiMap = new MIDIMap();
         midiMap->addHardwareControl("CTRL", MIDI::GENERAL::CC_HEADER, 100);
@@ -67,8 +65,7 @@ public:
         midiMap->addMapping({"SHIFT", "CTRL", "K4"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::UPUP);
 
         midiMap->addMapping({"ALT"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::ALT_PARAMS);
-        midiMap->addMapping({"LOOP"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::LOOP_SCREEN);
-//        midiMap->addMapping({"SAVE"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::SAVE);
+        midiMap->addMapping({"SHIFT", "LOOP"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::LOOP_SCREEN);
 
         for (int i = 0; i < n_tapes; i ++) {
             auto kn = "P" + std::to_string(i);
@@ -77,21 +74,27 @@ public:
             midiMap->addMapping({"CTRL", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::TAPE::DOUBLE);
             midiMap->addMapping({"SHIFT", "CTRL", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::TAPE::STOP);
             midiMap->addMapping({"COPY", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::COPY);
+            midiMap->addMapping({"LOOP", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::SELECT_SCENE);
+            midiMap->addMapping({"LOOP", "COPY", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::COPY_SCENE);
         }
 
         addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::LEFT, [this](MData &cmd) -> MIDISTATUS {
             if (cmd.data2 > 0) {
-                switch (focus_rack_depth) {
-                    case 1:
-                        this->focus_rack = (Rack *) this->focus_rack->dive_out()->get_item(1);
-                        focus_rack_depth = 0;
-                        break;
-                    case 2:
-                        this->focus_rack = (Rack *) this->focus_rack->dive_out()->get_item(0);
-                        focus_rack_depth = 1;
-                        break;
-                    default:
-                        break;
+                if (current_screen == FSCREEN::MAIN) {
+                    switch (focus_rack_depth) {
+                        case 1:
+                            this->focus_rack = (Rack *) this->focus_rack->dive_out()->get_item(1);
+                            focus_rack_depth = 0;
+                            break;
+                        case 2:
+                            this->focus_rack = (Rack *) this->focus_rack->dive_out()->get_item(0);
+                            focus_rack_depth = 1;
+                            break;
+                        default:
+                            break;
+                    }
+                } else if (current_screen == FSCREEN::LOOP) {
+                    master_fx->dive_prev();
                 }
             }
             return MIDISTATUS::DONE;
@@ -131,17 +134,21 @@ public:
 
         addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::RIGHT, [this](MData &cmd) -> MIDISTATUS {
             if (cmd.data2 > 0) {
-                switch (focus_rack_depth) {
-                    case 0:
-                        this->focus_rack = (Rack*) this->focus_rack->dive_out()->get_item(0);
-                        focus_rack_depth = 1;
-                        break;
-                    case 1:
-                        this->focus_rack = (Rack*) this->focus_rack->dive_out()->get_item(2);
-                        focus_rack_depth = 2;
-                        break;
-                    default:
-                        break;
+                if (current_screen == FSCREEN::MAIN) {
+                    switch (focus_rack_depth) {
+                        case 0:
+                            this->focus_rack = (Rack *) this->focus_rack->dive_out()->get_item(0);
+                            focus_rack_depth = 1;
+                            break;
+                        case 1:
+                            this->focus_rack = (Rack *) this->focus_rack->dive_out()->get_item(2);
+                            focus_rack_depth = 2;
+                            break;
+                        default:
+                            break;
+                    }
+                } else if (current_screen == FSCREEN::LOOP) {
+                    master_fx->dive_next();
                 }
             }
             return MIDISTATUS::DONE;
@@ -185,8 +192,10 @@ public:
                     previous_screen = current_screen;
                     if (current_screen != FSCREEN::LOOP) {
                         current_screen = FSCREEN::LOOP;
+                        tapes->select_screen(1);
                     } else {
                         current_screen = FSCREEN::MAIN;
+                        tapes->select_screen(0);
                     }
                     screenchange_time = std::chrono::steady_clock::now();
                 }
@@ -195,6 +204,8 @@ public:
                 auto timedelta = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - screenchange_time).count();
                 if (timedelta > 300) {
                     current_screen = previous_screen;
+                    if (current_screen == FSCREEN::MAIN) tapes->select_screen(0);
+                    else if (current_screen == FSCREEN::LOOP) tapes->select_screen(1);
                 }
                 screen_toggle = false;
             }
@@ -203,6 +214,10 @@ public:
 
         tracks = spawnTracksRack(n_tracks);
         tapes = new LoopMatrix<2,2>();
+
+        master_fx = new Rack("MASTER FX", Rack::SELECTIVE);
+        master_fx->add(new Scale());
+        master_fx->add(tapes);
 
         tapes->addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::SAVE, [this](MData &cmd) -> MIDISTATUS {
             if (cmd.data2 > 0) {

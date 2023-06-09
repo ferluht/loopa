@@ -9,6 +9,7 @@
 #include "SingleTone/SingleTone.h"
 #include "Sampler/Sampler.h"
 #include "Sampler/SampleKit.h"
+#include "MicInput/MicInput.h"
 
 class DummyInstrument : public Instrument {
 

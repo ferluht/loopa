@@ -6,7 +6,7 @@
 #include <cstdint>
 
 #define SAMPLERATE 44100
-#define BUF_SIZE 128
+#define BUF_SIZE 256
 #define PERF_TESTING false
 
 /**

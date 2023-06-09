@@ -55,7 +55,7 @@ bool checkMidi(RtMidiIn * midiin) {
         unsigned int nPorts = midiin->getPortCount();
         if (nPorts < 2) return false;
         try {
-            midiin->openPort(2);
+            midiin->openPort(1);
             std::cout << "midi port opened" << std::endl;
         } catch (RtMidiError &error) {
             error.printMessage();
@@ -102,8 +102,12 @@ int main( int argc, char *argv[] )
     RtAudio::StreamParameters oParams;
     oParams.nChannels = 2;
     oParams.firstChannel = offset;
-
     oParams.deviceId = dac.getDefaultOutputDevice();
+
+    RtAudio::StreamParameters iParams;
+    iParams.nChannels = 1;
+    iParams.firstChannel = 0;
+    iParams.deviceId = dac.getDefaultInputDevice();
 
     options.flags = RTAUDIO_HOG_DEVICE;
     options.flags |= RTAUDIO_SCHEDULE_REALTIME;
@@ -117,7 +121,7 @@ int main( int argc, char *argv[] )
     // An error in the openStream() function can be detected either by
     // checking for a non-zero return value OR by a subsequent call to
     // isStreamOpen().
-    if ( dac.openStream( &oParams, NULL, RTAUDIO_FLOAT32, fs, &bufferFrames, &audiocallback, (void *)data, &options ) ) {
+    if ( dac.openStream( &oParams, &iParams, RTAUDIO_FLOAT32, fs, &bufferFrames, &audiocallback, (void *)data, &options ) ) {
         std::cout << dac.getErrorText() << std::endl;
         goto cleanup;
     }

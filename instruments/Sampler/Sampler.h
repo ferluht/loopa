@@ -5,21 +5,31 @@
 #pragma once
 
 #include "WavFile.hpp"
+#include "ADSR.h"
 #include "Instrument.h"
+
 
 class SamplerState : public VoiceState{
 public:
 
+    SamplerState() {
+        adsr.set(0.01, 0.1, 1.0, 5.0);
+        out = 0;
+        time = 0;
+        transient = false;
+        alpha = 0;
+    }
+
     unsigned char velocity;
     float note;
 
+    ADSR adsr;
     float volume;
 
     bool transient;
     float time;
 
     float out;
-
     float alpha;
 };
 
@@ -33,6 +43,8 @@ class Sampler : public PolyInstrument<SamplerState> {
     bool const_pitch;
 
     bool triggered = false;
+
+    Parameter * decay, * voices;
 
 //    GUI::Plot<GUI::TimeGraph> * plot;
 
