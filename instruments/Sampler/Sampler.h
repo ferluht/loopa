@@ -55,7 +55,7 @@ public:
     static float InterpolateCubic(float x0, float x1, float x2, float x3, float t);
     static float InterpolateHermite4pt3oX(float x0, float x1, float x2, float x3, float t);
 
-    void updateVoice(SamplerState * state, MData md) override;
+    void updateVoice(SamplerState * state, MData &md) override;
 
 //    void MIn(double beat) override ;
 

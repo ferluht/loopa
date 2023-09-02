@@ -17,7 +17,7 @@ public:
     void draw(GFXcanvas1 * screen) override;
 
 private:
-    float dry = 0.5;
+    float dry = 0;
     Dattorro * dattorro;
 };
 

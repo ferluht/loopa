@@ -105,7 +105,11 @@ int main( int argc, char *argv[] )
     oParams.deviceId = dac.getDefaultOutputDevice();
 
     RtAudio::StreamParameters iParams;
+#ifndef __APPLE__
+    iParams.nChannels = 2;
+#else
     iParams.nChannels = 1;
+#endif
     iParams.firstChannel = 0;
     iParams.deviceId = dac.getDefaultInputDevice();
 
@@ -115,7 +119,7 @@ int main( int argc, char *argv[] )
     init_gui();
 
     int it = 0;
-    const int div = 50;
+    const int div = 66;
     const int midi_refresh_time = 1;
 
     // An error in the openStream() function can be detected either by

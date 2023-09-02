@@ -22,6 +22,7 @@ include_directories(common)
 include_directories(core)
 include_directories(effects_audio)
 include_directories(effects_midi)
+include_directories(effects_master)
 include_directories(instruments)
 include_directories(utils)
 include_directories(3rdparty)
@@ -61,6 +62,7 @@ add_executable(rpidaw
         effects_audio/Chronoblob/Chronoblob.cpp
         effects_audio/Tape/Tape.cpp
         common/Utils.cpp
+        core/AMG.cpp
         instruments/SingleTone/SingleTone.cpp
 #        3rdparty/nanovg/src/nanovg.c
         effects_midi/Scale.cpp
@@ -68,9 +70,12 @@ add_executable(rpidaw
         utils/WavFile.cpp
         instruments/Sampler/Sampler.cpp
         instruments/Sampler/SampleKit.cpp
+        instruments/MicInput/MicInput.cpp
         3rdparty/Adafruit-GFX-offscreen/Adafruit_GFX.cpp
         Gui.cpp
-        effects_audio/LoopMatrix/LoopMatrix.cpp)
+        effects_audio/LoopMatrix/LoopMatrix.cpp
+        effects_master/MasterEffects.cpp
+        effects_audio/Tanhx/Tanhx.cpp)
 
 set(CMAKE_CXX_FLAGS "-O3 -Wno-cpp") # -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wall -Wextra")
 #target_compile_options(rpidaw PRIVATE -Ofast)

@@ -11,36 +11,46 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <Effect.h>
 
 #define HISTORY_SIZE (1<<21)
 
 /// @private
-class Delay {
+class Delay : public AudioEffect {
 
-    DoubleRingBuffer<float, HISTORY_SIZE> historyBuffer;
-    DoubleRingBuffer<float, 16> outBuffer;
+    DoubleRingBuffer<float, HISTORY_SIZE> historyBufferL;
+    DoubleRingBuffer<float, HISTORY_SIZE> historyBufferR;
+    DoubleRingBuffer<float, 512> outBuffer;
     SRC_STATE* src;
-    float lastWet = 0.f;
+    float lastWetL = 0.f;
+    float lastWetR = 0.f;
+
+    float prevlinelength = 0;
 
 public:
 
-    float in = 0;
-    float out = 0;
-    float feedback = 0;
-    float mix = 0;
-    float delay = 0;
-    float wet = 0;
+    float wetL = 0;
+    float wetR = 0;
 
-    Delay() {
+    Parameter * time, * drywet, * feedback;
+
+    Delay() : AudioEffect("DELAY") {
         src = src_new(SRC_SINC_FASTEST, 1, nullptr);
         assert(src);
+
+        drywet = addParameter("D/W", 0.60);
+        time = addParameter("TIME", 0.0);
+        feedback = addParameter("FB", 0.45);
     }
 
     ~Delay() {
         src_delete(src);
     }
 
-    void process();
+    void process(float *outputBuffer, float * inputBuffer,
+                 unsigned int nBufferFrames, double streamTime) override;
+
+//    void draw(GFXcanvas1 * screen) override;
 
 private:
 

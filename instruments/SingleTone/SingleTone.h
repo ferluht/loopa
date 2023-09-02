@@ -38,7 +38,7 @@ public:
         set_voices(1);
     }
 
-    void updateVoice(SingleToneVoiceState * voiceState, MData cmd) override;
+    void updateVoice(SingleToneVoiceState * voiceState, MData &cmd) override;
 
     void processVoice(SingleToneVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
                       unsigned int nBufferFrames, double streamTime, uint8_t nvoices) override;

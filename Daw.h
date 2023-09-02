@@ -213,7 +213,7 @@ public:
         });
 
         tracks = spawnTracksRack(n_tracks);
-        tapes = new LoopMatrix<2,2>();
+        tapes = new LoopMatrix();
 
         master_fx = new Rack("MASTER FX", Rack::SELECTIVE);
         master_fx->add(new Scale());
@@ -260,7 +260,7 @@ private:
     static Rack * spawnEffectRack();
 
     Rack * tracks;
-    LoopMatrix<2,2> * tapes;
+    LoopMatrix * tapes;
     Rack * focus_rack;
     int focus_rack_depth = 0;
 

@@ -349,8 +349,14 @@ bool process_gui() {
 
     glfwSwapBuffers(window);
 #else
+
+//    serialPutchar(fd, 0xAA);
     for (int i = 0; i < 128*32/8; i ++) {
         serialPutchar(fd, screen->getBuffer()[i]);
+    }
+
+    for (int i = 0; i < 18; i ++) {
+        serialPutchar(fd, screen->leds[i]);
     }
 #endif
     return true;

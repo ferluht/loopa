@@ -36,6 +36,7 @@ MIDISTATUS Rack::midiIn(MData &cmd) {
 }
 
 void Rack::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) {
+    int c = 0;
     switch (racktype) {
         case PARALLEL:
             for (unsigned int i = 0; i < 2 * nBufferFrames; i++) emptybuffer[i] = 0;
@@ -53,7 +54,15 @@ void Rack::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
             break;
         case SEQUENTIAL:
             for (auto it = items.begin(); it < items.end(); it++) {
+                if (strcmp(it->first->getName(), "MIDI FX") == 0) continue;
+                if (c != 0) {
+                    for (unsigned int i = 0; i < 2 * nBufferFrames; i++) {
+                        inputBuffer[i] = outputBuffer[i];
+                        outputBuffer[i] = 0;
+                    }
+                }
                 it->first->process(outputBuffer, inputBuffer, nBufferFrames, streamTime);
+                c++;
             }
             break;
         case SELECTIVE:

@@ -4,7 +4,7 @@
 
 #include "SingleTone.h"
 
-void SingleTone::updateVoice(SingleToneVoiceState * voiceState, MData cmd) {
+void SingleTone::updateVoice(SingleToneVoiceState * voiceState, MData &cmd) {
     if ((cmd.status == MIDI::GENERAL::NOTEON_HEADER) && (cmd.data2 != 0)) {
         if (!voiceState->isActive()) {
             voiceState->glide = 0;
@@ -40,7 +40,7 @@ void SingleTone::processVoice(SingleToneVoiceState * voiceState, float *outputBu
 
         voiceState->adsr.process();
 
-        float sample = (first * crossmod + first * second * (1 - crossmod)) * voiceState->volume * voiceState->adsr.get() * instrument_volume;
+        float sample = (first * crossmod + first * second * (1 - crossmod)) * voiceState->volume * voiceState->adsr.get() * instrument_volume * 0.4;
 
         if (voiceState->adsr.end()) voiceState->disable();
 

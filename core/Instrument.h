@@ -10,7 +10,6 @@
 #include <iostream>
 #include "AMG.h"
 
-
 class VoiceState {
 
     unsigned char key;
@@ -29,60 +28,9 @@ public:
     template <class VoiceState> friend class PolyInstrument;
 };
 
-class Instrument : public AMG {
-
-    bool altparams;
-    std::vector<Parameter> inputparams;
-
+class Instrument : public DeviceWithParameters {
 public:
-
-    Instrument(const char * name) : AMG(name) {
-        altparams = false;
-        addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::ALT_PARAMS, [this](MData &cmd) -> MIDISTATUS {
-            this->altparams = cmd.data2 > 0;
-            return MIDISTATUS::DONE;
-        });
-
-        addMIDIHandler({MIDI::GENERAL::CC_HEADER}, {CC_E1, CC_E2}, [this](MData &cmd) -> MIDISTATUS {
-            if (this->altparams) {
-                if (cmd.data1 == CC_E1 && inputparams.size() > 2) inputparams[2].update(cmd.data2);
-                if (cmd.data1 == CC_E2 && inputparams.size() > 3) inputparams[3].update(cmd.data2);
-            } else {
-                if (cmd.data1 == CC_E1 && inputparams.size() > 0) inputparams[0].update(cmd.data2);
-                if (cmd.data1 == CC_E2 && inputparams.size() > 1) inputparams[1].update(cmd.data2);
-            }
-            return MIDISTATUS::DONE;
-        });
-    }
-
-    void draw(GFXcanvas1 * screen) override {
-
-        for (int i = 0; i < 4; i ++) {
-            if (inputparams.size() <= i || !inputparams[i].enabled) continue;
-            int xoffset = (int)(i / 2) * 46;
-            int yoffset = (i % 2) * 10;
-            screen->setCursor(4 + xoffset, 17 + yoffset);
-            screen->setTextSize(1);
-            screen->print(inputparams[i].name.c_str());
-            screen->drawRect(26 + xoffset, 14 + yoffset, 20, 4, 1);
-            screen->drawRect(26 + xoffset, 15 + yoffset, inputparams[i].value * 19 + 1, 2, 1);
-        }
-
-//        screen->print("par1");
-    }
-
-    Parameter * addParameter(std::string name) {
-        return addParameter(name, 0);
-    }
-
-
-    Parameter * addParameter(std::string name, float default_value) {
-        inputparams.emplace_back();
-        inputparams.back().name = name;
-        inputparams.back().enabled = true;
-        inputparams.back().value = default_value;
-        return &inputparams.back();
-    }
+    explicit Instrument(const char * name) : DeviceWithParameters(name) {}
 };
 
 template <class TVoiceState>
@@ -114,7 +62,7 @@ public:
     float pitch = 0;
     float pitch_distance = 2.0;
 
-    PolyInstrument(const char * name) : Instrument(name){
+    explicit PolyInstrument(const char * name) : Instrument(name){
         pitch = 0;
         for (int i = 0; i < num_voices; i++) voices.push_back(new TVoiceState());
 
@@ -136,7 +84,7 @@ public:
 
     inline float getFrequency(float note)
     {
-        return base_frequency*(powf(power_base, (note - base_note + pitch)/semitones));
+        return GLOBAL_SPEED*base_frequency*(powf(power_base, (note - base_note + pitch)/semitones));
     }
 
     inline float getPhaseIncrement(float note)
@@ -149,7 +97,7 @@ public:
         while (voices.size() < nvoices) voices.push_back(new TVoiceState());
     }
 
-    virtual void updateVoice(TVoiceState * voiceState, MData cmd) {};
+    virtual void updateVoice(TVoiceState * voiceState, MData &cmd) {};
 
     virtual void processVoice(TVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
                               unsigned int nBufferFrames, double streamTime, uint8_t nvoices) {};
@@ -186,11 +134,15 @@ void PolyInstrument<TVoiceState>::keyPressed(MData &md) {
         }
     }
 
-    TVoiceState * state = *voices.begin();
-    updateVoice(state, md);
-    state->key = md.data1;
-    voices.pop_front();
-    voices.push_back(state);
+    if (voices.empty()) {
+        updateVoice(nullptr, md);
+    } else {
+        TVoiceState *state = *voices.begin();
+        updateVoice(state, md);
+        state->key = md.data1;
+        voices.pop_front();
+        voices.push_back(state);
+    }
 
     keyPressedLock.unlock();
 }
@@ -201,9 +153,13 @@ void PolyInstrument<TVoiceState>::process(float *outputBuffer, float * inputBuff
 {
     keyPressedLock.lock();
 
-    for (auto it = voices.begin(); it != voices.end(); it++ ){
-        if (PERF_TESTING || (*it)->isActive())
-            processVoice(*it, outputBuffer, inputBuffer, nBufferFrames, streamTime, num_voices);
+    if (voices.empty()) {
+        processVoice(nullptr, outputBuffer, inputBuffer, nBufferFrames, streamTime, num_voices);
+    } else {
+        for (auto it = voices.begin(); it != voices.end(); it++) {
+            if (PERF_TESTING || (*it)->isActive())
+                processVoice(*it, outputBuffer, inputBuffer, nBufferFrames, streamTime, num_voices);
+        }
     }
 
     keyPressedLock.unlock();

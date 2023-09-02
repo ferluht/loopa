@@ -30,7 +30,7 @@ public:
 
     SimpleInstrument();
 
-    void updateVoice(SimpleInstrumentVoiceState * voiceState, MData cmd) override;
+    void updateVoice(SimpleInstrumentVoiceState * voiceState, MData &cmd) override;
 
     void processVoice(SimpleInstrumentVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
         unsigned int nBufferFrames, double streamTime, uint8_t nvoices) override;

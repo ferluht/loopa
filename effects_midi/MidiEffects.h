@@ -15,7 +15,7 @@ public:
     }
 
     void draw(GFXcanvas1 * screen) override {
-        screen->print("NO MIDI FX");
+//        screen->print("NO MIDI FX");
     }
 };
 

@@ -14,9 +14,9 @@ public:
         pingpong = new PingPong();
         pingpong->sync = false;
         pingpong->mode = false;
-        pingpong->leftTime = 4.257;
-        pingpong->rightTime = 1.257;
-        pingpong->feedback = 0.85;
+        pingpong->leftTime = 0.657;
+        pingpong->rightTime = 0.523;
+        pingpong->feedback = 0.5;
         pingpong->dw = 0.95;
     }
 

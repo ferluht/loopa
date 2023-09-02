@@ -5,6 +5,8 @@
 #pragma once
 
 #include "AMG.h"
+#include <MidiEffects.h>
+#include <iostream>
 
 class Rack : public AMG {
 
@@ -44,6 +46,7 @@ public:
     AMG * get_focus();
     int get_focus_index();
     inline AMG * get_item(int i) { return items[i % items.size()].first; }
+    inline int get_size() { return items.size(); }
 
 private:
 

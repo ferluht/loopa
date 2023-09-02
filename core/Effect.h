@@ -7,25 +7,19 @@
 
 #include <AMG.h>
 
-class Effect : public AMG {
+class Effect : public DeviceWithParameters {
 public:
-    Effect(char const * name) : AMG(name) {
-
-    }
+    explicit Effect(char const * name) : DeviceWithParameters(name) {}
 };
 
 class AudioEffect : public Effect {
 public:
-    AudioEffect(char const * name) : Effect(name) {
-
-    }
+    explicit AudioEffect(char const * name) : Effect(name) {}
 };
 
 class MIDIEffect : public Effect {
 public:
-    MIDIEffect(char const * name) : Effect(name) {
-
-    }
+    explicit MIDIEffect(char const * name) : Effect(name) {}
 };
 
 #endif //RPIDAW_EFFECT_H

@@ -6,21 +6,51 @@
 
 MicInput::MicInput() : PolyInstrument<MicInputVoiceState>("MICIN") {
     set_voices(1);
-    volume_knob = addParameter("VOL", 0.5);
+    line_in = false;
+    std::system("amixer set 'Capture Mux' 'MIC_IN'");
+    volume_knob = addParameter("VOL", 0.1);
     release_knob = addParameter("REL", 0.5);
 }
 
-void MicInput::updateVoice(MicInputVoiceState * voiceState, MData cmd) {
+void MicInput::updateVoice(MicInputVoiceState * voiceState, MData &cmd) {
     if ((cmd.status == MIDI::GENERAL::NOTEON_HEADER) && (cmd.data2 != 0)) {
-        voiceState->note = cmd.data1;
-        voiceState->velocity = (float)cmd.data2/127.f;
-        voiceState->enable();
+        if (cmd.data1 % 12 == 11) {
+            voiceState->note = cmd.data1;
+            voiceState->velocity = (float)cmd.data2/127.f;
+            voiceState->enable();
 
-        voiceState->adsr.set(1, 0.01, 1, 1);
-        voiceState->adsr.gateOn();
-    }else{
-        if (cmd.data1 == voiceState->note){
-            voiceState->adsr.gateOff();
+            voiceState->adsr.set(1, 0.01, 1, 1);
+            voiceState->adsr.gateOn();
+        }
+    } else {
+        if (cmd.data1 % 12 == 11) {
+            if (cmd.data1 == voiceState->note) {
+                voiceState->adsr.gateOff();
+            }
+        }
+    }
+
+    if (cmd.status == MIDI::GENERAL::NOTEON_HEADER || cmd.status == MIDI::GENERAL::NOTEOFF_HEADER) {
+        switch (cmd.data1 % 12) {
+            case 0:
+                if (cmd.data2 > 0) {
+                    if (line_in) std::system("amixer set 'Capture Mux' 'MIC_IN'");
+                    else std::system("amixer set 'Capture Mux' 'LINE_IN'");
+                    line_in = ~line_in;
+                }
+                break;
+            case 5:
+            case 6:
+                cmd.status = MIDI::GENERAL::CC_HEADER + (cmd.data1 % 12) - 5;
+                cmd.data1 = MIDI::UI::TAPE::TRIG;
+                break;
+            case 7:
+            case 8:
+                cmd.status = MIDI::GENERAL::CC_HEADER + (cmd.data1 % 12) - 7;
+                cmd.data1 = MIDI::UI::TAPE::CLEAR;
+                break;
+            default:
+                break;
         }
     }
 }
@@ -31,7 +61,7 @@ void MicInput::processVoice(MicInputVoiceState * voiceState, float *outputBuffer
 
         voiceState->adsr.process();
         if (voiceState->adsr.end()) voiceState->disable();
-        float vol = voiceState->adsr.get() * (volume_knob->value * 10 + 0.5);
+        float vol = voiceState->adsr.get() * (volume_knob->value * 5 + 0.2);
 
         outputBuffer[i+0] = inputBuffer[i+0] * vol * 10;
         outputBuffer[i+1] = inputBuffer[i+1] * vol * 10;

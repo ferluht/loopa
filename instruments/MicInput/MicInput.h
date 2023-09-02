@@ -19,11 +19,13 @@ class MicInput : public PolyInstrument<MicInputVoiceState> {
     Parameter * volume_knob;
     Parameter * release_knob;
 
+    bool line_in;
+
 public:
 
     MicInput();
 
-    void updateVoice(MicInputVoiceState * voiceState, MData cmd) override;
+    void updateVoice(MicInputVoiceState * voiceState, MData &cmd) override;
 
     void processVoice(MicInputVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
                       unsigned int nBufferFrames, double streamTime, uint8_t nvoices) override;

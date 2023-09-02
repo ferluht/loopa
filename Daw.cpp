@@ -43,11 +43,9 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
     float buf[BUF_SIZE * 2];
 
     if (strcmp(((Rack*)((Rack*)tracks->get_focus())->get_item(1))->get_focus()->getName(), "MICIN") == 0) {
-        int k = 0;
         for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
-            inbuf[i + 0] = inputBuffer[k];
-            inbuf[i + 1] = inputBuffer[k];
-            k ++;
+            inbuf[i + 0] = inputBuffer[i + 0];
+            inbuf[i + 1] = inputBuffer[i + 1];
         }
     } else {
         float j = -1;
@@ -77,7 +75,8 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
             if (cmd.status == MIDI::GENERAL::CC_HEADER) {
                 tracks_done = focus_rack->midiIn(cmd) == MIDISTATUS::DONE;
             } else {
-                if (dynamic_cast<SampleKit*>(((Rack*)((Rack*)tracks->get_focus())->get_item(1))->get_focus()) == nullptr) {
+                if (dynamic_cast<SampleKit*>(((Rack*)((Rack*)tracks->get_focus())->get_item(1))->get_focus()) == nullptr &&
+                    strcmp(((Rack*)((Rack*)tracks->get_focus())->get_item(1))->get_focus()->getName(), "MICIN") != 0) {
                     master_fx->get_item(0)->midiIn(cmd);
                 }
                 tracks_done = tracks->midiIn(cmd) == MIDISTATUS::DONE;
@@ -285,9 +284,9 @@ Rack *DAW::spawnMidiRack() {
 
 Rack *DAW::spawnInstrumentRack() {
     Rack * instrument = new Rack("ENGINE", Rack::SELECTIVE);
+    instrument->add(new SimpleInstrument());
     instrument->add(new MicInput());
     instrument->add(new SingleTone());
-    instrument->add(new SimpleInstrument());
 
     std::string base_path = "../res/samples";
     auto dirs = list_dir(base_path.c_str());
@@ -334,7 +333,7 @@ Rack *DAW::spawnInstrumentRack() {
 Rack *DAW::spawnEffectRack() {
     Rack * effects = new Rack("AUDIO FX", Rack::SELECTIVE);
     effects->add(new DummyAudioFX());
-//    effects->add(new Plateau());
+//    effects->add(new Delay());
     return effects;
 }
 

@@ -11,14 +11,14 @@
 #include <Delay/Delay.hpp>
 
 /// @private
-class PingPong {
+class PingPong : public AudioEffect {
 public:
 
     Delay* leftDelay = new Delay();
     Delay* rightDelay = new Delay();
 
-    float feedback = 0;
-    float dw = 0;
+    float feedback = 0.35;
+    float dw = 0.95;
 
     bool sync = false;
     bool prevSync = false;
@@ -34,15 +34,11 @@ public:
     float leftOut = 0;
     float rightOut = 0;
 
-    SmoothCrossFade* CFDW = new SmoothCrossFade();
-    SmoothCrossFade* CFFb = new SmoothCrossFade();
-    SmoothCrossFade* CFAmp = new SmoothCrossFade();
-    SmoothCrossFade* CFMode = new SmoothCrossFade();
+    PingPong() : AudioEffect("PINGPONG") {
 
-    PingPong() {
-        CFMode->set(0);
     }
 
     void updateParam();
-    void process();
+    void process(float *outputBuffer, float * inputBuffer,
+                 unsigned int nBufferFrames, double streamTime) override;
 };

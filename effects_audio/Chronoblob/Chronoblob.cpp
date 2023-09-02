@@ -6,11 +6,11 @@
 
 void Chronoblob::process(float *outputBuffer, float * inputBuffer,
                       unsigned int nBufferFrames, double streamTime) {
-    for (unsigned int i=0; i<nBufferFrames; i+=2 ) {
+    for (int i = 0; i < nBufferFrames * 2; i += 2 ) {
         pingpong->leftIn = inputBuffer[i+0];
         pingpong->rightIn = inputBuffer[i+1];
 
-        pingpong->process();
+//        pingpong->process();
 
         outputBuffer[i+0] = pingpong->leftOut;
         outputBuffer[i+1] = pingpong->rightOut;
