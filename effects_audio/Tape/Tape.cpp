@@ -128,6 +128,8 @@ MIDISTATUS Tape::clear() {
     } else {
         std::fill(audios[current_scene].begin(), audios[current_scene].end(), 0);
     }
+    fading_adsr.reset();
+    fading_adsr.gateOn();
     return MIDISTATUS::DONE;
 }
 
