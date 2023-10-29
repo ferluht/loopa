@@ -18,44 +18,68 @@ inline float Q_rsqrt(float number)
     return conv.f;
 }
 
-inline float ADSR::calc_env_value() {
-    float env = 0;
+void ADSR::process() {
+
+    if (stage == stageEnd && !gate) {
+        env = 0;
+        return;
+    }
 
     if (gate) {
         switch (stage) {
             case stageEnd:
             case stageR:
                 stage = stageA;
-                phase = out * out * prev_a;
+                phase = env * env;
+                d = dR;
+                update_d(dA);
+                phase += d;
+                if (phase < 0) {
+                    d = 0;
+                    phase = 0;
+                }
             case stageA:
-//                if (out == 0) out = 1;
-                env = 1 / Q_rsqrt(phase / prev_a);
-                if (env >= 1) {
+                env = 1 / Q_rsqrt(phase);
+                phase += d;
+                if (phase < 0) {
+                    d = 0;
+                    phase = 0;
+                }
+                if (phase >= 1) phase = 1;
+                update_d(dA);
+
+                if (phase >= 1) {
                     stage = stageD;
+                    phase = 1;
                     switch_level = env;
                 }
                 break;
             case stageD:
-                env = S + (switch_level - 1 / Q_rsqrt((phase - prev_a) / D)) * (switch_level - S);
+                env = S + phase * phase * (switch_level - S);
+                phase += dD;
+                if (phase < 0) phase = 0;
                 if (env <= S) stage = stageS;
+                if (env < 0) env = 0;
                 break;
             case stageS:
-                env = out;
                 break;
         }
     } else {
-        prev_a = A;
         switch (stage) {
             case stageA:
             case stageD:
             case stageS:
                 stage = stageR;
-                phase = phase_inc * clockdiv;
-                switch_level = out;
+                phase = 1;
+                switch_level = env;
             case stageR:
-                env = (1 - 1 / Q_rsqrt(phase / R)) * switch_level;
-                if (env <= 0) {
+                env = phase * phase * switch_level;
+                phase += dR;
+                if (phase < 0) phase = 0;
+                if (env <= 1e-16) {
                     env = 0;
+                    stage = stageEnd;
+                    d = 0;
                 }
                 break;
             default:
@@ -64,33 +88,5 @@ inline float ADSR::calc_env_value() {
     }
 
     if (env > 1) env = 1;
-    return env;
-}
-
-void ADSR::process() {
-
-    if (stage == stageEnd && !gate) {
-        out = 0;
-        return;
-    }
-
-    if (smpcount >= clockdiv) {
-
-        phase += phase_inc * clockdiv;
-
-        if (out_points[0] > 0 && out_points[1] == 0) {
-            reset();
-        } else {
-            out_points[0] = out_points[1];
-            out_points[1] = calc_env_value();
-            smpcount = 0;
-        }
-    }
-
-    if (stage != stageEnd) {
-        out = out_points[0] + (out_points[1] - out_points[0]) * smpcount / clockdiv;
-        smpcount += 1;
-    } else {
-        out = 0;
-    }
+    if (env < 1e-16) env = 0;
 }
