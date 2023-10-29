@@ -160,6 +160,7 @@ void setup() {
 
   pinMode(S1_PIN, INPUT_PULLUP);
   pinMode(S2_PIN, INPUT_PULLUP);
+  pinMode(S3_PIN, INPUT_PULLUP);
 
   pinMode(OP_PIN, INPUT_PULLUP);
   pinMode(OM_PIN, INPUT_PULLUP);
@@ -257,6 +258,7 @@ void loop() {
 
   S1.update();
   S2.update();
+  S3.update();
   OP.update();
   OM.update();
   E1.update();
