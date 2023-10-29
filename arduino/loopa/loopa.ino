@@ -38,6 +38,7 @@ PolledEncoder enc2;
 
 #define S1_PIN 9
 #define S2_PIN 10
+#define S3_PIN 8
 
 #define E1_PIN 5
 #define E2_PIN 6
@@ -61,6 +62,7 @@ PolledEncoder enc2;
 // it makes detecting changes very simple.
 Bounce S1 = Bounce(S1_PIN, KEY_BOUNCE_TIME);
 Bounce S2 = Bounce(S2_PIN, KEY_BOUNCE_TIME);
+Bounce S3 = Bounce(S3_PIN, KEY_BOUNCE_TIME);
 Bounce OP = Bounce(OP_PIN, KEY_BOUNCE_TIME);
 Bounce OM = Bounce(OM_PIN, KEY_BOUNCE_TIME);   
 Bounce E1 = Bounce(E1_PIN, KEY_BOUNCE_TIME);
@@ -274,6 +276,7 @@ void loop() {
 
   process_bounce(&S1, CC_HEADER, CC_HEADER, 100);
   process_bounce(&S2, CC_HEADER, CC_HEADER, 101);
+  process_bounce(&S3, CC_HEADER, CC_HEADER, 102);
 
 //  process_bounce(&E1, CC_HEADER, CC_HEADER, 64);
 //  process_bounce(&E2, CC_HEADER, CC_HEADER, 64);
