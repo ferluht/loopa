@@ -82,9 +82,9 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
                 tracks_done = tracks->midiIn(cmd) == MIDISTATUS::DONE;
             }
 
-            bool tapes_done = tapes->midiIn(cmd) == MIDISTATUS::DONE;
+            bool tape_done = tape->midiIn(cmd) == MIDISTATUS::DONE;
 
-            if (tracks_done && tapes_done) {
+            if (tracks_done && tape_done) {
                 midiLock.lock();
                 midiQueue.pop_front();
                 midiLock.unlock();
@@ -115,17 +115,17 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
     dawMidiStatus = ms;
 
     tracks->process(buf, inbuf, nBufferFrames, 0);
-    tapes->process(buf, buf, nBufferFrames, 0);
+    tape->process(inbuf, buf, nBufferFrames, 0);
 
     for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
-        buf[i + 0] *= 0.5;
-        buf[i + 1] *= 0.5;
+        inbuf[i + 0] *= 0.5;
+        inbuf[i + 1] *= 0.5;
     }
 
     for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
-        *outputBuffer++ = buf[i + 0];
-        *outputBuffer++ = buf[i + 1];
-        envelope(buf[i + 0], 0.01, 0.01);
+        *outputBuffer++ = inbuf[i + 0];
+        *outputBuffer++ = inbuf[i + 1];
+        envelope(inbuf[i + 0], 0.01, 0.01);
     }
 }
 
@@ -182,7 +182,7 @@ void DAW::drawMainScreen(GFXcanvas1 *screen) {
 
     screen->drawFastVLine(96, 0, 32, 1);
 
-    tapes->draw(screen);
+    tape->draw(screen);
 
     if (dawMidiStatus == MIDISTATUS::WAITING) {
         screen->fillRect(16, 4, 96, 24, 0);

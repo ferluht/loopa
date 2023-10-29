@@ -55,6 +55,7 @@ namespace MIDI {
                 CLEAR,
                 DOUBLE,
                 STOP,
+                PLAY,
                 END = 20
             };
         }

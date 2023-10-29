@@ -17,7 +17,7 @@ public:
     SimpleInstrumentVoiceState() : VoiceState() {
         phase = 0;
         note = 60;
-        volume = 1;
+        volume = 0.4;
         phase_inc = 0;
     }
 };

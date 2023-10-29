@@ -15,91 +15,44 @@
 #include <ADSR.h>
 #include <algorithm>
 #include <atomic>
+#include <Instruments.h>
 
-class Sync {
-    bool sync;
-    int sample_counter;
-    int sync_interval;
-    std::unordered_map<AMG *, bool> active_devices;
-    std::unordered_map<AMG *, std::function<void(void)>> callbacks;
-    
-public:
-
-    Sync(){
-        sync = false;
-        sample_counter = 0;
-    }
-
-    inline void attachSyncCallback(AMG * dev, std::function<void(void)> callback) { callbacks[dev] = callback; }
-    inline void inactivate(AMG * dev) { active_devices.erase(dev); }
-    inline void send(AMG * dev) {
-        active_devices[dev] = false;
-        sync = true;
-        if (sample_counter > 0) sync_interval = sample_counter;
-        sample_counter = 0;
-    }
-
-    inline int getSyncInterval() {
-        return sync_interval;
-    }
-
-    inline bool wait(AMG * dev) {
-        if (!active_devices.empty()){
-            if (sync)
-                active_devices[dev] = false;
-            else {
-                active_devices[dev] = true;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    inline bool isWaiting(AMG * dev) {
-        auto adev = active_devices.find(dev);
-        if (adev != active_devices.end() && adev->second)
-            return true;
-        return false;
-    }
-
-    inline void process() {
-        for (auto it = callbacks.begin(); it != callbacks.end(); it ++) {
-            auto dev = active_devices.find(it->first);
-            if (dev != active_devices.end() && dev->second && sync)
-                it->second();
-        }
-        sync = false;
-        sample_counter ++;
-    }
-};
+#define TAPE_NUM_CHANNELS 4
 
 class Tape : public AudioEffect {
 
     const float TAPE_MAX_MINUTES = 1.5;
 
-    const long long button_threshold_time = 150 * SAMPLERATE / 1000.0;
+    const long long button_threshold_time = 250 * SAMPLERATE / 1000.0;
     long long button_pressed_timedelta = 0;
     bool transition_to_overwrite_flag = false;
     bool overwrite_triggered_flag = false;
     float overwrite_start_position = 0;
     int overwrite_copying_position = 0;
 
-    float s_phase = 0;
-
     ADSR fading_adsr;
+    ADSR speedup_adsr;
 
-    const int scenes = 4;
-    int current_scene = 0;
-    int previous_scene = 0;
+    int active_channel = 0;
+
+    int bpm = 100;
 
     unsigned int doubling_progress = 0;
     unsigned int doubling_size = 0;
     const unsigned int max_doubling_stepsize = 8192;
     const unsigned int max_loop_size = TAPE_MAX_MINUTES*60*SAMPLERATE;
 
-    std::vector<int> looper_states;
-    std::vector<float> positions;
-    std::vector<float> old_positions;
+    int32_t loop_start;
+    int32_t loop_end;
+    int32_t loop_size;
+    float position;
+    float old_position;
+    float base_loop_size = -1;
+    const float display_div_step = 20.0;
+
+    float cassete_phase = 0;
+
+    int state;
     float speed = 1.0;
 
     std::vector<float> regular_spline_buffer;
@@ -107,7 +60,7 @@ class Tape : public AudioEffect {
 
     float level = 1;
 
-//    std::vector<float> audio;
+    bool isplaying = false;
 
     std::vector<std::vector<float>> audios;
 
@@ -119,12 +72,12 @@ class Tape : public AudioEffect {
 
     bool monitoring = true;
 
-    Sync * sync;
-
     WavFile<float> wf;
     int savingprogress = 0;
 
     std::atomic<float> amp;
+
+    SampleKit * click;
 
 public:
 
@@ -139,7 +92,6 @@ public:
     static const float looper_ratio;
 
     Tape();
-    Tape(Sync * sync);
 
     MIDISTATUS trig(uint8_t v);
     MIDISTATUS clear();
@@ -155,31 +107,40 @@ public:
 
     static float InterpolateHermite4pt3oX(float x0, float x1, float x2, float x3, float t);
 
-    static inline void incrementPosition(float & position, std::vector<float> & audio, unsigned int nframes, float speed) {
-        position += speed * static_cast<float>(nframes);
-        if (position >= audio.size() / 2) position -= audio.size() / 2;
+    inline void incrementPosition(float & position, unsigned int nframes, float speed_) {
+        position += speed_ * nframes;
+        if (position >= loop_end) position -= loop_size;
+        if (isnan(position)) {
+            std::cout << speed_ << "\n";
+        }
     }
 
-    static inline void getSampleAtPosition(std::vector<float> & audio, float position, float & lsample, float & rsample) {
-        int p0 = (int)position - 1;
-        int p1 = (int)position + 0;
-        int p2 = (int)position + 1;
-        int p3 = (int)position + 2;
-        if (p0 < 0) p0 = static_cast<int>(audio.size() / 2) + p0;
-        if (p2 >= audio.size() / 2) p2 -= static_cast<int>(audio.size() / 2);
-        if (p3 >= audio.size() / 2) p3 -= static_cast<int>(audio.size() / 2);
+    inline void getSampleAtPosition(std::vector<float> & audio, float position_, float & lsample, float & rsample) {
+        int p0 = (int)position_ - 1;
+        int p1 = (int)position_ + 0;
+        int p2 = (int)position_ + 1;
+        int p3 = (int)position_ + 2;
+        if (p0 < loop_start) p0 = loop_size + p0;
+        if (p2 >= loop_end) p2 -= loop_size;
+        if (p3 >= loop_end) p3 -= loop_size;
 
         lsample = InterpolateHermite4pt3oX(audio[p0*2 + 0],
                                         audio[p1*2 + 0],
                                         audio[p2*2 + 0],
                                         audio[p3*2 + 0],
-                                        position - (int)position);
+                                        position_ - (int)position_);
+
+//        if (isnan(lsample)) {
+//            std::cout << p0*2 << " " << p1*2 << " " << p2*2 << " " << p3*2 << "\n";
+//            std::cout << audio[p0 * 2 + 0] << " " << audio[p1 * 2 + 0] << " " << audio[p2 * 2 + 0] << " "
+//                      << audio[p3 * 2 + 0] << "\n";
+//        }
 
         rsample = InterpolateHermite4pt3oX(audio[p0*2 + 1],
                                         audio[p1*2 + 1],
                                         audio[p2*2 + 1],
                                         audio[p3*2 + 1],
-                                        position - (int)position);
+                                        position_ - (int)position_);
     }
 
     static inline void updateSplineBuffer(std::vector<float> & spline_buffer, float lsample, float rsample) {
@@ -193,40 +154,46 @@ public:
         }
     }
 
-    static inline void setSampleAtPosition(std::vector<float> & audio, std::vector<float> & spline_buffer,
-                                           float position, float lsample, float rsample, float speed, bool recording) {
+    inline void updateInactiveChannels(float (&outBufs)[TAPE_NUM_CHANNELS][BUF_SIZE * 2], unsigned int i, float position_) {
+        float lsample, rsample;
+        for (int j = 0; j < TAPE_NUM_CHANNELS; j ++) {
+            if (j == active_channel) continue;
+            getSampleAtPosition(audios[j], position_, lsample, rsample);
+            outBufs[j][i + 0] = lsample;
+            outBufs[j][i + 1] = rsample;
+        }
+    }
 
-        if (recording) {
-            audio.push_back(lsample);
-            audio.push_back(rsample);
-        } else {
-            float p1 = position - 2;
-            float p2 = position - 1;
+    inline void setSampleAtPosition(std::vector<float> & audio, std::vector<float> & spline_buffer,
+                                    float position_, float speed_) {
 
-            if (p1 < 0) p1 += audio.size();
-            if (p2 < 0) p2 += audio.size();
+        float p1 = position_ - 2;
+        float p2 = position_ - 1;
 
-            float t = ((int) p2 - p1) / speed;
-            if ((int)p2 < (int)p1) t = (audio.size() - p1) / speed;
+        if (p1 < 0) p1 += loop_size;
+        if (p2 < 0) p2 += loop_size;
 
-            if ((int)p1 != (int)p2) {
-                lsample = InterpolateHermite4pt3oX(spline_buffer[0],
-                                                   spline_buffer[2],
-                                                   spline_buffer[4],
-                                                   spline_buffer[6],
-                                                   t);
+        float t = ((int) p2 - p1) / speed_;
+        if ((int)p2 < (int)p1) t = (loop_size - p1) / speed_;
 
-                rsample = InterpolateHermite4pt3oX(spline_buffer[1],
-                                                   spline_buffer[3],
-                                                   spline_buffer[5],
-                                                   spline_buffer[7],
-                                                   t);
-                audio[(int) p2 * 2 + 0] = lsample;
-                audio[(int) p2 * 2 + 1] = rsample;
-            } else if (fabs(p2 - (int)p2) < 1e-10) {
-                audio[(int) p2 * 2 + 0] = spline_buffer[2];
-                audio[(int) p2 * 2 + 1] = spline_buffer[3];
-            }
+        if ((int)p1 != (int)p2) {
+            float lsample_ = InterpolateHermite4pt3oX(spline_buffer[0],
+                                               spline_buffer[2],
+                                               spline_buffer[4],
+                                               spline_buffer[6],
+                                               t);
+
+            float rsample_ = InterpolateHermite4pt3oX(spline_buffer[1],
+                                               spline_buffer[3],
+                                               spline_buffer[5],
+                                               spline_buffer[7],
+                                               t);
+
+            audio[(int) p2 * 2 + 0] = lsample_;
+            audio[(int) p2 * 2 + 1] = rsample_;
+        } else if (fabs(p2 - (int)p2) < 1e-10) {
+            audio[(int) p2 * 2 + 0] = spline_buffer[2];
+            audio[(int) p2 * 2 + 1] = spline_buffer[3];
         }
     }
 

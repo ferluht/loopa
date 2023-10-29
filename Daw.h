@@ -12,7 +12,6 @@
 #include <unistd.h>
 #include <chrono>
 #include <mutex>
-#include <LoopMatrix/LoopMatrix.h>
 
 #define SLEEP( milliseconds ) usleep( (unsigned long) (milliseconds * 1000.0) )
 
@@ -28,6 +27,7 @@ class DAW : public AMG{
     int previous_screen;
     int current_screen;
     bool screen_toggle = false;
+    bool isplaying = false;
 
     Rack * master_fx;
 
@@ -41,6 +41,7 @@ public:
         midiMap = new MIDIMap();
         midiMap->addHardwareControl("CTRL", MIDI::GENERAL::CC_HEADER, 100);
         midiMap->addHardwareControl("SHIFT", MIDI::GENERAL::CC_HEADER, 101);
+        midiMap->addHardwareControl("PAGE", MIDI::GENERAL::CC_HEADER, 102);
         midiMap->addHardwareControl("COPY", MIDI::GENERAL::CC_HEADER, 66);
 
         midiMap->addHardwareControl("P0", MIDI::GENERAL::CC_HEADER, 110);
@@ -57,12 +58,14 @@ public:
         midiMap->addHardwareControl("LOOP", MIDI::GENERAL::CC_HEADER, 65);
 //        midiMap->addHardwareControl("SAVE", MIDI::GENERAL::CC_HEADER, 66);
 
+        midiMap->addMapping({"CTRL"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::TAPE::PLAY);
+
         midiMap->addMapping({"SHIFT", "K1"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::LEFT);
         midiMap->addMapping({"SHIFT", "K2"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::DOWN);
-        midiMap->addMapping({"SHIFT", "CTRL", "K2"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::DOWNDOWN);
+//        midiMap->addMapping({"SHIFT", "CTRL", "K2"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::DOWNDOWN);
         midiMap->addMapping({"SHIFT", "K3"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::RIGHT);
         midiMap->addMapping({"SHIFT", "K4"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::SAVE);
-        midiMap->addMapping({"SHIFT", "CTRL", "K4"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::UPUP);
+//        midiMap->addMapping({"SHIFT", "CTRL", "K4"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::UPUP);
 
         midiMap->addMapping({"ALT"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::ALT_PARAMS);
         midiMap->addMapping({"SHIFT", "LOOP"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::LOOP_SCREEN);
@@ -71,8 +74,8 @@ public:
             auto kn = "P" + std::to_string(i);
             midiMap->addMapping({kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::TAPE::TRIG);
             midiMap->addMapping({"SHIFT", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::TAPE::CLEAR);
-            midiMap->addMapping({"CTRL", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::TAPE::DOUBLE);
-            midiMap->addMapping({"SHIFT", "CTRL", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::TAPE::STOP);
+//            midiMap->addMapping({"CTRL", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::TAPE::DOUBLE);
+//            midiMap->addMapping({"SHIFT", "CTRL", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::TAPE::STOP);
             midiMap->addMapping({"COPY", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::COPY);
             midiMap->addMapping({"LOOP", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::SELECT_SCENE);
             midiMap->addMapping({"LOOP", "COPY", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::COPY_SCENE);
@@ -192,10 +195,10 @@ public:
                     previous_screen = current_screen;
                     if (current_screen != FSCREEN::LOOP) {
                         current_screen = FSCREEN::LOOP;
-                        tapes->select_screen(1);
+//                        tapes->select_screen(1);
                     } else {
                         current_screen = FSCREEN::MAIN;
-                        tapes->select_screen(0);
+//                        tapes->select_screen(0);
                     }
                     screenchange_time = std::chrono::steady_clock::now();
                 }
@@ -204,8 +207,8 @@ public:
                 auto timedelta = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - screenchange_time).count();
                 if (timedelta > 300) {
                     current_screen = previous_screen;
-                    if (current_screen == FSCREEN::MAIN) tapes->select_screen(0);
-                    else if (current_screen == FSCREEN::LOOP) tapes->select_screen(1);
+//                    if (current_screen == FSCREEN::MAIN) tapes->select_screen(0);
+//                    else if (current_screen == FSCREEN::LOOP) tapes->select_screen(1);
                 }
                 screen_toggle = false;
             }
@@ -213,16 +216,16 @@ public:
         });
 
         tracks = spawnTracksRack(n_tracks);
-        tapes = new LoopMatrix();
+        tape = new Tape();
 
         master_fx = new Rack("MASTER FX", Rack::SELECTIVE);
         master_fx->add(new Scale());
-        master_fx->add(tapes);
+        master_fx->add(tape);
 
-        tapes->addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::SAVE, [this](MData &cmd) -> MIDISTATUS {
+        tape->addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::SAVE, [this](MData &cmd) -> MIDISTATUS {
             if (cmd.data2 > 0) {
-                if (tapes->save()) return MIDISTATUS::DONE;
-                else return MIDISTATUS::WAITING;
+//                if (tape->save()) return MIDISTATUS::DONE;
+//                else return MIDISTATUS::WAITING;
             }
             return MIDISTATUS::DONE;
         });
@@ -260,7 +263,7 @@ private:
     static Rack * spawnEffectRack();
 
     Rack * tracks;
-    LoopMatrix * tapes;
+    Tape * tape;
     Rack * focus_rack;
     int focus_rack_depth = 0;
 

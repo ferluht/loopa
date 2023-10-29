@@ -73,7 +73,7 @@ add_executable(rpidaw
         instruments/MicInput/MicInput.cpp
         3rdparty/Adafruit-GFX-offscreen/Adafruit_GFX.cpp
         Gui.cpp
-        effects_audio/LoopMatrix/LoopMatrix.cpp
+#        effects_audio/LoopMatrix/LoopMatrix.cpp
         effects_master/MasterEffects.cpp
         effects_audio/Tanhx/Tanhx.cpp)
 
