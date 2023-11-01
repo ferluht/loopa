@@ -24,7 +24,7 @@ Sampler::Sampler(const char * name, const char * sample_name_, int8_t note) : Po
     addParameter("PITCH");
     voices = addParameter("VOICS", 0.4);
     addParameter("FILTR");
-    decay = addParameter("DECAY", 0.875);
+    decay = addParameter("DECAY", 0.15);
 
 //    trig = new GUI::TapButton("trig", [this] (bool state) {triggered = true;});
 //    trig->GPlace({0.75, 0.75});
@@ -51,7 +51,7 @@ void Sampler::updateVoice(SamplerState *state, MData &md) {
             state->transient = true;
             state->alpha = 0.001;
         }
-        state->adsr.set(0.01, 0.1, 1.0, decay->value * 40);
+        state->adsr.set(0.01, 0.1, 1.0, decay->value * 5);
         state->adsr.gateOn();
         state->time = 0;
         state->enable();

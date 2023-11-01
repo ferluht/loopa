@@ -162,6 +162,25 @@ bool WavFile<T>::setAudioBuffer (std::vector<float>& newBuffer, int numChannels)
 
 //=============================================================
 template <class T>
+bool WavFile<T>::appendAudioBuffer (const float * newBuffer, unsigned int numSamples, int numChannels)
+{
+    // set the number of channels
+    samples.resize(numChannels);
+    int prev_size = samples[0].size();
+
+    for (int k = 0; k < numChannels; k++)
+        samples[k].resize(prev_size + numSamples);
+
+    for (int i = 0; i < numSamples; i ++)
+        for (int k = 0; k < numChannels; k++) {
+            samples[k][prev_size + i] = newBuffer[i * numChannels + k];
+        }
+
+    return false;
+}
+
+//=============================================================
+template <class T>
 void WavFile<T>::setAudioBufferSize (int numChannels, int numSamples)
 {
     samples.resize (numChannels);
@@ -929,3 +948,186 @@ T WavFile<T>::clamp (T value, T minValue, T maxValue)
 //===========================================================
 template class WavFile<float>;
 template class WavFile<double>;
+
+template <class T>
+StreamRecorder<T>::StreamRecorder() {
+
+}
+
+template <class T>
+void StreamRecorder<T>::dumpFiledata() {
+    if (outputFile->is_open()) {
+        outputFile->write(reinterpret_cast<const char *>(fileData.data()), sizeof(char) * fileData.size());
+    }
+    fileData.clear();
+}
+
+template <class T>
+void StreamRecorder<T>::openFile(std::string path) {
+    int32_t dataChunkSize = samples_written * (num_channels * bit_depth / 8);
+    if (dataChunkSize == 0) dataChunkSize = 10 * SAMPLERATE * (num_channels * bit_depth / 8);
+    int32_t fileSizeInBytes = 4 + 24 + 8 + dataChunkSize;
+
+    fileData.clear();
+
+    // -----------------------------------------------------------
+    // HEADER CHUNK
+    addStringToFileData (fileData, "RIFF");
+
+    // The file size in bytes is the header chunk size (4, not counting RIFF and WAVE) + the format
+    // chunk size (24) + the metadata part of the data chunk plus the actual data chunk size
+    addInt32ToFileData (fileData, fileSizeInBytes);
+
+    addStringToFileData (fileData, "WAVE");
+
+    // -----------------------------------------------------------
+    // FORMAT CHUNK
+    addStringToFileData (fileData, "fmt ");
+    addInt32ToFileData (fileData, 16); // format chunk size (16 for PCM)
+    addInt16ToFileData (fileData, 1); // audio format = 1
+    addInt16ToFileData (fileData, (int16_t)num_channels); // num channels
+    addInt32ToFileData (fileData, (int32_t)SAMPLERATE); // sample rate
+
+    int32_t numBytesPerSecond = (int32_t) ((num_channels * SAMPLERATE * bit_depth) / 8);
+    addInt32ToFileData (fileData, numBytesPerSecond);
+
+    int16_t numBytesPerBlock = num_channels * (bit_depth / 8);
+    addInt16ToFileData (fileData, numBytesPerBlock);
+
+    addInt16ToFileData (fileData, (int16_t)bit_depth);
+
+    // -----------------------------------------------------------
+    // DATA CHUNK
+    addStringToFileData (fileData, "data");
+    addInt32ToFileData (fileData, dataChunkSize);
+
+    if (outputFile != nullptr && outputFile->is_open())
+        outputFile->seekp(0, std::fstream::beg);
+    else
+        outputFile = new std::ofstream(path, std::ios::binary);
+
+    dumpFiledata();
+}
+
+template <class T>
+void StreamRecorder<T>::writeSamples(T *samples, unsigned int numSamples) {
+
+    for (int i = 0; i < numSamples * num_channels; i++) {
+        if (bit_depth == 8) {
+            uint8_t byte = sampleToSingleByte(samples[i]);
+            fileData.push_back(byte);
+        } else if (bit_depth == 16) {
+            int16_t sampleAsInt = sampleToSixteenBitInt(samples[i]);
+            addInt16ToFileData(fileData, sampleAsInt);
+        } else if (bit_depth == 24) {
+            int32_t sampleAsIntAgain = (int32_t) (samples[i] * (T) 8388608.);
+
+            uint8_t bytes[3];
+            bytes[2] = (uint8_t) (sampleAsIntAgain >> 16) & 0xFF;
+            bytes[1] = (uint8_t) (sampleAsIntAgain >> 8) & 0xFF;
+            bytes[0] = (uint8_t) sampleAsIntAgain & 0xFF;
+
+            fileData.push_back(bytes[0]);
+            fileData.push_back(bytes[1]);
+            fileData.push_back(bytes[2]);
+        } else {
+            assert (false && "Trying to write a file with unsupported bit depth");
+        }
+    }
+
+    samples_written += numSamples;
+    dumpFiledata();
+}
+
+template <class T>
+void StreamRecorder<T>::closeFile() {
+    dumpFiledata();
+    outputFile->close();
+    outputFile = nullptr;
+    samples_written = 0;
+}
+
+
+//=============================================================
+template <class T>
+void StreamRecorder<T>::addStringToFileData (std::vector<uint8_t>& fileData, std::string s)
+{
+    for (int i = 0; i < s.length();i++)
+        fileData.push_back ((uint8_t) s[i]);
+}
+
+//=============================================================
+template <class T>
+void StreamRecorder<T>::addInt32ToFileData (std::vector<uint8_t>& fileData, int32_t i, Endianness endianness)
+{
+    uint8_t bytes[4];
+
+    if (endianness == Endianness::LittleEndian)
+    {
+        bytes[3] = (i >> 24) & 0xFF;
+        bytes[2] = (i >> 16) & 0xFF;
+        bytes[1] = (i >> 8) & 0xFF;
+        bytes[0] = i & 0xFF;
+    }
+    else
+    {
+        bytes[0] = (i >> 24) & 0xFF;
+        bytes[1] = (i >> 16) & 0xFF;
+        bytes[2] = (i >> 8) & 0xFF;
+        bytes[3] = i & 0xFF;
+    }
+
+    for (int i = 0; i < 4; i++)
+        fileData.push_back (bytes[i]);
+}
+
+//=============================================================
+template <class T>
+void StreamRecorder<T>::addInt16ToFileData (std::vector<uint8_t>& fileData, int16_t i, Endianness endianness)
+{
+    uint8_t bytes[2];
+
+    if (endianness == Endianness::LittleEndian)
+    {
+        bytes[1] = (i >> 8) & 0xFF;
+        bytes[0] = i & 0xFF;
+    }
+    else
+    {
+        bytes[0] = (i >> 8) & 0xFF;
+        bytes[1] = i & 0xFF;
+    }
+
+    fileData.push_back (bytes[0]);
+    fileData.push_back (bytes[1]);
+}
+
+//=============================================================
+template <class T>
+int16_t StreamRecorder<T>::sampleToSixteenBitInt (T sample)
+{
+    sample = clamp (sample, -1., 1.);
+    return static_cast<int16_t> (sample * 32767.);
+}
+
+//=============================================================
+template <class T>
+uint8_t StreamRecorder<T>::sampleToSingleByte (T sample)
+{
+    sample = clamp (sample, -1., 1.);
+    sample = (sample + 1.) / 2.;
+    return static_cast<uint8_t> (sample * 255.);
+}
+
+//=============================================================
+template <class T>
+T StreamRecorder<T>::clamp (T value, T minValue, T maxValue)
+{
+    value = std::min (value, maxValue);
+    value = std::max (value, minValue);
+    return value;
+}
+
+//===========================================================
+template class StreamRecorder<float>;
+template class StreamRecorder<double>;

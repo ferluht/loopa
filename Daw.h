@@ -31,6 +31,11 @@ class DAW : public AMG{
 
     Rack * master_fx;
 
+    WavFile<float> wf;
+    StreamRecorder<float> sr;
+
+    bool recording_master = false;
+
 public:
 
     DAW(GFXcanvas1 * screen_) : DAW(3, 4, screen_) {};
@@ -41,6 +46,7 @@ public:
         midiMap = new MIDIMap();
         midiMap->addHardwareControl("CTRL", MIDI::GENERAL::CC_HEADER, 100);
         midiMap->addHardwareControl("SHIFT", MIDI::GENERAL::CC_HEADER, 101);
+        midiMap->addHardwareControl("REC", MIDI::GENERAL::CC_HEADER, 102);
         midiMap->addHardwareControl("COPY", MIDI::GENERAL::CC_HEADER, 66);
 
         midiMap->addHardwareControl("P0", MIDI::GENERAL::CC_HEADER, 110);
@@ -56,6 +62,8 @@ public:
         midiMap->addHardwareControl("ALT", MIDI::GENERAL::CC_HEADER, 64);
         midiMap->addHardwareControl("LOOP", MIDI::GENERAL::CC_HEADER, 65);
 //        midiMap->addHardwareControl("SAVE", MIDI::GENERAL::CC_HEADER, 66);
+
+        midiMap->addMapping({"REC"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::REC);
 
         midiMap->addMapping({"SHIFT", "K1"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::LEFT);
         midiMap->addMapping({"SHIFT", "K2"}, MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::DOWN);
@@ -77,6 +85,31 @@ public:
             midiMap->addMapping({"LOOP", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::SELECT_SCENE);
             midiMap->addMapping({"LOOP", "COPY", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::COPY_SCENE);
         }
+
+        addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::REC, [this](MData &cmd) -> MIDISTATUS {
+            if (cmd.data2 > 0) {
+                if (recording_master) {
+                    recording_master = false;
+                    sr.openFile("");
+                    sr.closeFile();
+                } else {
+                    auto t = std::time(nullptr);
+                    auto tm = *std::localtime(&t);
+
+                    std::ostringstream oss;
+                    oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+                    auto timestr = oss.str();
+
+                    std::string savedir = "../res/saved/" + timestr;
+
+                    mkdir(savedir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+                    sr.openFile(savedir + "/master.wav");
+                    recording_master = true;
+                }
+            }
+            return MIDISTATUS::DONE;
+        });
 
         addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::LEFT, [this](MData &cmd) -> MIDISTATUS {
             if (cmd.data2 > 0) {

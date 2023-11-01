@@ -26,6 +26,7 @@
 #include <vector>
 #include <assert.h>
 #include <string>
+#include <A.h>
 
 
 //=============================================================
@@ -97,6 +98,8 @@ public:
      */
     bool setAudioBuffer (std::vector<float>& newBuffer, int numChannels);
 
+    bool appendAudioBuffer (const float * newBuffer, unsigned int numSamples, int numChannels);
+
     /** Sets the audio buffer to a given number of channels and number of samples per channel. This will try to preserve
      * the existing audio, adding zeros to any new channels or new samples in a given channel.
      */
@@ -125,6 +128,8 @@ public:
     AudioBuffer samples;
 
     int16_t sampleToSixteenBitInt (T sample);
+
+    void clearAudioBuffer();
 
 private:
 
@@ -155,9 +160,6 @@ private:
     bool saveToAiffFile (std::string filePath);
 
     //=============================================================
-    void clearAudioBuffer();
-
-    //=============================================================
     int32_t fourBytesToInt (std::vector<uint8_t>& source, int startIndex, Endianness endianness = Endianness::LittleEndian);
     int16_t twoBytesToInt (std::vector<uint8_t>& source, int startIndex, Endianness endianness = Endianness::LittleEndian);
     int getIndexOfString (std::vector<uint8_t>& source, std::string s);
@@ -186,4 +188,47 @@ private:
     WavFileFormat audioFileFormat;
     uint32_t sampleRate;
     int bitDepth;
+};
+
+
+/// @private
+template <class T>
+class StreamRecorder {
+
+    std::ofstream * outputFile = nullptr;
+    std::vector<uint8_t> fileData;
+    int num_channels = 2;
+    int bit_depth = 16;
+    unsigned int samples_written = 0;
+
+public:
+
+    //=============================================================
+    /** Constructor */
+    StreamRecorder();
+
+    void openFile(std::string path);
+    void writeSamples(T * samples, unsigned int numSamples);
+    void closeFile();
+
+    void dumpFiledata();
+
+    //=============================================================
+    enum class Endianness
+    {
+        LittleEndian,
+        BigEndian
+    };
+
+    //=============================================================
+    void addStringToFileData (std::vector<uint8_t>& fileData, std::string s);
+    void addInt32ToFileData (std::vector<uint8_t>& fileData, int32_t i, Endianness endianness = Endianness::LittleEndian);
+    void addInt16ToFileData (std::vector<uint8_t>& fileData, int16_t i, Endianness endianness = Endianness::LittleEndian);
+
+
+    uint8_t sampleToSingleByte (T sample);
+    int16_t sampleToSixteenBitInt (T sample);
+
+    T clamp(T value, T minValue, T maxValue);
+
 };

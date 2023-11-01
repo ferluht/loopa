@@ -44,6 +44,7 @@ namespace MIDI {
                 UPUP,
                 DOWNDOWN,
                 SAVE,
+                REC,
                 END = 10
             };
         }

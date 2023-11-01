@@ -15,6 +15,7 @@ GLFWwindow* window = nullptr;
 
 #define S1 100
 #define S2 101
+#define S3 102
 
 #define K1 60
 #define K2 61
@@ -87,6 +88,11 @@ public:
         } else if (key == 340) {
             cmd.status = MIDI::GENERAL::CC_HEADER;
             cmd.data1 = S2;
+            cmd.data2 = action ? 127 : 0;
+            mdaw->midiIn(cmd);
+        } else if (key == '\\') {
+            cmd.status = MIDI::GENERAL::CC_HEADER;
+            cmd.data1 = S3;
             cmd.data2 = action ? 127 : 0;
             mdaw->midiIn(cmd);
         } else if (key == 96) {

@@ -280,8 +280,8 @@ void loop() {
   process_bounce(&S2, CC_HEADER, CC_HEADER, 101);
   process_bounce(&S3, CC_HEADER, CC_HEADER, 102);
 
-//  process_bounce(&E1, CC_HEADER, CC_HEADER, 64);
-//  process_bounce(&E2, CC_HEADER, CC_HEADER, 64);
+  process_bounce(&E1, CC_HEADER, CC_HEADER, 107);
+  process_bounce(&E2, CC_HEADER, CC_HEADER, 108);
 
   if (OP.fallingEdge()) {
     octave ++;

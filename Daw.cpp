@@ -123,9 +123,13 @@ void DAW::process(float *outputBuffer, float *inputBuffer,
     }
 
     for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
-        *outputBuffer++ = buf[i + 0];
-        *outputBuffer++ = buf[i + 1];
+        outputBuffer[i + 0] = soft_clip(buf[i + 0]);
+        outputBuffer[i + 1] = soft_clip(buf[i + 1]);
         envelope(buf[i + 0], 0.01, 0.01);
+    }
+
+    if (recording_master) {
+        sr.writeSamples(outputBuffer, nBufferFrames);
     }
 }
 
@@ -228,6 +232,9 @@ void DAW::drawLoopScreen(GFXcanvas1 *screen) {
 }
 
 void DAW::draw(GFXcanvas1 * screen) {
+
+    screen->leds[3] = recording_master * 50;
+
     switch (current_screen) {
         case (FSCREEN::LOOP):
             drawLoopScreen(screen);

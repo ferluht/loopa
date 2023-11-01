@@ -223,8 +223,8 @@ void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
             for (unsigned int i = 0; i < 2*nBufferFrames; i += 2) {
                 float lsample, rsample;
                 float adsrval = fading_adsr.get();
-                lsample = soft_clip(inputBuffer[i+0] * adsrval);
-                rsample = soft_clip(inputBuffer[i+1] * adsrval);
+                lsample = inputBuffer[i+0] * adsrval;
+                rsample = inputBuffer[i+1] * adsrval;
                 updateSplineBuffer(regular_spline_buffer, lsample, rsample);
                 setSampleAtPosition(audio, regular_spline_buffer, position, lsample, rsample, speed, true);
                 position += speed;
@@ -238,8 +238,8 @@ void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
                 float lsample, rsample;
                 getSampleAtPosition(audio, position, lsample, rsample);
 
-                lsample = soft_clip(lsample + inputBuffer[i + 0] * adsrval);
-                rsample = soft_clip(rsample + inputBuffer[i + 1] * adsrval);
+                lsample = lsample + inputBuffer[i + 0] * adsrval;
+                rsample = rsample + inputBuffer[i + 1] * adsrval;
                 updateSplineBuffer(regular_spline_buffer, lsample, rsample);
                 setSampleAtPosition(audio, regular_spline_buffer, position, lsample, rsample, speed, false);
 
@@ -254,10 +254,10 @@ void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
                 float adsrval = fading_adsr.get();
                 float lsample, rsample;
                 getSampleAtPosition(audio, position, lsample, rsample);
-                outputBuffer[i + 0] = soft_clip(lsample + inputBuffer[i + 0] * adsrval);
-                outputBuffer[i + 1] = soft_clip(rsample + inputBuffer[i + 1] * adsrval);
-                lsample = soft_clip(lsample * (1 - adsrval) + inputBuffer[i + 0] * adsrval);
-                rsample = soft_clip(rsample * (1 - adsrval) + inputBuffer[i + 1] * adsrval);
+                outputBuffer[i + 0] = lsample + inputBuffer[i + 0] * adsrval;
+                outputBuffer[i + 1] = rsample + inputBuffer[i + 1] * adsrval;
+                lsample = lsample * (1 - adsrval) + inputBuffer[i + 0] * adsrval;
+                rsample = rsample * (1 - adsrval) + inputBuffer[i + 1] * adsrval;
                 updateSplineBuffer(regular_spline_buffer, lsample, rsample);
                 if (transition_to_overwrite_flag) {
                     overwrite_tmp_buffer.push_back(lsample);
@@ -284,8 +284,8 @@ void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
                                         rsample + inputBuffer[i + 1] * adsrval,
                                         speed, false);
                 }
-                outputBuffer[i + 0] = soft_clip(lsample + inputBuffer[i + 0]) * level;
-                outputBuffer[i + 1] = soft_clip(rsample + inputBuffer[i + 1]) * level;
+                outputBuffer[i + 0] = (lsample + inputBuffer[i + 0]) * level;
+                outputBuffer[i + 1] = (rsample + inputBuffer[i + 1]) * level;
                 incrementPosition(position, audio, 1, speed);
                 fading_adsr.process();
             }
