@@ -17,6 +17,9 @@
 #define CC_E1 105
 #define CC_E2 106
 
+#define E1_B 107
+#define E2_B 108
+
 enum MIDISTATUS {
     WAITING,
     DONE

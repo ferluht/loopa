@@ -112,12 +112,18 @@ public:
             if (cmd.data1 == CC_E2 && inputparams.size() > parampage * 2 + 1) inputparams[parampage * 2 + 1]->update(cmd.data2);
             return MIDISTATUS::DONE;
         });
+
+        addMIDIHandler({MIDI::GENERAL::CC_HEADER}, {E1_B, E2_B}, [this](MData &cmd) -> MIDISTATUS {
+            if (cmd.data1 == E1_B && cmd.data2 > 0 && parampage > 0) parampage --;
+            if (cmd.data1 == E2_B && cmd.data2 > 0 && parampage < inputparams.size() / 2 - 1) parampage ++;
+            return MIDISTATUS::DONE;
+        });
     }
 
     void draw(GFXcanvas1 * screen) override {
         for (int i = parampage * 2; i < parampage * 2 + 2; i ++) {
             if (inputparams.size() <= i) continue;
-            int xoffset = (int)(i / 2) * 46;
+            int xoffset = 46;
             int yoffset = (i % 2) * 10;
             screen->setCursor(4 + xoffset, 17 + yoffset);
             screen->setTextSize(1);

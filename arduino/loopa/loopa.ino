@@ -40,8 +40,8 @@ PolledEncoder enc2;
 #define S2_PIN 10
 #define S3_PIN 8
 
-#define E1_PIN 5
-#define E2_PIN 6
+#define E1_PIN 4
+#define E2_PIN 2
 
 #define OP_PIN 11
 #define OM_PIN 12
