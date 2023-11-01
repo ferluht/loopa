@@ -56,7 +56,7 @@ void Sampler::updateVoice(SamplerState *state, MData &md) {
         state->time = 0;
         state->enable();
 
-        set_voices((int)(voices->value * 5) + 1);
+//        set_voices((int)(voices->value * 5) + 1);
 //        std::cout << "note" << std::endl;
     }else{
         state->adsr.gateOff();

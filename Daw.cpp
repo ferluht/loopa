@@ -250,7 +250,7 @@ void DAW::draw(GFXcanvas1 * screen) {
 Rack *DAW::spawnTracksRack(int n) {
     Rack * tracks_ = new Rack("ARRANGEMENT",Rack::SELECTIVE);
 
-    for (int i = 0; i < 7; i ++) {
+    for (int i = 0; i < 8; i ++) {
         auto tr = spawnSingleTrack("TRACK", 0, i, 0);
         tr->attach(tracks_);
         tracks_->add(tr);

@@ -188,8 +188,8 @@ void LoopMatrix::draw_main_screen(GFXcanvas1 *screen) {
 void LoopMatrix::draw_fx_screen(GFXcanvas1 *screen) {
     for (int i = 0; i < m; i ++) {
         for (int j = 0; j < n; j ++) {
-            screen->drawCircle(105 + i * 13, 15 + (n-j-1) * 11, 3, 1);
-            if (i + j*m == focus_tape) screen->drawCircle(105 + i * 13, 15 + (n-j-1) * 11, 1, 1);
+            screen->drawCircle(105 + i * 13, 15 + j * 11, 3, 1);
+            if (i + j*m == focus_tape) screen->drawCircle(105 + i * 13, 15 + j * 11, 1, 1);
         }
     }
     draw_counter = (draw_counter + 1) % 10;
