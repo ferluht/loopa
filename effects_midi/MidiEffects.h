@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Scale.h"
+#include "Arpeggiator.h"
 
 class DummyMidiFX : public MIDIEffect {
 
@@ -14,8 +15,5 @@ public:
 
     }
 
-    void draw(GFXcanvas1 * screen) override {
-//        screen->print("NO MIDI FX");
-    }
 };
 

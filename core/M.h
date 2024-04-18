@@ -13,17 +13,16 @@
 #include <map>
 #include <functional>
 #include <algorithm>
+#include <iostream>
+#include <Screens.h>
 
 #define CC_E1 105
 #define CC_E2 106
 
-#define E1_B 107
-#define E2_B 108
+#define CC_E3 107
+#define CC_E4 108
 
-enum MIDISTATUS {
-    WAITING,
-    DONE
-};
+#define MIDI_QUEUE_SIZE 50
 
 namespace MIDI {
 
@@ -32,23 +31,37 @@ namespace MIDI {
         const uint8_t NOTEON_HEADER = 144;
         const uint8_t POLYPRESSURE_HEADER = 160;
         const uint8_t CC_HEADER = 176;
+        const uint8_t SHFT_HEADER = 200;
+        const uint8_t CTRL_HEADER = 201;
+        const uint8_t PAGE_HEADER = 202;
+        const uint8_t NOTE_HEADER = 203;
+        const uint8_t BUTN_HEADER = 204;
+        const uint8_t LOOP_HEADER = 205;
         const uint8_t PITCHWHEEL_HEADER = 224;
+        const uint8_t PATTERN_HEADER = 230;
+        const uint8_t INVALIDATED=255;
     }
+
+    enum KEYS {
+        C = 0, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B
+    };
 
     namespace UI {
 
+        enum {
+            PLAY_BUTTON,
+            REWIND_FORWARD_BUTTON,
+            REWIND_BACKWARD_BUTTON,
+            REC_BUTTON,
+            CLICK_BUTTON
+        };
+
         namespace DAW {
             enum {
-                START = 0,
-                LEFT,
-                RIGHT,
                 UP,
                 DOWN,
-                UPUP,
-                DOWNDOWN,
-                SAVE,
                 REC,
-                END = 10
+                DUMMY
             };
         }
 
@@ -59,26 +72,8 @@ namespace MIDI {
                 CLEAR,
                 DOUBLE,
                 STOP,
+                REC,
                 END = 20
-            };
-        }
-
-        namespace LOOPMATRIX {
-            enum {
-                START = 20,
-                COPY,
-                COPY_SCENE,
-                SELECT_SCENE,
-                END = 30
-            };
-        }
-
-        namespace SCREEN {
-            enum {
-                START = 30,
-                LOOP_SCREEN,
-                ALT_PARAMS,
-                END = 40
             };
         }
     }
@@ -86,7 +81,7 @@ namespace MIDI {
 }
 
 struct MData {
-    double beat;
+    uint16_t tick;
     unsigned char status;
     unsigned char data1;
     unsigned char data2;
@@ -97,8 +92,9 @@ struct MData {
 */
 class M {
 
-    std::map<uint8_t, std::map<uint8_t, int>> handlers;
-    std::vector<std::function<MIDISTATUS(MData&)>> handlers_array;
+    std::map<uint8_t, std::map<uint8_t, std::map<uint8_t, int>>> handlers;
+    std::vector<std::function<void(MData&, Sync&)>> handlers_array;
+    std::deque<MData> mq;
 
 public:
 
@@ -107,64 +103,25 @@ public:
     }
 
     /**
-     * Add MIDI handler for specific header
-     *
-     * @param header status (first) byte of midi command
-     * @param handler callback to call when matching midi header is received
-     */
-    void addMIDIHandler(uint8_t header, std::function<MIDISTATUS(MData&)> handler) {
-        addMIDIHandler(header, 0, 255, handler);
-    }
-
-    /**
-     * Add MIDI handler for set of headers
-     *
-     * @param headers set of midi headers
-     * @param handler callback to call when matching midi header is received
-     */
-    void addMIDIHandler(std::vector<uint8_t> headers, std::function<MIDISTATUS(MData&)> handler) {
-        addMIDIHandler(headers, 0, 255, handler);
-    }
-
-    /**
-     * Add MIDI handler for set of headers
-     *
-     * @param headers set of midi headers
-     * @param handler callback to call when matching midi header is received
-     */
-    void addMIDIHandler(uint8_t header, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
-        std::vector<uint8_t> headers;
-        headers.push_back(header);
-        addMIDIHandler(headers, code_start, code_end, handler);
-    }
-
-    /**
-     * Add MIDI handler for set of headers and range of codes [code_start .. code_end]
-     *
-     * @param headers set of midi headers
-     * @param code_start first midi code to include in handler
-     * @param code_end last midi code to include in handler
-     * @param handler callback to call when matching midi header and code are received
-     */
-    void addMIDIHandler(std::vector<uint8_t> headers, uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
-        std::vector<uint8_t> codes;
-        for (uint8_t c = code_start; c < code_end; c ++)
-            codes.push_back(c);
-        codes.push_back(code_end);
-        addMIDIHandler(headers, codes, handler);
-    }
-
-    /**
      * Add MIDI handler for range of headers [header_start .. header_end] and range of codes [code_start .. code_end]
      *
+     * @param screen_start first screen to include in handler
+     * @param screen_end last screen to include in handler
      * @param header_start first midi header to include in handler
      * @param header_end last midi header to include in handler
      * @param code_start first midi code to include in handler
      * @param code_end last midi code to include in handler
      * @param handler callback to call when matching midi header and code are received
      */
-    void addMIDIHandler(uint8_t header_start, uint8_t header_end,
-                        uint8_t code_start, uint8_t code_end, std::function<MIDISTATUS(MData&)> handler) {
+    void addMIDIHandler(uint8_t screen_start, uint8_t screen_end,
+                        uint8_t header_start, uint8_t header_end,
+                        uint8_t code_start, uint8_t code_end,
+                        std::function<void(MData&, Sync&)> handler) {
+        std::vector<uint8_t> screens;
+        for (uint8_t s = screen_start; s < screen_end; s ++)
+            screens.push_back(s);
+        screens.push_back(screen_end);
+
         std::vector<uint8_t> headers;
         for (uint8_t h = header_start; h < header_end; h ++)
             headers.push_back(h);
@@ -174,7 +131,7 @@ public:
         for (uint8_t c = code_start; c < code_end; c ++)
             codes.push_back(c);
         codes.push_back(code_end);
-        addMIDIHandler(headers, codes, handler);
+        addMIDIHandler(screens, headers, codes, handler);
     }
 
     /**
@@ -184,25 +141,31 @@ public:
      * @param codes set of midi codes
      * @param handler callback to call when matching midi header and code are received
      */
-    void addMIDIHandler(std::vector<uint8_t> headers, std::vector<uint8_t> codes, std::function<MIDISTATUS(MData&)> handler) {
+    void addMIDIHandler(std::vector<uint8_t> screens, std::vector<uint8_t> headers, std::vector<uint8_t> codes, std::function<void(MData&, Sync&)> handler) {
         handlers_array.push_back(handler);
+
+        if (screens.empty())
+            for (int i = 0; i < SCREENS::MAX_SCREENS; i ++)
+                screens.push_back(i);
+
+        if (headers.empty())
+            for (int i = 0; i < 128; i ++)
+                headers.push_back(i);
+
+        if (codes.empty())
+            for (int i = 0; i < 128; i ++)
+                codes.push_back(i);
+
         int handler_idx = handlers_array.size() - 1;
-        for (auto ith = headers.begin(); ith < headers.end(); ith ++)
-            for (auto itc = codes.begin(); itc < codes.end(); itc ++)
-                handlers[*ith][*itc] = handler_idx;
+        for (auto screen_idx : screens)
+            for (auto ith = headers.begin(); ith < headers.end(); ith ++)
+                for (auto itc = codes.begin(); itc < codes.end(); itc ++)
+                    handlers[screen_idx][*ith][*itc] = handler_idx;
     }
 
-    /**
-     * Add MIDI handler for just one header and one code
-     *
-     * @param header header
-     * @param code code
-     * @param handler callback to call when matching midi header and code are received
-     */
-    void addMIDIHandler(uint8_t header, uint8_t code, std::function<MIDISTATUS(MData&)> handler) {
-        handlers_array.push_back(handler);
-        int handler_idx = handlers_array.size() - 1;
-        handlers[header][code] = handler_idx;
+    inline void midiPassThru(MData& cmd) {
+        mq.push_back(cmd);
+        if (mq.size() > MIDI_QUEUE_SIZE) mq.pop_front();
     }
 
     /**
@@ -211,13 +174,30 @@ public:
      * If no callback exists just returns MIDISTATUS::DONE
      * @param cmd midi command
      */
-    virtual MIDISTATUS midiIn(MData& cmd) {
-        auto x = handlers.find(cmd.status);
-        if (x == handlers.end()) return MIDISTATUS::DONE;
+    virtual void midiIn(MData& cmd, Sync & sync) {
+        auto s = handlers.find(SCREEN_IDX);
+        if (s == handlers.end()) {
+            midiPassThru(cmd);
+            return;
+        }
+        auto x = s->second.find(cmd.status);
+        if (x == s->second.end()) {
+            midiPassThru(cmd);
+            return;
+        }
         auto xy = x->second.find(cmd.data1);
-        if (xy == x->second.end()) return MIDISTATUS::DONE;
+        if (xy == x->second.end()) {
+            midiPassThru(cmd);
+            return;
+        }
         int idx = xy->second;
-        return handlers_array[idx](cmd);
+        handlers_array[idx](cmd, sync);
+        if (cmd.status != MIDI::GENERAL::INVALIDATED) midiPassThru(cmd);
+    }
+
+    virtual void midiOut(std::deque<MData> &q, Sync & sync) {
+        q.insert(q.end(), mq.begin(), mq.end());
+        mq.clear();
     }
 };
 
@@ -250,7 +230,7 @@ private:
     std::string label;
     std::vector<std::pair<std::vector<std::pair<uint8_t, uint8_t>>, std::pair<uint8_t, uint8_t>>> ctrl_seqs;
 
-    void midiIn(MData &cmd) {
+    void midiIn(MData &cmd, Sync & sync) {
         value = cmd.data2;
     }
 
@@ -289,7 +269,7 @@ private:
  *
  * ...
  *
- * MIDIMap->midiIn(cmd);
+ * MIDIMap->midiIn(cmd, sync);
  * @endcode
  *
  * When pressed SHIFT, midiIn will not change cmd
@@ -349,14 +329,14 @@ public:
     /**
      * @private
      */
-    MIDISTATUS midiIn(MData& cmd) override {
+    void midiIn(MData& cmd, Sync & sync) override {
         auto x = imap.find(cmd.status);
-        if (x == imap.end()) return MIDISTATUS::DONE;
+        if (x == imap.end()) return;
         auto xy = x->second.find(cmd.data1);
-        if (xy == x->second.end()) return MIDISTATUS::DONE;
+        if (xy == x->second.end()) return;
         HardwareControl * ctrl = xy->second;
         if (ctrl) {
-            ctrl->midiIn(cmd);
+            ctrl->midiIn(cmd, sync);
             for (auto it = ctrl->ctrl_seqs.begin(); it < ctrl->ctrl_seqs.end(); it ++) {
                 bool flag = true;
                 for (auto xy = it->first.begin(); xy < it->first.end(); xy ++) {
@@ -371,6 +351,5 @@ public:
                 }
             }
         }
-        return MIDISTATUS::DONE;
     }
 };

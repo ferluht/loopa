@@ -19,7 +19,16 @@ public:
 
 class MIDIEffect : public Effect {
 public:
-    explicit MIDIEffect(char const * name) : Effect(name) {}
+
+    Parameter * ison;
+
+    explicit MIDIEffect(char const * name) : Effect(name) {
+        ison = addParameter("ENBL", {"FALSE", "TRUE"}, 1);
+    }
+
+    inline void enable(bool enabled) {
+        ison->value = enabled;
+    }
 };
 
 #endif //RPIDAW_EFFECT_H

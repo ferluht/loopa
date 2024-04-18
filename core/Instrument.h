@@ -37,7 +37,6 @@ template <class TVoiceState>
 class PolyInstrument : public Instrument {
 
     unsigned int num_voices = 6;
-    std::list<TVoiceState *> voices;
 
     std::mutex keyPressedLock;
 
@@ -53,6 +52,8 @@ class PolyInstrument : public Instrument {
 
 public:
 
+    std::list<TVoiceState *> voices;
+
     float base_note = 57.0;
     float power_base = 2.0;
     float semitones = 12.0;
@@ -62,23 +63,23 @@ public:
     float pitch = 0;
     float pitch_distance = 2.0;
 
+    bool clear_input = true;
+
     explicit PolyInstrument(const char * name) : Instrument(name){
         pitch = 0;
         for (int i = 0; i < num_voices; i++) voices.push_back(new TVoiceState());
 
-        addMIDIHandler({MIDI::GENERAL::NOTEON_HEADER, MIDI::GENERAL::NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler({}, {MIDI::GENERAL::NOTEON_HEADER, MIDI::GENERAL::NOTEOFF_HEADER}, {}, [this](MData &cmd, Sync &sync) -> void {
             keyPressed(cmd);
-            return MIDISTATUS::DONE;
         });
 
-        addMIDIHandler(MIDI::GENERAL::PITCHWHEEL_HEADER, [this](MData &cmd) -> MIDISTATUS {
+        addMIDIHandler({}, {MIDI::GENERAL::PITCHWHEEL_HEADER}, {}, [this](MData &cmd, Sync &sync) -> void {
             pitch = ((float)((cmd.data2 << 7) + cmd.data1) / 16384.f - 0.5) * 2 * pitch_distance;
-            return MIDISTATUS::DONE;
         });
     }
 
     void process(float *outputBuffer, float * inputBuffer,
-                 unsigned int nBufferFrames, double streamTime) override;
+                 unsigned int nBufferFrames, Sync & sync) override;
 
     void keyPressed(MData& md);
 
@@ -100,7 +101,7 @@ public:
     virtual void updateVoice(TVoiceState * voiceState, MData &cmd) {};
 
     virtual void processVoice(TVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
-                              unsigned int nBufferFrames, double streamTime, uint8_t nvoices) {};
+                              unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) {};
 
 };
 
@@ -149,16 +150,25 @@ void PolyInstrument<TVoiceState>::keyPressed(MData &md) {
 
 template <class TVoiceState>
 void PolyInstrument<TVoiceState>::process(float *outputBuffer, float * inputBuffer,
-                                unsigned int nBufferFrames, double streamTime)
+                                unsigned int nBufferFrames, Sync & sync)
 {
     keyPressedLock.lock();
 
+    if (clear_input) {
+        float j = -1;
+        for (unsigned int i = 0; i < 2 * nBufferFrames; i += 2) {
+            inputBuffer[i + 0] = 0.0001f * j;
+            inputBuffer[i + 1] = 0.0001f * j;
+            j *= -1;
+        }
+    }
+
     if (voices.empty()) {
-        processVoice(nullptr, outputBuffer, inputBuffer, nBufferFrames, streamTime, num_voices);
+        processVoice(nullptr, outputBuffer, inputBuffer, nBufferFrames, sync, num_voices);
     } else {
         for (auto it = voices.begin(); it != voices.end(); it++) {
             if (PERF_TESTING || (*it)->isActive())
-                processVoice(*it, outputBuffer, inputBuffer, nBufferFrames, streamTime, num_voices);
+                processVoice(*it, outputBuffer, inputBuffer, nBufferFrames, sync, num_voices);
         }
     }
 

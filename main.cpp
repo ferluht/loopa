@@ -3,12 +3,109 @@
 #include <iostream>
 #include <cstdlib>
 #include <signal.h>
-
-#include "Gui.h"
 #include "Daw.h"
+#include <CRC8.h>
+
+#ifdef __arm__
+#include <wiringSerial.h>
+#else
+#include <SerialPort.h>
+#endif
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 32
 
 DAW * daw;
-extern GFXcanvas1 * screen;
+GFXcanvas1 * screen = new GFXcanvas1(SCREEN_WIDTH, SCREEN_HEIGHT);
+int ardport, echoport=-1;
+uint8_t uartbuffer[256];
+uint8_t uartit = 0;
+bool debug_mode = false;
+
+void init_serial() {
+#ifdef __arm__
+    if((ardport=serialOpen("/dev/ttyS0", 115200))<0){
+        fprintf(stderr,"Unable to open serial device: %s\n",strerror(errno));
+        return;
+    }
+    if((echoport=serialOpen("/dev/ttyGS0", 115200))<0){
+        fprintf(stderr,"Unable to open serial device: %s\n",strerror(errno));
+        return;
+    }
+#else
+    if((ardport=openAndConfigureSerialPort("/dev/tty.usbmodem14401", 115200))<0){
+        fprintf(stderr,"Unable to open serial device: %s\n",strerror(errno));
+        return;
+    }
+#endif
+}
+
+void process_gui() {
+#ifdef __arm__
+    if (echoport > -1 && (serialDataAvail(echoport) > 0 || debug_mode)) {
+        debug_mode = true;
+        while (serialDataAvail(echoport) > 0) {
+            const char c = serialGetchar(echoport);
+            serialPutchar(ardport, c);
+        }
+    } else {
+        for (int i = 0; i < 128 * 32 / 8; i++)
+            serialPutchar(ardport, screen->getBuffer()[i]);
+
+        for (unsigned char led: screen->leds)
+            serialPutchar(ardport, led);
+
+        uint8_t crc = getCrc(0, screen->getBuffer(), 128 * 32 / 8);
+        crc = getCrc(crc, screen->leds, 18);
+        serialPutchar(ardport, crc);
+    }
+#else
+    for (int i = 6; i < 18; i ++) {
+        if (screen->leds[i] < 245) screen->leds[i] += 1;
+    }
+    writeSerialData(screen->getBuffer(), 128 * 32 / 8);
+    writeSerialData(screen->leds, 18);
+
+    uint8_t crc = getCrc(0, screen->getBuffer(), 128 * 32 / 8);
+    crc = getCrc(crc, screen->leds, 18);
+    writeSerialData(&crc, 1);
+#endif
+}
+
+void scan_buttons() {
+#ifdef __arm__
+    while (serialDataAvail(ardport) > 0) {
+        uartbuffer[uartit] = serialGetchar(ardport);
+        if (echoport > -1 && debug_mode) {
+            serialPutchar(echoport, uartbuffer[uartit]);
+        }
+#else
+    char buf;
+    while (readSerialData(&buf, 1) > 0) {
+        uartbuffer[uartit] = buf;
+#endif
+        if (uartbuffer[uartit] == '\n') {
+            MData cmd;
+            switch (uartbuffer[0]) {
+                case MIDI::GENERAL::CC_HEADER:
+                case MIDI::GENERAL::NOTEON_HEADER:
+                case MIDI::GENERAL::NOTEOFF_HEADER:
+                    cmd.status = uartbuffer[0];
+                    cmd.data1 = uartbuffer[1];
+                    cmd.data2 = uartbuffer[2];
+                    if (!debug_mode) daw->midiIn(cmd);
+                    break;
+                default:
+                    break;
+            }
+            uartit = 0;
+        } else {
+            uartit++;
+        }
+        if (uartit > 255) uartit = 0;
+    }
+//    flushSerialData();
+}
 
 void midiErrorCallback( RtMidiError::Type /*type*/, const std::string &errorText, void *) {
     std::cerr << "\nMidi Error: " << errorText << "\n\n";
@@ -34,29 +131,32 @@ void midicallback( double deltatime, std::vector< unsigned char > *message, void
 int audiocallback( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
                    double streamTime, RtAudioStreamStatus status, void *data )
 {
+    if (debug_mode) return 0;
+
     if ( status )
         std::cout << "Stream underflow detected!" << std::endl;
 
+    Sync sync;
     float *outBufferFloat = (float *) outputBuffer;
     float *inBufferFloat = (float *) inputBuffer;
-    daw->process(outBufferFloat, inBufferFloat, nBufferFrames, streamTime);
+    daw->process(outBufferFloat, inBufferFloat, nBufferFrames);
 
     return 0;
 }
 
-bool checkMidi(RtMidiIn * midiin) {
+bool checkMidiIn(RtMidiIn * midiin) {
     if (midiin->isPortOpen()) {
         unsigned int nPorts = midiin->getPortCount();
         if (nPorts < 2) {
             midiin->closePort();
-            std::cout << "midi port closed" << std::endl;
+            std::cout << "midi in port closed" << std::endl;
         }
     } else {
         unsigned int nPorts = midiin->getPortCount();
         if (nPorts < 2) return false;
         try {
             midiin->openPort(1);
-            std::cout << "midi port opened" << std::endl;
+            std::cout << "midi in port opened" << std::endl;
         } catch (RtMidiError &error) {
             error.printMessage();
         }
@@ -76,7 +176,6 @@ int main( int argc, char *argv[] )
 
     RtAudio::StreamOptions options;
 
-    // Specify our own error callback function.
 #ifdef __APPLE__
     RtAudio dac( RtAudio::MACOSX_CORE, &audioErrorCallback );
 #else
@@ -94,10 +193,8 @@ int main( int argc, char *argv[] )
 
     double *data = (double *) calloc( 2, sizeof( double ) );
 
-    // Tell RtAudio to output all messages, even warnings.
     dac.showWarnings( false );
 
-    // Set our stream parameters for output only.
     bufferFrames = BUF_SIZE;
     RtAudio::StreamParameters oParams;
     oParams.nChannels = 2;
@@ -116,10 +213,10 @@ int main( int argc, char *argv[] )
     options.flags = RTAUDIO_HOG_DEVICE;
     options.flags |= RTAUDIO_SCHEDULE_REALTIME;
 
-    init_gui();
+    init_serial();
 
     int it = 0;
-    const int div = 66;
+    const int div = 100;
     const int midi_refresh_time = 1;
 
     // An error in the openStream() function can be detected either by
@@ -141,17 +238,15 @@ int main( int argc, char *argv[] )
     while ( dac.isStreamRunning() == true ) {
 
         if (it == 0) {
-            checkMidi(&midiin);
+            checkMidiIn(&midiin);
             screen->fillScreen(0x00);
-            daw->draw(screen);
-            if (!process_gui()) break;
+            if (!debug_mode) daw->draw(screen);
+            process_gui();
         }
         scan_buttons();
         it = (it + 1) % div;
         SLEEP(midi_refresh_time);
     }
-
-    close_gui();
 
     cleanup:
     if ( dac.isStreamOpen() ) dac.closeStream();

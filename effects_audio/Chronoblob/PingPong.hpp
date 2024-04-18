@@ -40,5 +40,5 @@ public:
 
     void updateParam();
     void process(float *outputBuffer, float * inputBuffer,
-                 unsigned int nBufferFrames, double streamTime) override;
+                 unsigned int nBufferFrames, Sync & sync) override;
 };

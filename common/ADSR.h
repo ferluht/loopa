@@ -64,10 +64,20 @@ public:
     inline void gateOn() { gate = true; }
     inline void gateOff() { gate = false; }
 
+    inline bool ended() const { return stage == stageEnd && !gate; }
+
     inline float get() const { return env; }
+    inline float getAndProcess() {
+        float res = env;
+        process();
+        return res;
+    }
 
     inline bool end() const { return stage == stageEnd; }
     inline void forcePeak() { gate = true; stage = stageA; env = 1; phase = 1; }
 
     void process();
+    inline void process(unsigned int nframes) {
+        for (int i = 0; i < nframes; i ++) process();
+    }
 };

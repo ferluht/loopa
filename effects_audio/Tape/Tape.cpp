@@ -9,8 +9,8 @@ Tape::Tape() : Tape(nullptr){}
 Tape::Tape(Sync * sync) : AudioEffect("TAPE") {
     amp = 0;
 
-    if (sync) this->sync = sync;
-    else this->sync = new Sync();
+//    if (sync) this->sync = sync;
+//    else this->sync = new Sync();
 
     fading_adsr.set(0.01, 0.005, 1.0, 7);
 
@@ -22,24 +22,24 @@ Tape::Tape(Sync * sync) : AudioEffect("TAPE") {
         old_positions.push_back(0);
     }
 
-    sync->attachSyncCallback(this, [this](){ trig(127); });
+//    sync->attachSyncCallback(this, [this](){ trig(127); });
 
-    addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::TAPE::TRIG, [this](MData &cmd) -> MIDISTATUS {
+    addMIDIHandler({}, {MIDI::GENERAL::LOOP_HEADER}, {MIDI::UI::TAPE::TRIG}, [this](MData &cmd, Sync &sync) -> MIDISTATUS {
         return trig(cmd.data2);
         return MIDISTATUS::DONE;
     });
 
-    addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::TAPE::CLEAR, [this](MData &cmd) -> MIDISTATUS {
+    addMIDIHandler({}, {MIDI::GENERAL::LOOP_HEADER}, {MIDI::UI::TAPE::CLEAR}, [this](MData &cmd, Sync &sync) -> MIDISTATUS {
         if (cmd.data2 > 0) return clear();
         return MIDISTATUS::DONE;
     });
 
-    addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::TAPE::DOUBLE, [this](MData &cmd) -> MIDISTATUS {
+    addMIDIHandler({}, {MIDI::GENERAL::LOOP_HEADER}, {MIDI::UI::TAPE::DOUBLE}, [this](MData &cmd, Sync &sync) -> MIDISTATUS {
         if (cmd.data2 > 0) return double_loop();
         return MIDISTATUS::DONE;
     });
 
-    addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::TAPE::STOP, [this](MData &cmd) -> MIDISTATUS {
+    addMIDIHandler({}, {MIDI::GENERAL::LOOP_HEADER}, {MIDI::UI::TAPE::STOP}, [this](MData &cmd, Sync &sync) -> MIDISTATUS {
 //        looper_state = STOP;
         if (cmd.data2 > 0)
             level = std::abs(level - 1.0);
@@ -64,7 +64,7 @@ MIDISTATUS Tape::trig(uint8_t v) {
     switch (looper_state) {
         case STOP:
             if (v > 0) {
-                if (sync->wait(this)) break;
+//                if (sync->wait(this)) break;
                 if (!audio.empty()) looper_state = PLAY;
                 else {
                     looper_state = REC;
@@ -76,7 +76,7 @@ MIDISTATUS Tape::trig(uint8_t v) {
             break;
         case REC:
             if (v > 0) {
-                if (sync->wait(this)) break;
+//                if (sync->wait(this)) break;
                 looper_state = OVERDUB;
             }
             break;
@@ -120,7 +120,7 @@ MIDISTATUS Tape::clear() {
     if (looper_states[current_scene] == PLAY) {
         looper_states[current_scene] = STOP;
         audios[current_scene].clear();
-        sync->inactivate(this);
+//        sync->inactivate(this);
         positions[current_scene] = 0;
         avg = 0;
         speed = 1;
@@ -318,7 +318,7 @@ void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
 
     for (int i = 0; i < scenes; i ++)
         if (positions[i] < old_positions[i]) {
-            sync->send(this);
+//            sync->send(this);
             break;
         }
 
@@ -329,39 +329,6 @@ void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
     if (m < 0) m = 0;
     float alpha = 0.02;
     amp = m * alpha + (1 - alpha) * amp;
-}
-
-void Tape::draw(GFXcanvas1 * screen) {
-//    nvgCircle(vg, 50, 16, 10);
-//    nvgCircle(vg, 78, 16, 10);
-//
-//    nvgCircle(vg, 50, 16, 6);
-//    nvgCircle(vg, 78, 16, 6);
-//
-//    nvgCircle(vg, 50, 16, 2.5);
-//    nvgCircle(vg, 78, 16, 2.5);
-//
-//    nvgMoveTo(vg, 50, 26);
-//    nvgLineTo(vg, 78, 26);
-//
-//    for (int i = 0; i < 5; i++) {
-//        nvgMoveTo(vg, 50 + 3 * std::cos(phase + M_PI * 2 / 5 * i), 16 + 3 * std::sin(phase + M_PI * 2 / 5 * i));
-//        nvgLineTo(vg, 50 + 10 * std::cos(phase + M_PI * 2 / 5 * i), 16 + 10 * std::sin(phase + M_PI * 2 / 5 * i));
-//
-//        nvgMoveTo(vg, 78 + 3 * std::cos(phase + M_PI * 2 / 5 * i), 16 + 3 * std::sin(phase + M_PI * 2 / 5 * i));
-//        nvgLineTo(vg, 78 + 10 * std::cos(phase + M_PI * 2 / 5 * i), 16 + 10 * std::sin(phase + M_PI * 2 / 5 * i));
-//    }
-//
-//    nvgRoundedRect(vg, 38, 4, 51, 24, 4);
-//
-//    nvgCircle(vg, 64, 22, 2);
-//
-//    nvgStrokeWidth(vg, 1);
-//    nvgStrokeColor(vg, nvgRGB(255, 255, 255));
-//    nvgStroke(vg);
-//
-//    phase += 0.1;
-//    if (phase > M_PI * 2) phase = 0;
 }
 
 float Tape::getPosition() {

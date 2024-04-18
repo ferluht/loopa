@@ -21,7 +21,7 @@ public:
     void setAlpha(float alpha);
 
     void process(float *outputBuffer, float * inputBuffer,
-                 unsigned int nBufferFrames, double streamTime) override {
+                 unsigned int nBufferFrames, Sync & sync) override {
         for (unsigned int i=0; i<nBufferFrames; i+=2 ) {
             outputBuffer[i+0] = soft_clip(inputBuffer[i+0]);
             outputBuffer[i+1] = soft_clip(inputBuffer[i+1]);

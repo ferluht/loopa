@@ -33,6 +33,6 @@ public:
     void updateVoice(SimpleInstrumentVoiceState * voiceState, MData &cmd) override;
 
     void processVoice(SimpleInstrumentVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
-        unsigned int nBufferFrames, double streamTime, uint8_t nvoices) override;
+        unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) override;
 };
 

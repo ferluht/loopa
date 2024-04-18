@@ -233,8 +233,8 @@ public:
     bool save(std::string path);
 
     void process(float *outputBuffer, float * inputBuffer,
-                 unsigned int nBufferFrames, double streamTime) override;
-    void draw(GFXcanvas1 * screen) override;
+                 unsigned int nBufferFrames, Sync & sync) override;
+
     float getPosition();
     int getState();
     float getAmp();

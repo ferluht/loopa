@@ -6,19 +6,17 @@
 
 Plateau::Plateau() : AudioEffect("PLATEAU") {
     dattorro = new Dattorro();
-    dattorro->size = 0.95;
-    dattorro->decay = 0.9;
 
-    addMIDIHandler(MIDI::GENERAL::CC_HEADER, CC_E1, [this](MData &cmd) -> MIDISTATUS {
-        dry += (float) (cmd.data2 - 64) / 127.0;
-        if (dry > 1) dry = 1;
-        if (dry < 0) dry = 0;
-        return MIDISTATUS::DONE;
-    });
+    drywet = addParameter("D/W", 0, 1, 0.1, 0.025);
+    size = addParameter("SIZE", 0, 1, 0.95, 0.025);
+    decay = addParameter("DECA", 0, 1, 0.9, 0.025);
 }
 
 void Plateau::process(float *outputBuffer, float * inputBuffer,
-                      unsigned int nBufferFrames, double streamTime) {
+                      unsigned int nBufferFrames, Sync & sync) {
+    float dry = drywet->getVal();
+    dattorro->size = size->getVal();
+    dattorro->decay = decay->getVal();
     for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
         dattorro->leftInput = inputBuffer[i+0];
         dattorro->rightInput = inputBuffer[i+1];
@@ -28,11 +26,4 @@ void Plateau::process(float *outputBuffer, float * inputBuffer,
         outputBuffer[i+0] = dattorro->leftOut * (1 - dry) + inputBuffer[i+0] * dry;
         outputBuffer[i+1] = dattorro->rightOut * (1 - dry) + inputBuffer[i+1] * dry;
     }
-}
-
-void Plateau::draw(GFXcanvas1 * screen) {
-    screen->setCursor(4, 17);
-    char output[50];
-    sprintf(output, "SZ:0.95 | DC:0.9 | D/W:%.2f", dry);
-    screen->print(output);
 }

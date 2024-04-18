@@ -48,7 +48,7 @@ public:
     }
 
     void process(float *outputBuffer, float * inputBuffer,
-                 unsigned int nBufferFrames, double streamTime) override;
+                 unsigned int nBufferFrames, Sync & sync) override;
 
 //    void draw(GFXcanvas1 * screen) override;
 

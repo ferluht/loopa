@@ -5,7 +5,7 @@
 #include "Chronoblob.h"
 
 void Chronoblob::process(float *outputBuffer, float * inputBuffer,
-                      unsigned int nBufferFrames, double streamTime) {
+                      unsigned int nBufferFrames, Sync & sync) {
     for (int i = 0; i < nBufferFrames * 2; i += 2 ) {
         pingpong->leftIn = inputBuffer[i+0];
         pingpong->rightIn = inputBuffer[i+1];

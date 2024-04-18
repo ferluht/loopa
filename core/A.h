@@ -4,9 +4,10 @@
 
 #pragma once
 #include <cstdint>
+#include "Sync.h"
 
 #define SAMPLERATE 44100
-#define BUF_SIZE 512
+#define BUF_SIZE 256
 #define PERF_TESTING false
 
 /**
@@ -26,11 +27,11 @@ public:
      * @param outputBuffer output buffer of floats
      * @param inputBuffer input buffer of floats
      * @param nBufferFrames amount samples in buffers
-     * @param streamTime time since start
+     * @param sync time sync object
      *
      * Pass-thru example of usage in child class:
      * @code
-     * void process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) override {
+     * void process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, Sync & sync) override {
      *   for (unsigned int i = 0; i < 2*nBufferFrames; i += 2) {
      *     outputBuffer[i + 0] = inputBuffer[i + 0];
      *     outputBuffer[i + 1] = inputBuffer[i + 1];
@@ -39,7 +40,7 @@ public:
      * @endcode
      */
     virtual void process(float *outputBuffer, float * inputBuffer,
-                 unsigned int nBufferFrames, double streamTime) {};
+                 unsigned int nBufferFrames, Sync & sync) {};
 
 };
 

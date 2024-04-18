@@ -25,35 +25,35 @@ public:
         else emptybuffer = nullptr;
         outbuffer = nullptr;
         parent = nullptr;
-        rackMidiStatus = MIDISTATUS::DONE;
+
+        addDrawHandler({SCREENS::LOOP_VIEW}, [this](GFXcanvas1 * screen) -> void {
+            if (focus_item != items.end())
+                (*focus_item)->draw(screen);
+        });
     }
 
-    MIDISTATUS midiIn(MData& cmd) override;
+    void midiIn(MData& cmd, Sync & sync) override;
+    void midiOut(std::deque<MData> &q, Sync & sync) override;
 
-    void draw(GFXcanvas1 * screen) override;
-
-    void process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) override;
+    void process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, Sync & sync) override;
 
     void add(AMG * item);
 
     void attach(Rack * parent_);
 
-    Rack * dive_in();
-    Rack * dive_out();
     Rack * dive_prev();
     Rack * dive_next();
     void set_focus_by_index(int i);
     AMG * get_focus();
     int get_focus_index();
-    inline AMG * get_item(int i) { return items[i % items.size()].first; }
+    inline AMG * get_item(int i) { return items[i % items.size()]; }
     inline int get_size() { return items.size(); }
 
 private:
 
     RACKTYPE racktype;
-    std::vector<std::pair<AMG*, MIDISTATUS>> items;
-    std::vector<std::pair<AMG*, MIDISTATUS>>::iterator focus_item;
-    MIDISTATUS rackMidiStatus;
+    std::vector<AMG*> items;
+    std::vector<AMG*>::iterator focus_item;
 
     Rack * parent;
 

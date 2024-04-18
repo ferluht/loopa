@@ -48,15 +48,15 @@ public:
         continuous = false;
         values = values_;
         min = 0;
-        max = values.size();
+        max = values.size() - 1;
         step = 1;
     }
 
     void update(uint8_t v) {
         float inc = (float) (v - 64) * step;
-        value += inc;
-        if (value > max) value = max;
-        if (value < min) value = min;
+        if (value + inc > max) value = max;
+        else if (value + inc < min) value = min;
+        else value += inc;
     }
 
     inline float getVal() {
@@ -68,7 +68,7 @@ public:
     }
 
     inline std::string getStringVal() {
-        if (continuous) return values[(int)value];
+        if (!continuous) return values[(int)value];
         return "default";
     }
 };
@@ -101,37 +101,7 @@ class DeviceWithParameters : public AMG {
 
 public:
 
-    DeviceWithParameters(const char * name_) : AMG(name_) {
-//        addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::SCREEN::ALT_PARAMS, [this](MData &cmd) -> MIDISTATUS {
-//            this->altparams = cmd.data2 > 0;
-//            return MIDISTATUS::DONE;
-//        });
-
-        addMIDIHandler({MIDI::GENERAL::CC_HEADER}, {CC_E1, CC_E2}, [this](MData &cmd) -> MIDISTATUS {
-            if (cmd.data1 == CC_E1 && inputparams.size() > parampage * 2 + 0) inputparams[parampage * 2 + 0]->update(cmd.data2);
-            if (cmd.data1 == CC_E2 && inputparams.size() > parampage * 2 + 1) inputparams[parampage * 2 + 1]->update(cmd.data2);
-            return MIDISTATUS::DONE;
-        });
-
-        addMIDIHandler({MIDI::GENERAL::CC_HEADER}, {E1_B, E2_B}, [this](MData &cmd) -> MIDISTATUS {
-            if (cmd.data1 == E1_B && cmd.data2 > 0 && parampage > 0) parampage --;
-            if (cmd.data1 == E2_B && cmd.data2 > 0 && parampage < inputparams.size() / 2 - 1) parampage ++;
-            return MIDISTATUS::DONE;
-        });
-    }
-
-    void draw(GFXcanvas1 * screen) override {
-        for (int i = parampage * 2; i < parampage * 2 + 2; i ++) {
-            if (inputparams.size() <= i) continue;
-            int xoffset = 46;
-            int yoffset = (i % 2) * 10;
-            screen->setCursor(4 + xoffset, 17 + yoffset);
-            screen->setTextSize(1);
-            screen->print(inputparams[i]->name.c_str());
-            screen->drawRect(26 + xoffset, 14 + yoffset, 20, 4, 1);
-            screen->drawRect(26 + xoffset, 15 + yoffset, inputparams[i]->getVal0to1() * 19 + 1, 2, 1);
-        }
-    }
+    DeviceWithParameters(const char * name_);
 
     Parameter * addParameter(std::string name) {
         return addParameter(name, 0);

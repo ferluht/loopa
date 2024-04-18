@@ -3,7 +3,7 @@
 #include <iostream>
 
 void Delay::process(float *outputBuffer, float * inputBuffer,
-                    unsigned int nBufferFrames, double streamTime) {
+                 unsigned int nBufferFrames, Sync & sync) {
     float linelength = std::round(time->value * (float)SAMPLERATE);
     if (linelength != prevlinelength) {
         historyBufferL.clear();

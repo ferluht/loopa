@@ -7,15 +7,14 @@
 SampleKit::SampleKit(const char * name) : Instrument(name) {
     for (int i = 0; i < 128; i ++) notes[i] = nullptr;
 
-    addMIDIHandler({MIDI::GENERAL::NOTEON_HEADER, MIDI::GENERAL::NOTEOFF_HEADER}, [this](MData &cmd) -> MIDISTATUS {
+    addMIDIHandler({}, {MIDI::GENERAL::NOTEON_HEADER, MIDI::GENERAL::NOTEOFF_HEADER}, {}, [this](MData &cmd, Sync & sync) -> void {
         if (notes[cmd.data1])
-            return notes[cmd.data1]->midiIn(cmd);
-        return MIDISTATUS::DONE;
+            return notes[cmd.data1]->midiIn(cmd, sync);
     });
 }
 
-void SampleKit::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) {
-    for (auto const& chain : activeChains) chain->process(outputBuffer, inputBuffer, nBufferFrames, streamTime);
+void SampleKit::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, Sync & sync) {
+    for (auto const& chain : activeChains) chain->process(outputBuffer, inputBuffer, nBufferFrames, sync);
 }
 
 void SampleKit::addSample(const char *sample_name_, const char note) {

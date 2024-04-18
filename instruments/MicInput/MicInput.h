@@ -28,5 +28,5 @@ public:
     void updateVoice(MicInputVoiceState * voiceState, MData &cmd) override;
 
     void processVoice(MicInputVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
-                      unsigned int nBufferFrames, double streamTime, uint8_t nvoices) override;
+                      unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) override;
 };

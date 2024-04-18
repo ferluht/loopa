@@ -27,23 +27,19 @@ public:
 
 class SingleTone : public PolyInstrument<SingleToneVoiceState> {
 
-    Parameter * glide_time;
+    float glide_time = 8000;
 
-    Parameter * crossmod;
-    Parameter * interp1, * interp2;
+    float interp1 = 0.4, interp2 = 0.3;
+    float crossmod = 0.5;
 
 public:
 
     SingleTone() : PolyInstrument<SingleToneVoiceState>("SNGLTN") {
         set_voices(1);
-        crossmod = addParameter("XMOD", 0, 1, 0.5, 0.05);
-        interp1 = addParameter("I_1", 0, 1, 0.4, 0.05);
-        interp2 = addParameter("I_2", 0, 1, 0.3, 0.05);
-        glide_time = addParameter("TIME", 0, 40000, 4000, 500);
     }
 
-    void updateVoice(SingleToneVoiceState * voiceState, MData &cmd) override;
+    void updateVoice(SingleToneVoiceState * voiceState, MData cmd) override;
 
     void processVoice(SingleToneVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
-                      unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) override;
+                      unsigned int nBufferFrames, double streamTime, uint8_t nvoices) override;
 };

@@ -12,12 +12,11 @@ public:
     Plateau();
 
     void process(float *outputBuffer, float * inputBuffer,
-                 unsigned int nBufferFrames, double streamTime) override;
-
-    void draw(GFXcanvas1 * screen) override;
+                 unsigned int nBufferFrames, Sync & sync) override;
 
 private:
-    float dry = 0;
+
+    Parameter * drywet, * size, * decay;
     Dattorro * dattorro;
 };
 

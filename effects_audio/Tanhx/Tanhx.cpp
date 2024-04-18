@@ -4,7 +4,7 @@
 
 #include "Tanhx.h"
 
-void Tanhx::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, double streamTime) {
+void Tanhx::process(float *outputBuffer, float *inputBuffer, unsigned int nBufferFrames, Sync & sync) {
     float sat_drive = db_to_k(driveP->getVal());
     float bias_offset = biasP->getVal() / 10 * 0.1;
     sL.setSatThreshold(db_to_k(14) / sat_drive, bias_offset);

@@ -26,7 +26,7 @@ void SimpleInstrument::updateVoice(SimpleInstrumentVoiceState * voiceState, MDat
 }
 
 void SimpleInstrument::processVoice(SimpleInstrumentVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
-                  unsigned int nBufferFrames, double streamTime, uint8_t nvoices) {
+                  unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) {
     for (unsigned int i = 0; i < 2*nBufferFrames; i += 2) {
         voiceState->adsr.process();
         float out = sinf(voiceState->phase) / (float)nvoices * voiceState->adsr.get() * voiceState->volume * instrument_volume;

@@ -25,7 +25,5 @@ class Scale : public MIDIEffect {
 
 public:
     Scale();
-    void draw(GFXcanvas1 * screen) override;
-    const char * getRoot();
-    const char * getScale();
+    void midiOut(std::deque<MData> &q, Sync & sync) override;
 };

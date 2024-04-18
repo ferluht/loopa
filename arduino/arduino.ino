@@ -4,8 +4,6 @@
 #include <EncoderTool.h>
 using namespace EncoderTool;
 
-#include "CRC8.h"
-
 #define LED_COUNT 6
 #define LED_PIN 3
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
@@ -40,13 +38,19 @@ PolledEncoder enc2;
 
 #define S1_PIN 9
 #define S2_PIN 10
-#define S3_PIN 8
 
-#define E1_PIN 4
-#define E2_PIN 2
+#define E1_PIN 5
+#define E2_PIN 6
 
 #define OP_PIN 11
 #define OM_PIN 12
+//#define K1_PIN 2
+//#define K2_PIN 3
+//#define K3_PIN 4
+//#define K4_PIN 5
+//#define K5_PIN 6
+//#define K6_PIN 7
+//#define K7_PIN 8
 #define P1_PIN 17
 #define P2_PIN 16
 #define P3_PIN 14
@@ -57,11 +61,17 @@ PolledEncoder enc2;
 // it makes detecting changes very simple.
 Bounce S1 = Bounce(S1_PIN, KEY_BOUNCE_TIME);
 Bounce S2 = Bounce(S2_PIN, KEY_BOUNCE_TIME);
-Bounce S3 = Bounce(S3_PIN, KEY_BOUNCE_TIME);
 Bounce OP = Bounce(OP_PIN, KEY_BOUNCE_TIME);
 Bounce OM = Bounce(OM_PIN, KEY_BOUNCE_TIME);   
 Bounce E1 = Bounce(E1_PIN, KEY_BOUNCE_TIME);
-Bounce E2 = Bounce(E2_PIN, KEY_BOUNCE_TIME);
+Bounce E2 = Bounce(E2_PIN, KEY_BOUNCE_TIME);    // 5 = 5 ms debounce time
+//Bounce K1 = Bounce(K1_PIN, KEY_BOUNCE_TIME);  // which is appropriate for good
+//Bounce K2 = Bounce(K2_PIN, KEY_BOUNCE_TIME);  // quality mechanical pushbuttons
+//Bounce K3 = Bounce(K3_PIN, KEY_BOUNCE_TIME);
+//Bounce K4 = Bounce(K4_PIN, KEY_BOUNCE_TIME);  // if a button is too "sensitive"
+//Bounce K5 = Bounce(K5_PIN, KEY_BOUNCE_TIME);  // to rapid touch, you can
+//Bounce K6 = Bounce(K6_PIN, KEY_BOUNCE_TIME);  // increase this time.
+//Bounce K7 = Bounce(K7_PIN, KEY_BOUNCE_TIME);
 Bounce P1 = Bounce(P1_PIN, PAD_BOUNCE_TIME);
 Bounce P2 = Bounce(P2_PIN, PAD_BOUNCE_TIME);
 Bounce P3 = Bounce(P3_PIN, PAD_BOUNCE_TIME);
@@ -85,18 +95,23 @@ void testdrawchar(void) {
   display.display();
 }
 
+bool shiftpressed = false;
+int octave = 3;
+
 void process_bounce(Bounce * b, uint8_t h1, uint8_t h2, uint8_t num) {
   if (b->fallingEdge()) {
     Serial.write(h1);
     Serial.write(num);
     Serial.write(127);
     Serial.write('\n');
+    if (b == &S2) shiftpressed = true;
   }
   if (b->risingEdge()) {
     Serial.write(h2);
     Serial.write(num);
     Serial.write(0);
     Serial.write('\n');
+    if (b == &S2) shiftpressed = false;
   }
 }
 
@@ -124,6 +139,8 @@ void setup() {
 
   display.setRotation(0);
 
+  // Show initial display buffer contents on the screen --
+  // the library initializes this with an Adafruit splash screen.
   testdrawchar();
   display.clearDisplay();
   display.setCursor(0, 0);
@@ -141,19 +158,34 @@ void setup() {
 
   pinMode(S1_PIN, INPUT_PULLUP);
   pinMode(S2_PIN, INPUT_PULLUP);
-  pinMode(S3_PIN, INPUT_PULLUP);
 
   pinMode(OP_PIN, INPUT_PULLUP);
   pinMode(OM_PIN, INPUT_PULLUP);
 
   pinMode(E1_PIN, INPUT_PULLUP);
   pinMode(E2_PIN, INPUT_PULLUP);
+//  pinMode(K1_PIN, INPUT_PULLUP);
+//  pinMode(K2_PIN, INPUT_PULLUP);
+//  pinMode(K3_PIN, INPUT_PULLUP);
+//  pinMode(K4_PIN, INPUT_PULLUP);
+//  pinMode(K5_PIN, INPUT_PULLUP);
+//  pinMode(K6_PIN, INPUT_PULLUP);
+//  pinMode(K7_PIN, INPUT_PULLUP);
   pinMode(P1_PIN, INPUT_PULLUP);
   pinMode(P2_PIN, INPUT_PULLUP);
   pinMode(P3_PIN, INPUT_PULLUP);
   pinMode(P4_PIN, INPUT_PULLUP);
 
   Serial.begin(115200);
+
+//  if (!cap.begin(0x5A)) {
+//    display.println("MPR121 not found, check wiring?");
+//    display.display();
+//    while (1);
+//  }
+//  display.println("MPR121 found!");
+//  display.display();
+
 
   mpr121.setupSingleDevice(Wire, MPR121::ADDRESS_5A, true);
 
@@ -175,25 +207,43 @@ bool boot = true;
 unsigned long lastbytetime = 0;
 uint16_t prev_status = 0;
 uint8_t led_colors[18];
-uint8_t crc = 0;
 
 void loop() {
+
+//  for (int i = 0; i < 6; i ++) {
+//    strip.setPixelColor(i, 0, 0, 60);
+//  }
+//  strip.show();
 
   uint16_t touch_status = mpr121.getTouchStatus(MPR121::ADDRESS_5A);
   for (int i = 0; i < 12; i ++) {
     int s = (touch_status >> i) & 0x01;
     int prev_s = (prev_status >> i) & 0x01;
     if (s != prev_s) {
-      if (s > 0) {
-        Serial.write(CC_HEADER);
-        Serial.write(60 + key_mapping[i]);
-        Serial.write(127);
-        Serial.write('\n');
+      if (shiftpressed) {
+        if (s > 0) {
+          Serial.write(CC_HEADER);
+          Serial.write(60 + key_mapping[i]);
+          Serial.write(127);
+          Serial.write('\n');
+        } else {
+          Serial.write(CC_HEADER);
+          Serial.write(60 + key_mapping[i]);
+          Serial.write(0);
+          Serial.write('\n');
+        }
       } else {
-        Serial.write(CC_HEADER);
-        Serial.write(60 + key_mapping[i]);
-        Serial.write(0);
-        Serial.write('\n');
+        if (s > 0) {
+          Serial.write(NOTEON_HEADER);
+          Serial.write(octave * 12 + key_mapping[i]);
+          Serial.write(127);
+          Serial.write('\n');
+        } else {
+          Serial.write(NOTEOFF_HEADER);
+          Serial.write(octave * 12 + key_mapping[i]);
+          Serial.write(0);
+          Serial.write('\n');
+        }
       }
     }
   }
@@ -205,25 +255,45 @@ void loop() {
 
   S1.update();
   S2.update();
-  S3.update();
   OP.update();
   OM.update();
   E1.update();
   E2.update();
+//  K1.update();
+//  K2.update();
+//  K3.update();
+//  K4.update();
+//  K5.update();
+//  K6.update();
+//  K7.update();
   P1.update();
   P2.update();
   P3.update();
   P4.update();
 
-  process_bounce(&OM, CC_HEADER, CC_HEADER, 98);
-  process_bounce(&OP, CC_HEADER, CC_HEADER, 99);
 
   process_bounce(&S1, CC_HEADER, CC_HEADER, 100);
   process_bounce(&S2, CC_HEADER, CC_HEADER, 101);
-  process_bounce(&S3, CC_HEADER, CC_HEADER, 102);
 
-  process_bounce(&E1, CC_HEADER, CC_HEADER, 107);
-  process_bounce(&E2, CC_HEADER, CC_HEADER, 108);
+//  process_bounce(&E1, CC_HEADER, CC_HEADER, 64);
+//  process_bounce(&E2, CC_HEADER, CC_HEADER, 64);
+
+  if (OP.fallingEdge()) {
+    octave ++;
+    if (octave > 7) octave = 7;
+  }
+  if (OM.fallingEdge()) {
+    octave --;
+    if (octave < 0) octave = 0;
+  }
+//
+//  process_bounce(&K1, CC_HEADER, CC_HEADER, 60);
+//  process_bounce(&K2, CC_HEADER, CC_HEADER, 61);
+//  process_bounce(&K3, CC_HEADER, CC_HEADER, 62);
+//  process_bounce(&K4, CC_HEADER, CC_HEADER, 63);
+//  process_bounce(&K5, CC_HEADER, CC_HEADER, 64);
+//  process_bounce(&K6, CC_HEADER, CC_HEADER, 65);
+//  process_bounce(&K7, CC_HEADER, CC_HEADER, 66);
 
   process_bounce(&P1, CC_HEADER, CC_HEADER, 110);
   process_bounce(&P2, CC_HEADER, CC_HEADER, 111);
@@ -257,25 +327,22 @@ void loop() {
       rbi ++;
       
       if (rbi > 0 && (rbi % 16 == 0)) {
-        crc = getCrc(crc, rowbuffer, 16);
         display.drawBitmap(0, rbi / 16 - 1, rowbuffer, 128, 1, 1);
+        if (rbi / 16 == 32) {
+          display.display();
+          display.setCursor(0, 0);
+          display.clearDisplay();
+        }
       }
     } else {
-      if (rbi != 530) {
-          led_colors[rbi - 512] = c;
-          rbi ++;
-      } else {
+      led_colors[rbi - 512] = c;
+      rbi ++;
+      if (rbi == 530) {
         for (int i = 0; i < 6; i ++)
           strip.setPixelColor(i, led_colors[i * 3 + 0], led_colors[i * 3 + 1], led_colors[i * 3 + 2]);
-        crc = getCrc(crc, led_colors, 18);
-        if (crc == c) {
-            strip.show();
-            display.display();
-            display.setCursor(0, 0);
-            display.clearDisplay();
-        }
+//        strip.setBrightness(40);
+        strip.show();
         rbi = 0;
-        crc = 0;
       }
     }
 
@@ -287,10 +354,5 @@ void loop() {
     boot = false;
   }
 
-  if (lastbytetime > 0 && millis() - lastbytetime > 10) {
-      rbi = 0;
-      crc = 0;
-      display.setCursor(0, 0);
-      display.clearDisplay();
-  }
+  if (lastbytetime > 0 && millis() - lastbytetime > 10) rbi = 0;
 }

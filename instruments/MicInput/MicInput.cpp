@@ -30,33 +30,34 @@ void MicInput::updateVoice(MicInputVoiceState * voiceState, MData &cmd) {
         }
     }
 
-    if (cmd.status == MIDI::GENERAL::NOTEON_HEADER || cmd.status == MIDI::GENERAL::NOTEOFF_HEADER) {
-        switch (cmd.data1 % 12) {
-            case 0:
-                if (cmd.data2 > 0) {
-                    if (line_in) std::system("amixer set 'Capture Mux' 'MIC_IN'");
-                    else std::system("amixer set 'Capture Mux' 'LINE_IN'");
-                    line_in = ~line_in;
-                }
-                break;
-            case 5:
-            case 6:
-                cmd.status = MIDI::GENERAL::CC_HEADER + (cmd.data1 % 12) - 5;
-                cmd.data1 = MIDI::UI::TAPE::TRIG;
-                break;
-            case 7:
-            case 8:
-                cmd.status = MIDI::GENERAL::CC_HEADER + (cmd.data1 % 12) - 7;
-                cmd.data1 = MIDI::UI::TAPE::CLEAR;
-                break;
-            default:
-                break;
-        }
-    }
+//    if (cmd.status == MIDI::GENERAL::NOTEON_HEADER || cmd.status == MIDI::GENERAL::NOTEOFF_HEADER) {
+//        switch (cmd.data1 % 12) {
+//            case 0:
+//                if (cmd.data2 > 0) {
+//                    if (line_in) std::system("amixer set 'Capture Mux' 'MIC_IN'");
+//                    else std::system("amixer set 'Capture Mux' 'LINE_IN'");
+//                    line_in = ~line_in;
+//                }
+//                break;
+//            case 5:
+//            case 6:
+//                cmd.status = MIDI::GENERAL::CC_HEADER + (cmd.data1 % 12) - 5;
+//                cmd.data1 = MIDI::UI::TAPE::TRIG;
+//                break;
+//            case 7:
+//            case 8:
+//                cmd.status = MIDI::GENERAL::CC_HEADER + (cmd.data1 % 12) - 7;
+//                cmd.data1 = MIDI::UI::TAPE::CLEAR;
+//                break;
+//            default:
+//                break;
+//        }
+//    }
 }
 
 void MicInput::processVoice(MicInputVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
-                                    unsigned int nBufferFrames, double streamTime, uint8_t nvoices) {
+                                    unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) {
+
     for (unsigned int i=0; i<2*nBufferFrames; i+=2) {
 
         voiceState->adsr.process();

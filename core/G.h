@@ -6,11 +6,17 @@
 
 #include <cstdint>
 #include <Adafruit-GFX-offscreen/Adafruit_GFX.h>
+#include <Screens.h>
+#include <iostream>
 
 /**
  * G stands for Graphics. The base class for all graphic objects.
 */
 class G {
+
+    std::map<uint8_t, int> handlers;
+    std::vector<std::function<void(GFXcanvas1 *)>> handlers_array;
+
 public:
 
     G() {
@@ -31,5 +37,18 @@ public:
      * }
      * @endcode
      */
-    virtual void draw(GFXcanvas1 * screen) {}
+    void draw(GFXcanvas1 * screen) {
+        auto h = handlers.find(SCREEN_IDX);
+        if (h != handlers.end()) handlers_array[h->second](screen);
+    }
+
+    void addDrawHandler(std::vector<uint8_t> screen_indices, std::function<void(GFXcanvas1 *)> drawer) {
+        if (screen_indices.empty())
+            for (int i = 0; i < MAX_SCREENS; i ++)
+                screen_indices.push_back(i);
+
+        handlers_array.push_back(drawer);
+        for (uint8_t idx : screen_indices)
+            handlers[idx] = handlers_array.size() - 1;
+    }
 };

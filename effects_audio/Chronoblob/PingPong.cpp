@@ -14,7 +14,7 @@ void PingPong::updateParam() {
 }
 
 void PingPong::process(float *outputBuffer, float * inputBuffer,
-                       unsigned int nBufferFrames, double streamTime) {
+                       unsigned int nBufferFrames, Sync & sync) {
     updateParam();
 
 //    if (!mode) {
@@ -25,7 +25,7 @@ void PingPong::process(float *outputBuffer, float * inputBuffer,
 //        leftDelay->in = (rightIn * (1 - CFAmp->get()) + rightDelay->out * CFAmp->get()) * CFMode->get() + (leftIn * (1 - CFAmp->get()) + leftDelay->out * CFAmp->get()) * (1 - CFMode->get());
 //    }
 
-    leftDelay->process(outputBuffer, inputBuffer, nBufferFrames, streamTime);
+    leftDelay->process(outputBuffer, inputBuffer, nBufferFrames, sync);
 //    rightDelay->process();
 
 //    leftOut = leftDelay->out;

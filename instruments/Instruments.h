@@ -15,10 +15,8 @@ class DummyInstrument : public Instrument {
 
 public:
     DummyInstrument() : Instrument("EMPTY") {
-
-    }
-
-    void draw(GFXcanvas1 * screen) override {
-        screen->print("NO INSTRUMENT");
+        addDrawHandler({SCREENS::LOOP_VIEW}, [this](GFXcanvas1 * screen) -> void {
+            screen->print("NO INSTRUMENT");
+        });
     }
 };

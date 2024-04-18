@@ -2,15 +2,12 @@
 // Created by ferluht on 06/01/2024.
 //
 
-#ifndef RPIDAW_FILESYSTEM_H
-#define RPIDAW_FILESYSTEM_H
+#pragma once
 
+#include <vector>
+#include <string>
+#include <iostream>
+#include <dirent.h>
+#include <sys/types.h>
 
-
-class Filesystem {
-
-};
-
-
-
-#endif //RPIDAW_FILESYSTEM_H
+std::vector<std::string> list_dir(const char *path);
