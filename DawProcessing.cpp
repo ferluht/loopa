@@ -6,22 +6,30 @@
 #include <Adafruit-GFX-offscreen/Fonts/Picopixel.h>
 #include <cmath>
 
-#include <string>
-#include <iostream>
-#include <dirent.h>
-#include <sys/types.h>
+DAW::DAW (GFXcanvas1 * screen_) : AMG("DAW") {
+    screen = screen_;
 
-std::vector<std::string> list_dir(const char *path) {
-    std::vector<std::string> ret;
-    struct dirent *entry;
-    DIR *dir = opendir(path);
-    if (dir == nullptr) return ret;
+    initMidiHandlers();
 
-    while ((entry = readdir(dir)) != nullptr)
-        ret.emplace_back(entry->d_name);
+    tracks = spawnTracksRack();
+    tapes = new LoopMatrix();
 
-    closedir(dir);
-    return ret;
+    master_fx = new Rack("MASTER FX", Rack::SELECTIVE);
+    master_fx->add(new Scale());
+    master_fx->add(tapes);
+
+    tapes->addMIDIHandler(MIDI::GENERAL::CC_HEADER, MIDI::UI::DAW::SAVE, [this](MData &cmd) -> MIDISTATUS {
+        if (cmd.data2 > 0) {
+            if (tapes->save()) return MIDISTATUS::DONE;
+            else return MIDISTATUS::WAITING;
+        }
+        return MIDISTATUS::DONE;
+    });
+
+    focus_rack = (Rack*)((Rack*)tracks->get_focus())->get_item(1);
+    focus_rack_depth = 0;
+
+    dawMidiStatus = MIDISTATUS::DONE;
 }
 
 MIDISTATUS DAW::midiIn(MData& cmd) {
@@ -247,7 +255,7 @@ void DAW::draw(GFXcanvas1 * screen) {
     }
 }
 
-Rack *DAW::spawnTracksRack(int n) {
+Rack *DAW::spawnTracksRack() {
     Rack * tracks_ = new Rack("ARRANGEMENT",Rack::SELECTIVE);
 
     for (int i = 0; i < 8; i ++) {

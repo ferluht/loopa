@@ -1,9 +1,6 @@
 [submodule "3rdparty/libsamplerate"]
 	path = 3rdparty/libsamplerate
 	url = https://github.com/libsndfile/libsamplerate
-[submodule "3rdparty/nanovg"]
-	path = 3rdparty/nanovg
-	url = https://github.com/memononen/nanovg
 [submodule "3rdparty/Adafruit-GFX-offscreen"]
 	path = 3rdparty/Adafruit-GFX-offscreen
 	url = https://github.com/ferluht/Adafruit-GFX-offscreen
@@ -13,9 +10,3 @@
 [submodule "3rdparty/rtmidi"]
 	path = 3rdparty/rtmidi
 	url = https://github.com/thestk/rtmidi
-[submodule "3rdparty/glfw"]
-	path = 3rdparty/glfw
-	url = https://github.com/glfw/glfw
-[submodule "3rdparty/nanogui"]
-	path = 3rdparty/nanogui
-	url = https://github.com/wjakob/nanogui
