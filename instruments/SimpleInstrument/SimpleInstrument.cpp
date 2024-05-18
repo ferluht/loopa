@@ -5,7 +5,7 @@
 #include <iostream>
 #include "SimpleInstrument.h"
 
-SimpleInstrument::SimpleInstrument() : PolyInstrument<SimpleInstrumentVoiceState>("SIMP") {
+SimpleInstrument::SimpleInstrument() : PolyInstrument<SimpleInstrumentVoiceState>("SimpleInstrument") {
     Ap = addParameter("ATT");
     Dp = addParameter("DEC");
     Sp = addParameter("SUS");
@@ -36,4 +36,8 @@ void SimpleInstrument::processVoice(SimpleInstrumentVoiceState * voiceState, flo
         if (voiceState->phase > M_PI * 2) voiceState->phase -= M_PI * 2;
         if (voiceState->adsr.end()) voiceState->disable();
     }
+}
+
+namespace {
+    DeviceFactory::AddToRegistry<SimpleInstrument> _("SimpleInstrument");
 }

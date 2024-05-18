@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Instrument.h"
+#include "AMG.h"
 #include "ADSR.h"
 
 class MicInputVoiceState : public VoiceState{
@@ -22,6 +22,7 @@ class MicInput : public PolyInstrument<MicInputVoiceState> {
     bool line_in;
 
 public:
+    static DeviceFactory* create() { return new MicInput(); }
 
     MicInput();
 
@@ -29,4 +30,6 @@ public:
 
     void processVoice(MicInputVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
                       unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) override;
+
+    const char * getName() override { return "MIC"; }
 };

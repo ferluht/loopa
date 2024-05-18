@@ -4,8 +4,8 @@
 
 #include "Scale.h"
 
-Scale::Scale() : MIDIEffect("SCALE") {
-    selected_scale = scales.begin();
+Scale::Scale() : MIDIEffect("Scale") {
+    selected_scale = scales.begin() + 4;
     selected_root = roots.begin();
 
     for (int i = 0; i < 12; i ++) note_map.push_back(i);
@@ -101,4 +101,8 @@ void Scale::midiOut(std::deque<MData> &q, Sync &sync) {
     if (ison->getStringVal() == "TRUE") for (auto & cmd : q) {
         cmd.data1 = (int)(cmd.data1 / 12) * 12 + note_map[cmd.data1 % 12] + selected_root - roots.begin();
     }
+}
+
+namespace {
+    DeviceFactory::AddToRegistry<Scale> _("Scale");
 }

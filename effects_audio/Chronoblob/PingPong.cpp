@@ -31,3 +31,7 @@ void PingPong::process(float *outputBuffer, float * inputBuffer,
 //    leftOut = leftDelay->out;
 //    rightOut = leftOut;//rightDelay->out;
 }
+
+//namespace {
+//    DeviceFactory::AddToRegistry<PingPong> _("PingPong");
+//}

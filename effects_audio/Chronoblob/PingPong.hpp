@@ -13,6 +13,7 @@
 /// @private
 class PingPong : public AudioEffect {
 public:
+    static DeviceFactory* create() { return new PingPong(); }
 
     Delay* leftDelay = new Delay();
     Delay* rightDelay = new Delay();
@@ -34,7 +35,7 @@ public:
     float leftOut = 0;
     float rightOut = 0;
 
-    PingPong() : AudioEffect("PINGPONG") {
+    PingPong() : AudioEffect("PingPong") {
 
     }
 

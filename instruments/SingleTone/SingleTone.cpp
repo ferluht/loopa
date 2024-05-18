@@ -62,3 +62,7 @@ void SingleTone::processVoice(SingleToneVoiceState * voiceState, float *outputBu
         outputBuffer[i+1] = inputBuffer[i+1] + sample * 0.1;
     }
 }
+
+namespace {
+    DeviceFactory::AddToRegistry<SingleTone> _("SingleTone");
+}

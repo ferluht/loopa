@@ -69,8 +69,8 @@ void DAW::initControlMappings() {
         midiMap->addMapping({"SHFT", kn}, MIDI::GENERAL::LOOP_HEADER + i, MIDI::UI::TAPE::CLEAR);
         midiMap->addMapping({"CTRL", kn}, MIDI::GENERAL::LOOP_HEADER + i, MIDI::UI::TAPE::DOUBLE);
         midiMap->addMapping({"SHFT", "CTRL", kn}, MIDI::GENERAL::LOOP_HEADER + i, MIDI::UI::TAPE::STOP);
-        for (int j = 0; j < 12; j ++)
-            midiMap->addMapping({kn, "K" + std::to_string(j)}, MIDI::GENERAL::PATTERN_HEADER + i, j);
+//        for (int j = 0; j < 12; j ++)
+//            midiMap->addMapping({kn, "K" + std::to_string(j)}, MIDI::GENERAL::PATTERN_HEADER + i, j);
 //        midiMap->addMapping({"COPY", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::COPY);
 //        midiMap->addMapping({"LOOP", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::SELECT_SCENE);
 //        midiMap->addMapping({"LOOP", "COPY", kn}, MIDI::GENERAL::CC_HEADER + i, MIDI::UI::LOOPMATRIX::COPY_SCENE);
@@ -133,8 +133,21 @@ void DAW::initMidiHandlers() {
                    MIDI::GENERAL::LOOP_HEADER, MIDI::GENERAL::LOOP_HEADER + n_tapes,
                    0, 128,
                    [this](MData &cmd, Sync &sync) -> void {
-        if (SCREEN_IDX != SCREENS::TRACK_VIEW) tapes->midiIn(cmd, sync);
-        else getCurrentTrackInstrument()->midiIn(cmd, sync);
+        if (SCREEN_IDX != SCREENS::PROJECT) {
+            if (SCREEN_IDX != SCREENS::TRACK_VIEW) tapes->midiIn(cmd, sync);
+            else getCurrentTrackInstrument()->midiIn(cmd, sync);
+        } else {
+            if (cmd.status - MIDI::GENERAL::LOOP_HEADER == 1) {
+                std::string ssid;
+                get_ssid(ssid);
+                kbd.enable("SSID", ssid, [this](std::string entry) { this->set_ssid(entry); });
+            }
+            if (cmd.status - MIDI::GENERAL::LOOP_HEADER == 3) {
+                std::string pwd;
+                get_pwd(pwd);
+                kbd.enable("PWD", pwd, [this](std::string entry) { this->set_pwd(entry); });
+            }
+        }
     });
 
     addMIDIHandler(0, SCREENS::MAX_SCREENS,
@@ -154,7 +167,10 @@ void DAW::initMidiHandlers() {
 
         if (cmd.status == MIDI::GENERAL::NOTE_HEADER) {
             cmd.status = cmd.data2 > 0 ? MIDI::GENERAL::NOTEON_HEADER : MIDI::GENERAL::NOTEOFF_HEADER;
-            cmd.data1 = cmd.data1 + (octave + 5) * 12;
+            if (dynamic_cast<SampleKit*>(getCurrentTrackInstrument()) != nullptr)
+                cmd.data1 = cmd.data1 + 60;
+            else
+                cmd.data1 = cmd.data1 + (octave + 5) * 12;
             cmd.data2 = cmd.data2;
         }
 
@@ -208,15 +224,21 @@ void DAW::initMidiHandlers() {
     });
 
     addMIDIHandler({SCREENS::PROJECT},
-                   {MIDI::GENERAL::CC_HEADER},
+                   {MIDI::GENERAL::CC_HEADER, MIDI::GENERAL::BUTN_HEADER},
                    {}, [this](MData &cmd, Sync &sync) -> void {
-        if (cmd.data1 == CC_E1) {
+        if (cmd.status == MIDI::GENERAL::CC_HEADER && cmd.data1 == CC_E1) {
             sync.setBPM(sync.getBPM() + (cmd.data2 - 64) * 0.25);
         }
-        if (cmd.data1 == CC_E2 && cmd.data2 > 0) {
+        if (cmd.status == MIDI::GENERAL::CC_HEADER && cmd.data1 == CC_E2 && cmd.data2 > 0) {
             if (line_in) std::system("amixer set 'Capture Mux' 'MIC_IN'");
             else std::system("amixer set 'Capture Mux' 'LINE_IN'");
             line_in = ~line_in;
+        }
+//        if (cmd.status == MIDI::GENERAL::BUTN_HEADER && cmd.data1 == 99 && cmd.data2 > 0) {
+//            save();
+//        }
+        if (cmd.status == MIDI::GENERAL::BUTN_HEADER && cmd.data1 == 98 && cmd.data2 > 0) {
+            load();
         }
         cmd.status = MIDI::GENERAL::INVALIDATED;
     });
@@ -262,8 +284,8 @@ void DAW::initMidiHandlers() {
                 break;
         }
 
-        if ((dynamic_cast<SampleKit*>(((Rack*)((Rack*)tracks->get_focus())->get_item(1))->get_focus()) == nullptr &&
-            strcmp(((Rack*)((Rack*)tracks->get_focus())->get_item(1))->get_focus()->getName(), "MICIN") != 0)) {
+        if (dynamic_cast<SampleKit*>(getCurrentTrackInstrument()) == nullptr &&
+            dynamic_cast<MicInput*>(getCurrentTrackInstrument()) == nullptr) {
             master_scale->enable(true);
         } else {
             master_scale->enable(false);

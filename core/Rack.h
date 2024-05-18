@@ -18,13 +18,12 @@ public:
         SELECTIVE,
     };
 
-    Rack(const char * name, RACKTYPE racktype_) : AMG(name) {
+    Rack(RACKTYPE racktype_) : AMG("Rack") {
         racktype = racktype_;
         focus_item = items.begin();
-        if (racktype == PARALLEL) emptybuffer = new float[BUF_SIZE * 2];
+        if (racktype == PARALLEL) emptybuffer = new float[AUDIO_BUF_SIZE * 2];
         else emptybuffer = nullptr;
         outbuffer = nullptr;
-        parent = nullptr;
 
         addDrawHandler({SCREENS::LOOP_VIEW}, [this](GFXcanvas1 * screen) -> void {
             if (focus_item != items.end())
@@ -39,12 +38,11 @@ public:
 
     void add(AMG * item);
 
-    void attach(Rack * parent_);
-
     Rack * dive_prev();
     Rack * dive_next();
     void set_focus_by_index(int i);
     AMG * get_focus();
+    AMG * get_back();
     int get_focus_index();
     inline AMG * get_item(int i) { return items[i % items.size()]; }
     inline int get_size() { return items.size(); }
@@ -54,8 +52,6 @@ private:
     RACKTYPE racktype;
     std::vector<AMG*> items;
     std::vector<AMG*>::iterator focus_item;
-
-    Rack * parent;
 
     float * outbuffer;
     float * emptybuffer;

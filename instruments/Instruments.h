@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Instrument.h>
+#include <AMG.h>
 #include "SimpleInstrument/SimpleInstrument.h"
 #include "SingleTone/SingleTone.h"
 #include "Sampler/Sampler.h"

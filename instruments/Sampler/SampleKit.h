@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Instrument.h>
+#include <AMG.h>
 #include "Sampler.h"
 
 class SampleKit : public Instrument {
@@ -13,11 +13,16 @@ class SampleKit : public Instrument {
     std::list<AMG *> activeChains;
 
 public:
+    static DeviceFactory* create() { return new SampleKit(); }
 
-    SampleKit(const char * name);
+    SampleKit();
 
     void addSample(const char * sample_name_, const char note);
 
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, Sync & sync) override;
+
+    void save(tinyxml2::XMLDocument * xmlDoc, tinyxml2::XMLElement * state) override;
+    void load(tinyxml2::XMLElement * state) override;
+//    void init(const char * sample_name_, int8_t note);
 };

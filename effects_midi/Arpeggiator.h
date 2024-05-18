@@ -5,7 +5,7 @@
 #pragma once
 
 #include <set>
-#include <Effect.h>
+#include <AMG.h>
 
 class Arpeggiator : public MIDIEffect {
 
@@ -16,6 +16,7 @@ class Arpeggiator : public MIDIEffect {
     uint8_t last_note = 0;
 
 public:
+    static DeviceFactory* create() { return new Arpeggiator(); }
 
     Arpeggiator();
 

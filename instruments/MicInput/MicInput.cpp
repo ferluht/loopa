@@ -4,30 +4,29 @@
 
 #include "MicInput.h"
 
-MicInput::MicInput() : PolyInstrument<MicInputVoiceState>("MICIN") {
+MicInput::MicInput() : PolyInstrument<MicInputVoiceState>("MicInput") {
     set_voices(1);
     line_in = false;
     std::system("amixer set 'Capture Mux' 'MIC_IN'");
     volume_knob = addParameter("VOL", 0.1);
     release_knob = addParameter("REL", 0.5);
+    clear_input = false;
 }
 
 void MicInput::updateVoice(MicInputVoiceState * voiceState, MData &cmd) {
     if ((cmd.status == MIDI::GENERAL::NOTEON_HEADER) && (cmd.data2 != 0)) {
-        if (cmd.data1 % 12 == 11) {
-            voiceState->note = cmd.data1;
-            voiceState->velocity = (float)cmd.data2/127.f;
-            voiceState->enable();
+//        if (cmd.data1 % 12 == 11) {
+        voiceState->note = cmd.data1;
+        voiceState->velocity = (float)cmd.data2/127.f;
+        voiceState->enable();
 
-            voiceState->adsr.set(1, 0.01, 1, 1);
-            voiceState->adsr.gateOn();
-        }
+        voiceState->adsr.set(1, 0.01, 1, 1);
+        voiceState->adsr.gateOn();
+//        }
     } else {
-        if (cmd.data1 % 12 == 11) {
-            if (cmd.data1 == voiceState->note) {
-                voiceState->adsr.gateOff();
-            }
-        }
+//        if (cmd.data1 % 12 == 11) {
+        voiceState->adsr.gateOff();
+//        }
     }
 
 //    if (cmd.status == MIDI::GENERAL::NOTEON_HEADER || cmd.status == MIDI::GENERAL::NOTEOFF_HEADER) {
@@ -67,4 +66,8 @@ void MicInput::processVoice(MicInputVoiceState * voiceState, float *outputBuffer
         outputBuffer[i+0] = inputBuffer[i+0] * vol * 10;
         outputBuffer[i+1] = inputBuffer[i+1] * vol * 10;
     }
+}
+
+namespace {
+    DeviceFactory::AddToRegistry<MicInput> _("MicInput");
 }

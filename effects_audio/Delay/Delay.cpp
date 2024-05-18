@@ -56,3 +56,7 @@ void Delay::process(float *outputBuffer, float * inputBuffer,
 //    sprintf(output, "SZ:0.95 | DC:0.9 | D/W:%.2f", dry);
 //    screen->print(output);
 //}
+
+namespace {
+    DeviceFactory::AddToRegistry<Delay> _("Delay");
+}

@@ -10,3 +10,6 @@
 [submodule "3rdparty/rtmidi"]
 	path = 3rdparty/rtmidi
 	url = https://github.com/thestk/rtmidi
+[submodule "3rdparty/tinyxml2"]
+	path = 3rdparty/tinyxml2
+	url = https://github.com/leethomason/tinyxml2

@@ -62,14 +62,14 @@ void Rack::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
 
             for (auto it = items.begin(); it < items.end(); it++) {
                 if (it == focus_item)
-                    (*it)->process(&outbuffer[(it - items.begin()) * BUF_SIZE * 2], inputBuffer, nBufferFrames, sync);
+                    (*it)->process(&outbuffer[(it - items.begin()) * AUDIO_BUF_SIZE * 2], inputBuffer, nBufferFrames, sync);
                 else
-                    (*it)->process(&outbuffer[(it - items.begin()) * BUF_SIZE * 2], emptybuffer, nBufferFrames, sync);
+                    (*it)->process(&outbuffer[(it - items.begin()) * AUDIO_BUF_SIZE * 2], emptybuffer, nBufferFrames, sync);
             }
 
             for (unsigned int k = 0; k < items.size(); k ++)
                 for (unsigned int i = 0; i < 2 * nBufferFrames; i ++)
-                    outputBuffer[i] += outbuffer[k * BUF_SIZE * 2 + i];
+                    outputBuffer[i] += outbuffer[k * AUDIO_BUF_SIZE * 2 + i];
             break;
         case SEQUENTIAL:
             for (auto it = items.begin(); it < items.end(); it++) {
@@ -90,7 +90,7 @@ void Rack::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
             }
             break;
         case SELECTIVE:
-            if (inputBuffer[0] == 1) std::cout << getName() << "\n";
+            if (inputBuffer[0] == 1) std::cout << getClassName() << "\n";
             if (focus_item != items.end())
                 (*focus_item)->process(outputBuffer, inputBuffer, nBufferFrames, sync);
             break;
@@ -105,7 +105,7 @@ void Rack::add(AMG *item) {
 
     if (racktype == PARALLEL) {
         if (outbuffer) free(outbuffer);
-        outbuffer = new float[items.size() * BUF_SIZE * 2];
+        outbuffer = new float[items.size() * AUDIO_BUF_SIZE * 2];
     }
 }
 
@@ -121,10 +121,6 @@ Rack * Rack::dive_next() {
     return this;
 }
 
-void Rack::attach(Rack *parent_) {
-    parent = parent_;
-}
-
 void Rack::set_focus_by_index(int i) {
     if (items.begin() + i < items.end()) focus_item = items.begin() + i;
 }
@@ -133,6 +129,10 @@ AMG *Rack::get_focus() {
     return *focus_item;
 }
 
+AMG *Rack::get_back() {
+    return items.back();
+}
+
 int Rack::get_focus_index() {
-    return focus_item - items.begin();
+    return std::distance(items.begin(), focus_item);
 }

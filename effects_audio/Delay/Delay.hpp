@@ -11,7 +11,7 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
-#include <Effect.h>
+#include <AMG.h>
 
 #define HISTORY_SIZE (1<<21)
 
@@ -28,13 +28,14 @@ class Delay : public AudioEffect {
     float prevlinelength = 0;
 
 public:
+    static DeviceFactory* create() { return new Delay(); }
 
     float wetL = 0;
     float wetR = 0;
 
     Parameter * time, * drywet, * feedback;
 
-    Delay() : AudioEffect("DELAY") {
+    Delay() : AudioEffect("Delay") {
         src = src_new(SRC_SINC_FASTEST, 1, nullptr);
         assert(src);
 

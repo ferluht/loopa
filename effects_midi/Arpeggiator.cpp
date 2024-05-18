@@ -4,7 +4,7 @@
 
 #include "Arpeggiator.h"
 
-Arpeggiator::Arpeggiator() : MIDIEffect("ARP") {
+Arpeggiator::Arpeggiator() : MIDIEffect("Arpeggiator") {
     enable(false);
 
     arp_time = addParameter("RATE", 0.1, 16, 7, 0.1);
@@ -43,7 +43,7 @@ void Arpeggiator::midiOut(std::deque<MData> &q, Sync & sync) {
         }
         return;
     }
-    time += BUF_SIZE;
+    time += AUDIO_BUF_SIZE;
     if (time > 2 && last_note < 255) {
         MData cmd = {0, MIDI::GENERAL::NOTEOFF_HEADER, last_note, 0};
         q.emplace_back(cmd);
@@ -63,4 +63,8 @@ uint8_t Arpeggiator::arp_step(std::set<uint8_t>::iterator it) {
     it++;
     if (it == pressed_notes.end()) it = pressed_notes.begin();
     return *it;
+}
+
+namespace {
+    DeviceFactory::AddToRegistry<Arpeggiator> _("Arpeggiator");
 }

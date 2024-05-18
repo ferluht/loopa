@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Instrument.h"
+#include "AMG.h"
 #include <cmath>
 #include "ADSR.h"
 
@@ -27,6 +27,7 @@ class SimpleInstrument : public PolyInstrument<SimpleInstrumentVoiceState> {
     Parameter * Ap, * Dp, * Sp, * Rp;
 
 public:
+    static DeviceFactory* create() { return new SimpleInstrument(); }
 
     SimpleInstrument();
 
@@ -34,5 +35,7 @@ public:
 
     void processVoice(SimpleInstrumentVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
         unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) override;
+
+    const char * getName() override { return "SIMPL"; }
 };
 

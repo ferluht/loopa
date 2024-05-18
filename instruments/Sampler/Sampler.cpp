@@ -6,70 +6,57 @@
 #include <numeric>
 #include <algorithm>
 
-Sampler::Sampler(const char * name, const char * sample_name_, int8_t note) : PolyInstrument<SamplerState>(name) {
-    sample_name = sample_name_;
-
-    mode = MODE::ADSR;
-
-    base_note = note;
-
-    const_pitch = false;
-
-    sample.load(sample_name);
-
-    base_frequency = sample.getSampleRate() / 2 / M_PI;
+Sampler::Sampler() : PolyInstrument<SamplerState>("Sampler") {
 
     addParameter("PITCH");
     n_voices = addParameter("VOICS", 0.4);
     addParameter("FILTR");
     decay = addParameter("DECAY", 0.15);
 
-    int wf_width = 62;
-
-    computePoints(0, sample.getNumSamplesPerChannel(), 2, 18, wf_width, 7);
+    mode = MODE::ADSR;
 
     addMIDIHandler({SCREENS::TRACK_VIEW}, {MIDI::GENERAL::LOOP_HEADER},
                    {MIDI::UI::TAPE::TRIG}, [this](MData &cmd, Sync &sync) -> void {
-        if (cmd.data2 == 0) return;
-        init_speed *= -1;
-        cmd.status = MIDI::GENERAL::INVALIDATED;
-    });
+                if (cmd.data2 == 0) return;
+                init_speed *= -1;
+                cmd.status = MIDI::GENERAL::INVALIDATED;
+            });
 
     addMIDIHandler({SCREENS::TRACK_VIEW}, {MIDI::GENERAL::LOOP_HEADER+2},
                    {MIDI::UI::TAPE::TRIG}, [this](MData &cmd, Sync &sync) -> void {
-        if (cmd.data2 == 0) return;
-        if (mode == MODE::ONESHOT) mode = MODE::ADSR;
-        else if (mode == MODE::ADSR) mode = MODE::LOOPED;
-        else if (mode == MODE::LOOPED) mode = MODE::ONESHOT;
-        cmd.status = MIDI::GENERAL::INVALIDATED;
-    });
+                if (cmd.data2 == 0) return;
+                if (mode == MODE::ONESHOT) mode = MODE::ADSR;
+                else if (mode == MODE::ADSR) mode = MODE::LOOPED;
+                else if (mode == MODE::LOOPED) mode = MODE::ONESHOT;
+                cmd.status = MIDI::GENERAL::INVALIDATED;
+            });
 
     addMIDIHandler({SCREENS::TRACK_VIEW}, {MIDI::GENERAL::LOOP_HEADER+3},
                    {MIDI::UI::TAPE::TRIG}, [this](MData &cmd, Sync &sync) -> void {
-        if (cmd.data2 == 0) return;
-        instrument_volume += 0.1;
-        if (instrument_volume > 1) instrument_volume = 0;
-        cmd.status = MIDI::GENERAL::INVALIDATED;
-    });
+                if (cmd.data2 == 0) return;
+                instrument_volume += 0.1;
+                if (instrument_volume > 1) instrument_volume = 0;
+                cmd.status = MIDI::GENERAL::INVALIDATED;
+            });
 
     addMIDIHandler({SCREENS::TRACK_VIEW}, {MIDI::GENERAL::CTRL_HEADER},
                    {MIDI::UI::PLAY_BUTTON}, [this](MData &cmd, Sync &sync) -> void {
-        if (cmd.data2 > 0) {
-            this->clear_input = false;
-            for (auto &v : voices) v->disable();
-            voices.back()->enable();
-            sample.clearAudioBuffer();
-            recording = true;
-        } else {
-            this->clear_input = true;
-            voices.back()->disable();
-            computePoints(0, sample.getNumSamplesPerChannel(), 2, 18, 62, 7);
-            recording = false;
-        }
-        cmd.status = MIDI::GENERAL::INVALIDATED;
-    });
+                if (cmd.data2 > 0) {
+                    this->clear_input = false;
+                    for (auto &v : voices) v->disable();
+                    voices.back()->enable();
+                    sample.clearAudioBuffer();
+                    recording = true;
+                } else {
+                    this->clear_input = true;
+                    voices.back()->disable();
+                    computePoints(0, sample.getNumSamplesPerChannel(), 2, 18, 62, 7);
+                    recording = false;
+                }
+                cmd.status = MIDI::GENERAL::INVALIDATED;
+            });
 
-    addDrawHandler({SCREENS::TRACK_VIEW}, [this, wf_width](GFXcanvas1 * screen) -> void {
+    addDrawHandler({SCREENS::TRACK_VIEW}, [this](GFXcanvas1 * screen) -> void {
 
         if (!recording)
             drawWaveform(screen, 0, sample.getNumSamplesPerChannel(), 2, 18, wf_width, 7);
@@ -96,7 +83,7 @@ Sampler::Sampler(const char * name, const char * sample_name_, int8_t note) : Po
 
         screen->setCursor(100, 28);
         screen->print("VOL ");
-        char vol[4];
+        char vol[5];
         sprintf(vol, "%.2f", instrument_volume);
         screen->print(vol);
 
@@ -162,6 +149,16 @@ Sampler::Sampler(const char * name, const char * sample_name_, int8_t note) : Po
 
         cmd.status = MIDI::GENERAL::INVALIDATED;
     });
+}
+
+void Sampler::init(const char * sample_name_, int8_t note) {
+    strcpy(sample_name, sample_name_);
+    base_note = note;
+    const_pitch = false;
+    sample.load(sample_name);
+    base_frequency = sample.getSampleRate() / 2 / M_PI;
+
+    computePoints(0, sample.getNumSamplesPerChannel(), 2, 18, wf_width, 7);
 }
 
 void Sampler::computePoints(int start_sample, int end_sample, int start_x, int start_y, int w, int h) {
@@ -320,4 +317,62 @@ void Sampler::processVoice(SamplerState *voiceState, float *outputBuffer, float 
 
         time += speed * getPhaseIncrement(voiceState->note);// + *pitch);
     }
+}
+
+void Sampler::save(tinyxml2::XMLDocument * xmlDoc, tinyxml2::XMLElement * state) {
+    auto project = xmlDoc->FirstChildElement("LoopaProject");
+
+    const char * root_directory = new char[100];
+    auto pSettings = project->FirstChildElement("ProjectSettings");
+    pSettings->QueryAttribute("root_directory", &root_directory);
+
+    int num_samples;
+    pSettings->QueryAttribute("num_samples", &num_samples);
+    std::string sample_path = root_directory;
+    sample_path += "/" + std::to_string(num_samples) + ".wav";
+    strcpy(sample_name, sample_path.c_str());
+    sample.save(sample_name, WavFileFormat::Wave, -1, -1);
+    pSettings->SetAttribute("num_samples", num_samples+1);
+
+    state->SetAttribute("sample_name", sample_name);
+    state->SetAttribute("playback_start_sample", playback_start_sample);
+    state->SetAttribute("playback_end_sample", playback_end_sample);
+    state->SetAttribute("loop_start_sample", loop_start_sample);
+    state->SetAttribute("loop_end_sample", loop_end_sample);
+    state->SetAttribute("mode", mode);
+    state->SetAttribute("init_speed", init_speed);
+    state->SetAttribute("instrument_volume", instrument_volume);
+    state->SetAttribute("display_name", display_name);
+    state->SetAttribute("base_note", base_note);
+}
+
+void Sampler::load(tinyxml2::XMLElement * state) {
+    const char * sample_name_;
+    state->QueryAttribute("sample_name", &sample_name_);
+    state->QueryAttribute("base_note", &base_note);
+    init(sample_name_, base_note);
+
+    state->QueryAttribute("playback_start_sample", &playback_start_sample);
+    state->QueryAttribute("playback_end_sample", &playback_end_sample);
+    state->QueryAttribute("loop_start_sample", &loop_start_sample);
+    state->QueryAttribute("loop_end_sample", &loop_end_sample);
+    state->QueryIntAttribute("mode", &mode);
+    state->QueryAttribute("init_speed", &init_speed);
+    state->QueryAttribute("instrument_volume", &instrument_volume);
+
+    const char * display_name_;
+    state->QueryAttribute("display_name", &display_name_);
+    strcpy(display_name, display_name_);
+}
+
+void Sampler::setName(const char * name) {
+    strcpy(display_name, name);
+}
+
+const char *Sampler::getName() {
+    return display_name;
+}
+
+namespace {
+    DeviceFactory::AddToRegistry<Sampler> _("Sampler");
 }

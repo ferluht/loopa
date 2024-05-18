@@ -13,16 +13,16 @@ Tape::Tape() : AudioEffect("TAPE") {
     bar_size = bpmToBarSize(120);
 //    setBPM(120);
 
-    click = new SampleKit("CLK");
+    click = new SampleKit();
     click->addSample("../res/metronome/hi_60.wav", 60);
     click->addSample("../res/metronome/lo_61.wav", 61);
     click_on = false;
 
-    master_effects = new Rack("AUDIO FX", Rack::SEQUENTIAL);
+    master_effects = new Rack(Rack::SEQUENTIAL);
     master_effects->add(new Delay());
     master_effects->add(new Plateau());
 //    master_effects->add(new Tanhx());
-    master_effects->add(new DummyAudioFX());
+//    master_effects->add(new DummyAudioFX());
 
     for (int i = 0; i < TAPE_NUM_CHANNELS; i ++) {
         for (int j = 0; j < master_effects->get_size(); j ++)
@@ -58,22 +58,37 @@ Tape::Tape() : AudioEffect("TAPE") {
     active_channel = 0;
     channel_fading_adsrs[active_channel].forcePeak();
 
+    state = PLAY;
+    speedup_adsr.reset();
+    speedup_adsr.set(0.25 + ((double) rand() / (RAND_MAX)) * 0.1,
+                     0.0001, 1.0, 0.25 + ((double) rand() / (RAND_MAX)) * 0.1);
+    speedup_adsr.gateOn();
+
     active_pattern = 0;
 
     addMIDIHandler(0, SCREENS::MAX_SCREENS,
                    MIDI::GENERAL::LOOP_HEADER, MIDI::GENERAL::LOOP_HEADER + 4,
                    MIDI::UI::TAPE::TRIG, MIDI::UI::TAPE::TRIG, [this](MData &cmd, Sync &sync) -> void {
-        if (cmd.data2 == 0) return;
+        if (cmd.data2 == 0) {
+            time_trig_pressed = 0;
+            return;
+        }
         channel_fading_adsrs[active_channel].gateOff();
         active_channel = cmd.status - MIDI::GENERAL::LOOP_HEADER;
         channel_fading_adsrs[active_channel].gateOn();
+        time_trig_pressed++;
     });
 
     addMIDIHandler(0, SCREENS::MAX_SCREENS,
                    MIDI::GENERAL::LOOP_HEADER, MIDI::GENERAL::LOOP_HEADER + 4,
                    MIDI::UI::TAPE::CLEAR, MIDI::UI::TAPE::CLEAR,[this](MData &cmd, Sync &sync) -> void {
         active_channel = cmd.status - MIDI::GENERAL::LOOP_HEADER;
-        if (cmd.data2 > 0) return clear();
+        if (cmd.data2 == 0) {
+            clear();
+            time_clear_pressed = 5;
+            return;
+        }
+        time_clear_pressed = 0;
     });
 
     addMIDIHandler(0, SCREENS::MAX_SCREENS,
@@ -219,7 +234,12 @@ Tape::Tape() : AudioEffect("TAPE") {
             screen->print(std::to_string(active_pattern).c_str());
         }
 
-        screen->setLed(2 + active_channel, 10, 10, 10);
+        if (time_clear_pressed == 0)
+            screen->setLed(2 + active_channel, 10, 10, 10);
+        else {
+            screen->setLed(2 + active_channel, 20, 0, 0);
+            time_clear_pressed --;
+        }
 
         screen->setLed(0,
                        (state == OVERDUB) * 10 * speedup_adsr.get(),
@@ -407,12 +427,15 @@ void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
     int & looper_state = state;
     float ac_begin_position = playheads[active_channel].back().position;
 
+    if (time_trig_pressed > 0) time_trig_pressed++;
+//    if (time_clear_pressed > 0) time_clear_pressed++;
+
     speed = GLOBAL_SPEED;
 
-    float outBufs[TAPE_NUM_CHANNELS][BUF_SIZE * 2] = {0};
-    float input_fading[BUF_SIZE];
-    float speeds[BUF_SIZE];
-    float channel_fading[BUF_SIZE] = {0};
+    float outBufs[TAPE_NUM_CHANNELS][AUDIO_BUF_SIZE * 2] = {0};
+    float input_fading[AUDIO_BUF_SIZE];
+    float speeds[AUDIO_BUF_SIZE];
+    float channel_fading[AUDIO_BUF_SIZE] = {0};
 
     float lsample, rsample;
 
@@ -509,7 +532,7 @@ void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
         }
     }
 
-    float emptybuf[BUF_SIZE * 2];
+    float emptybuf[AUDIO_BUF_SIZE * 2];
     float j = -1;
     for (unsigned int i=0; i<2*nBufferFrames; i+=2 ) {
         emptybuf[i + 0] = 0.0001f * j;
@@ -550,25 +573,62 @@ void Tape::process(float *outputBuffer, float *inputBuffer, unsigned int nBuffer
     }
 }
 
-bool Tape::save(std::string path) {
-    switch (savingprogress) {
-        case 0:
-            wf.setBitDepth(16);
-            wf.setNumChannels(2);
-            wf.setSampleRate(SAMPLERATE);
-            savingprogress = 1;
-            break;
-        case 1:
-            if (wf.setAudioBuffer(audios[active_channel], 2))
-                savingprogress = 2;
-            break;
-        case 2:
-            if (wf.save(path))
-                savingprogress = 3;
-            break;
-        case 3:
-            savingprogress = 0;
-            return true;
+void Tape::save(tinyxml2::XMLDocument *xmlDoc, tinyxml2::XMLElement *state) {
+    auto project = xmlDoc->FirstChildElement("LoopaProject");
+
+    const char * root_directory = new char[100];
+    auto pSettings = project->FirstChildElement("ProjectSettings");
+    pSettings->QueryAttribute("root_directory", &root_directory);
+
+    for (int i = 0; i < TAPE_NUM_CHANNELS; i ++) {
+        int num_samples;
+        pSettings->QueryAttribute("num_samples", &num_samples);
+        std::string sample_path = root_directory;
+        sample_path += "/" + std::to_string(num_samples) + ".wav";
+
+        auto wf = WavFile<float>();
+        wf.setBitDepth(16);
+        wf.setNumChannels(2);
+        wf.setSampleRate(SAMPLERATE);
+        wf.setAudioBuffer(audios[i], 2, -1);
+        wf.save(sample_path, WavFileFormat::Wave, -1, -1);
+        pSettings->SetAttribute("num_samples", num_samples + 1);
+
+        tinyxml2::XMLElement * tapeState = xmlDoc->NewElement("Tape");
+        tapeState->SetAttribute("sample_name", sample_path.c_str());
+        state->InsertEndChild(tapeState);
+
+        for (int j = 0; j < 12; j ++) {
+            tinyxml2::XMLElement *patternState = xmlDoc->NewElement("Pattern");
+            patternState->SetAttribute("l", patternsLoopBounds[j][i].l);
+            patternState->SetAttribute("r", patternsLoopBounds[j][i].r);
+            tapeState->InsertEndChild(patternState);
+        }
     }
-    return false;
+}
+
+void Tape::load(tinyxml2::XMLElement *state) {
+    auto tapeState = state->FirstChildElement();
+    int i = 0;
+    while (tapeState != nullptr) {
+        auto wf = WavFile<float>();
+        const char * sample_name_;
+        tapeState->QueryAttribute("sample_name", &sample_name_);
+        wf.load(sample_name_);
+        wf.getArray(audios[i]);
+
+        tinyxml2::XMLElement *patternState = tapeState->FirstChildElement("Pattern");
+        int j = 0;
+        while (patternState != nullptr) {
+            int l, r;
+            patternState->QueryAttribute("l", &l);
+            patternState->QueryAttribute("r", &r);
+            patternsLoopBounds[j][i].set(l, r);
+            patternState = patternState->NextSiblingElement();
+            j++;
+        }
+
+        tapeState = tapeState->NextSiblingElement();
+        i ++;
+    }
 }

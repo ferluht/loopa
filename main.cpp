@@ -166,8 +166,23 @@ bool checkMidiIn(RtMidiIn * midiin) {
 
 int main( int argc, char *argv[] )
 {
+    init_serial();
+
+
     unsigned int bufferFrames, fs = SAMPLERATE, device = 0, offset = 0;
     daw = new DAW(screen);
+//    screen->fillScreen(0x00);
+//    daw->draw(screen);
+//    screen->fillRect(16, 4, 96, 24, 0);
+//    screen->drawRect(16, 4, 96, 24, 1);
+//    screen->setCursor(32, 20);
+//    screen->setTextSize(2);
+//    screen->print("LOADING...");
+//    for (int i = 0; i < 10; i++) {
+//        process_gui();
+//        SLEEP(100);
+//    }
+//    daw->load();
 
     RtMidiIn midiin;
     midiin.setErrorCallback(&midiErrorCallback);
@@ -195,7 +210,7 @@ int main( int argc, char *argv[] )
 
     dac.showWarnings( false );
 
-    bufferFrames = BUF_SIZE;
+    bufferFrames = AUDIO_BUF_SIZE;
     RtAudio::StreamParameters oParams;
     oParams.nChannels = 2;
     oParams.firstChannel = offset;
@@ -213,10 +228,8 @@ int main( int argc, char *argv[] )
     options.flags = RTAUDIO_HOG_DEVICE;
     options.flags |= RTAUDIO_SCHEDULE_REALTIME;
 
-    init_serial();
-
     int it = 0;
-    const int div = 100;
+    const int div = 66;
     const int midi_refresh_time = 1;
 
     // An error in the openStream() function can be detected either by

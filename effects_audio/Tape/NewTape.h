@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <cmath>
 #include <iostream>
-#include <Effect.h>
+#include <AMG.h>
 #include <WavFile.hpp>
 #include <Utils.hpp>
 #include <chrono>
@@ -20,7 +20,7 @@
 #include <AudioEffects.h>
 
 #define TAPE_NUM_CHANNELS 4
-#define TAPE_MAX_LENGTH_MINUTES 2.5
+#define TAPE_MAX_LENGTH_MINUTES 1
 #define TAPE_MAX_LOOP_SIZE TAPE_MAX_LENGTH_MINUTES*60*SAMPLERATE*2
 
 struct LoopBounds {
@@ -144,10 +144,10 @@ class Tape : public AudioEffect {
 
     int tick_counter = 0;
 
-    bool monitoring = true;
+    int time_trig_pressed = 0;
+    int time_clear_pressed = 0;
 
-    WavFile<float> wf;
-    int savingprogress = 0;
+    bool monitoring = true;
 
     std::atomic<float> amp;
 
@@ -270,8 +270,6 @@ public:
         }
     }
 
-    bool save(std::string path);
-
     void process(float *outputBuffer, float * inputBuffer,
                  unsigned int nBufferFrames, Sync & sync) override;
     float getPosition();
@@ -279,4 +277,7 @@ public:
     float getAmp();
 
     void setBPM(float bpm);
+
+    void save(tinyxml2::XMLDocument * xmlDoc, tinyxml2::XMLElement * state) override;
+    void load(tinyxml2::XMLElement * state) override;
 };

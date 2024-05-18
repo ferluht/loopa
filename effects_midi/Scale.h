@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Effect.h>
+#include <AMG.h>
 
 class Scale : public MIDIEffect {
 
@@ -24,6 +24,7 @@ class Scale : public MIDIEffect {
     void update_note_map();
 
 public:
+    static DeviceFactory* create() { return new Scale(); }
     Scale();
     void midiOut(std::deque<MData> &q, Sync & sync) override;
 };

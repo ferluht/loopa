@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include <Effect.h>
+#include <AMG.h>
 #include "Dattorro.hpp"
 
 class Plateau : public AudioEffect{
 public:
+    static DeviceFactory* create() { return new Plateau(); }
     Plateau();
 
     void process(float *outputBuffer, float * inputBuffer,

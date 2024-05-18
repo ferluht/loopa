@@ -127,7 +127,7 @@ void WavFile<T>::printSummary() const
 
 //=============================================================
 template <class T>
-bool WavFile<T>::setAudioBuffer (std::vector<float>& newBuffer, int numChannels)
+bool WavFile<T>::setAudioBuffer (std::vector<float>& newBuffer, int numChannels, int chunksize)
 {
     int numSamples = (int) newBuffer.size() / numChannels;
 
@@ -145,7 +145,7 @@ bool WavFile<T>::setAudioBuffer (std::vector<float>& newBuffer, int numChannels)
     }
 
     int i;
-    for (i = copied_samples; (i - copied_samples < sabchunksize) && (i < numSamples); i ++)
+    for (i = copied_samples; (i - copied_samples < chunksize || chunksize < 0) && (i < numSamples); i ++)
         for (int k = 0; k < numChannels; k++) {
             samples[k][i] = newBuffer[i * numChannels + k];
         }
@@ -544,11 +544,11 @@ void WavFile<T>::addSampleRateToAiffData (std::vector<uint8_t>& fileData, uint32
 
 //=============================================================
 template <class T>
-bool WavFile<T>::save (std::string filePath, WavFileFormat format)
+bool WavFile<T>::save (std::string filePath, WavFileFormat format, int pchunksize, int wchunksize)
 {
     if (format == WavFileFormat::Wave)
     {
-        return saveToWaveFile (filePath);
+        return saveToWaveFile (filePath, pchunksize, wchunksize);
     }
     else if (format == WavFileFormat::Aiff)
     {
@@ -560,7 +560,7 @@ bool WavFile<T>::save (std::string filePath, WavFileFormat format)
 
 //=============================================================
 template <class T>
-bool WavFile<T>::saveToWaveFile (std::string filePath)
+bool WavFile<T>::saveToWaveFile (std::string filePath, int pchunksize, int wchunksize)
 {
     int32_t dataChunkSize = getNumSamplesPerChannel() * (getNumChannels() * bitDepth / 8);
     int32_t fileSizeInBytes = 4 + 24 + 8 + dataChunkSize;
@@ -603,7 +603,7 @@ bool WavFile<T>::saveToWaveFile (std::string filePath)
     if (prepared_samples < getNumSamplesPerChannel()) {
 
         int i;
-        for (i = prepared_samples; ((i - prepared_samples) < pchunksize) && (i < getNumSamplesPerChannel()); i++) {
+        for (i = prepared_samples; ((i - prepared_samples) < pchunksize || pchunksize == -1) && (i < getNumSamplesPerChannel()); i++) {
             for (int channel = 0; channel < getNumChannels(); channel++) {
                 if (bitDepth == 8) {
                     uint8_t byte = sampleToSingleByte(samples[channel][i]);
@@ -653,7 +653,7 @@ bool WavFile<T>::saveToWaveFile (std::string filePath)
     if (outputFile->is_open())
     {
         int i;
-        for (i = written_bytes; (i - written_bytes < wchunksize) && (i < fileData.size()); i++)
+        for (i = written_bytes; (i - written_bytes < wchunksize || wchunksize == -1) && (i < fileData.size()); i++)
         {
             char value = (char) fileData[i];
             outputFile->write (&value, sizeof (char));
@@ -840,6 +840,14 @@ void WavFile<T>::clearAudioBuffer()
     }
 
     samples.clear();
+}
+
+template <class T>
+void WavFile<T>::getArray(std::vector<T> &audio) {
+    for (int i = 0; i < getNumSamplesPerChannel() && i < audio.size() / getNumChannels(); i++) {
+        for (int j = 0; j < getNumChannels(); j ++)
+            audio[getNumChannels()*i+j] = samples[j][i];
+    }
 }
 
 //=============================================================

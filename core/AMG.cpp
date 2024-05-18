@@ -7,6 +7,12 @@
 float GLOBAL_SPEED = 1.0;
 uint8_t SCREEN_IDX = SCREENS::TAPE_VIEW;
 
+std::unordered_map<DeviceFactory::DEVICE_TYPE, std::unordered_map<std::string, DeviceFactory::create_f *>> & DeviceFactory::registry()
+{
+    static std::unordered_map<DeviceFactory::DEVICE_TYPE, std::unordered_map<std::string, DeviceFactory::create_f *>> impl;
+    return impl;
+}
+
 DeviceWithParameters::DeviceWithParameters(const char *name_) : AMG(name_) {
 
     addMIDIHandler({}, {MIDI::GENERAL::CC_HEADER}, {CC_E1, CC_E2}, [this](MData &cmd, Sync &sync) -> void {

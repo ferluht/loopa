@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Instrument.h"
+#include "AMG.h"
 #include "ADSR.h"
 
 class SingleToneVoiceState : public VoiceState{
@@ -33,8 +33,9 @@ class SingleTone : public PolyInstrument<SingleToneVoiceState> {
     Parameter * interp1, * interp2;
 
 public:
+    static DeviceFactory* create() { return new SingleTone(); }
 
-    SingleTone() : PolyInstrument<SingleToneVoiceState>("SNGLTN") {
+    SingleTone() : PolyInstrument<SingleToneVoiceState>("SingleTone") {
         set_voices(1);
         crossmod = addParameter("XMOD", 0, 1, 0.5, 0.05);
         interp1 = addParameter("I_1", 0, 1, 0.4, 0.05);
@@ -46,4 +47,6 @@ public:
 
     void processVoice(SingleToneVoiceState * voiceState, float *outputBuffer, float * inputBuffer,
                       unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) override;
+
+    const char * getName() override { return "SYNTH"; }
 };

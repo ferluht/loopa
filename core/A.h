@@ -7,7 +7,7 @@
 #include "Sync.h"
 
 #define SAMPLERATE 44100
-#define BUF_SIZE 256
+#define AUDIO_BUF_SIZE 256
 #define PERF_TESTING false
 
 /**

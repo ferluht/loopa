@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "Effect.h"
+#include "AMG.h"
 
 inline float db_to_k(float x) {
     return std::pow(10, x / 20);

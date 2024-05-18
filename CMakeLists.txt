@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7.2)
-project(rpidaw)
+project(loopa)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MACOSX TRUE)
@@ -30,6 +30,7 @@ include_directories(3rdparty/nanogui/include)
 include_directories(3rdparty/nanogui/ext/eigen)
 include_directories(3rdparty/nanogui/ext/glfw/include)
 include_directories(3rdparty/nanogui/ext/nanovg/src)
+include_directories(3rdparty/tinyxml2)
 
 set(LIBSAMPLERATE_TESTS OFF)
 set(LIBSAMPLERATE_EXAMPLES OFF)
@@ -47,7 +48,7 @@ endif()
 #FIND_LIBRARY(brcmEGL NAMES brcmEGL)
 #FIND_LIBRARY(brcmGLESv2 NAMES brcmGLESv2)
 
-add_executable(rpidaw
+add_executable(loopa
         main.cpp
         DawProcessing.cpp
         effects_audio/Limiter/SoftClipper.cpp
@@ -79,15 +80,16 @@ add_executable(rpidaw
         3rdparty/Adafruit-GFX-offscreen/Adafruit_GFX.cpp
         utils/SerialPort.cpp
 #        effects_audio/LoopMatrix/LoopMatrix.cpp
-        effects_audio/Tanhx/Tanhx.cpp)
+        effects_audio/Tanhx/Tanhx.cpp
+        3rdparty/tinyxml2/tinyxml2.cpp)
 
 set(CMAKE_CXX_FLAGS "-O3 -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wno-cpp") # -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wall -Wextra")
 #target_compile_options(rpidaw PRIVATE -Ofast)
 
 if (MACOSX)
     set(CMAKE_CXX_FLAGS "-O0 -Wno-cpp")
-    target_link_libraries(rpidaw rtaudio rtmidi samplerate)
+    target_link_libraries(loopa rtaudio rtmidi samplerate)
 else()
     set(CMAKE_CXX_FLAGS "-O3 -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wno-cpp")
-    target_link_libraries(rpidaw rtaudio rtmidi samplerate wiringPi)
+    target_link_libraries(loopa rtaudio rtmidi samplerate wiringPi)
 endif()

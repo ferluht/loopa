@@ -64,7 +64,7 @@ public:
     /** Saves an audio file to a given file path.
      * @Returns true if the file was successfully saved
      */
-    bool save (std::string filePath, WavFileFormat format = WavFileFormat::Wave);
+    bool save (std::string filePath, WavFileFormat format = WavFileFormat::Wave, int pchunksize=500, int wchunksize=200);
 
     //=============================================================
     /** @Returns the sample rate */
@@ -96,7 +96,7 @@ public:
     /** Set the audio buffer for this AudioFile by copying samples from another buffer.
      * @Returns true if the buffer was copied successfully.
      */
-    bool setAudioBuffer (std::vector<float>& newBuffer, int numChannels);
+    bool setAudioBuffer (std::vector<float>& newBuffer, int numChannels, int chunksize=500);
 
     bool appendAudioBuffer (const float * newBuffer, unsigned int numSamples, int numChannels);
 
@@ -131,16 +131,15 @@ public:
 
     void clearAudioBuffer();
 
+    void getArray(std::vector<T> &audio);
+
 private:
 
-    const int sabchunksize = 500;
     int copied_samples = 0;
 
     std::vector<uint8_t> fileData;
     int prepared_samples = 0;
     int written_bytes = 0;
-    const int pchunksize = 500;
-    const int wchunksize = 200;
     std::ofstream * outputFile;
 
     //=============================================================
@@ -156,7 +155,7 @@ private:
     bool decodeAiffFile (std::vector<uint8_t>& fileData);
 
     //=============================================================
-    bool saveToWaveFile (std::string filePath);
+    bool saveToWaveFile (std::string filePath, int pchunksize=500, int wchunksize=200);
     bool saveToAiffFile (std::string filePath);
 
     //=============================================================

@@ -6,7 +6,7 @@
 
 #include "WavFile.hpp"
 #include "ADSR.h"
-#include "Instrument.h"
+#include "AMG.h"
 
 
 class SamplerState : public VoiceState{
@@ -43,10 +43,13 @@ class Sampler : public PolyInstrument<SamplerState> {
         ONESHOT,
         ADSR,
         LOOPED
-    } mode;
+    };
+
+    int mode;
 
     WavFile<float> sample;
-    const char * sample_name;
+    char sample_name[100];
+    char display_name[100];
 
 //    GUI::TapButton * trig;
 //    GUI::Encoder * pitch;
@@ -65,6 +68,8 @@ class Sampler : public PolyInstrument<SamplerState> {
     int loop_start_sample = 70000;
     int loop_end_sample = 170000;
 
+    const int wf_width = 62;
+
     bool encoders_loop_mode = false;
 
 //    GUI::Plot<GUI::TimeGraph> * plot;
@@ -74,8 +79,9 @@ class Sampler : public PolyInstrument<SamplerState> {
     void drawWaveform(GFXcanvas1 * screen, int start_sample, int end_sample, int start_x, int start_y, int w, int h);
 
 public:
+    static DeviceFactory* create() { return new Sampler(); }
 
-    Sampler(const char * name, const char * sample_name_, int8_t note);
+    Sampler();
 
     static float InterpolateCubic(float x0, float x1, float x2, float x3, float t);
     static float InterpolateHermite4pt3oX(float x0, float x1, float x2, float x3, float t);
@@ -87,4 +93,10 @@ public:
     void processVoice(SamplerState * voiceState, float *outputBuffer, float * inputBuffer,
                       unsigned int nBufferFrames, Sync & sync, uint8_t nvoices) override ;
 
+    void save(tinyxml2::XMLDocument * xmlDoc, tinyxml2::XMLElement * state) override;
+    void load(tinyxml2::XMLElement * state) override;
+    void init(const char * sample_name_, int8_t note);
+
+    void setName(const char * name);
+    const char * getName() override;
 };
